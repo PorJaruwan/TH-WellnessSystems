@@ -1,0 +1,22 @@
+{"asctime": "2025-12-07 17:29:02,384", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /"}
+{"asctime": "2025-12-07 17:29:02,385", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET / in 0.00s"}
+{"asctime": "2025-12-07 17:29:02,472", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /favicon.ico"}
+{"asctime": "2025-12-07 17:29:02,473", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=404 for GET /favicon.ico in 0.00s"}
+{"asctime": "2025-12-07 17:29:43,685", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2025-12-07 17:29:43,686", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.00s"}
+{"asctime": "2025-12-07 17:29:43,977", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2025-12-07 17:29:44,039", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.06s"}
+{"asctime": "2025-12-07 17:31:40,047", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/companies/search-by-all"}
+{"asctime": "2025-12-07 17:31:41,344", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/companies/search-by-all in 1.30s"}
+{"asctime": "2025-12-07 17:35:40,443", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/bookings/patients/search"}
+{"asctime": "2025-12-07 17:35:41,562", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/bookings/patients/search in 1.12s"}
+{"asctime": "2025-12-07 17:36:11,501", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/bookings/patients/search"}
+{"asctime": "2025-12-07 17:36:11,629", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/bookings/patients/search in 0.13s"}
+{"asctime": "2025-12-07 17:36:23,869", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/bookings/patients/search"}
+{"asctime": "2025-12-07 17:36:24,005", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/bookings/patients/search in 0.14s"}
+{"asctime": "2025-12-07 17:36:37,756", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/bookings/patients/search"}
+{"asctime": "2025-12-07 17:36:37,890", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/bookings/patients/search in 0.13s"}
+{"asctime": "2025-12-07 17:36:52,758", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/bookings/patients/search"}
+{"asctime": "2025-12-07 17:36:52,894", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/bookings/patients/search in 0.14s"}
+{"asctime": "2025-12-07 17:37:09,539", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/bookings/patients/search"}
+{"asctime": "2025-12-07 17:37:09,674", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/bookings/patients/search in 0.13s"}

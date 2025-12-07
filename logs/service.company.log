@@ -1,0 +1,2 @@
+{"asctime": "2025-12-07 17:31:40,047", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2025-12-07 17:31:41,343", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 4 companies"}
