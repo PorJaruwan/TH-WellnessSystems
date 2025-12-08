@@ -52,5 +52,7 @@ uvicorn>=0.30
 pydantic>=2.6
 pydantic-settings>=2.2
 python-multipart>=0.0.9
-supabase>=2.4.0   
+supabase>=2.4.0  
+python-jose==3.3.0
+
 
