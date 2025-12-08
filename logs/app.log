@@ -23,3 +23,39 @@
 {"asctime": "2025-12-07 17:36:52,894", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/bookings/patients/search in 0.14s"}
 {"asctime": "2025-12-07 17:37:09,539", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/bookings/patients/search"}
 {"asctime": "2025-12-07 17:37:09,674", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/bookings/patients/search in 0.13s"}
+{"asctime": "2025-12-07 21:42:35,980", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2025-12-07 21:42:35,981", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.00s"}
+{"asctime": "2025-12-07 21:42:36,061", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2025-12-07 21:42:36,119", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.06s"}
+{"asctime": "2025-12-07 21:45:38,217", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2025-12-07 21:45:38,218", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.00s"}
+{"asctime": "2025-12-07 21:45:38,245", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2025-12-07 21:45:38,246", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.00s"}
+{"asctime": "2025-12-07 21:45:39,963", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2025-12-07 21:45:39,963", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.00s"}
+{"asctime": "2025-12-07 21:45:39,994", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2025-12-07 21:45:39,996", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.00s"}
+{"asctime": "2025-12-07 21:45:40,603", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2025-12-07 21:45:40,603", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.00s"}
+{"asctime": "2025-12-07 21:45:40,635", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2025-12-07 21:45:40,638", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.00s"}
+{"asctime": "2025-12-07 21:45:40,991", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2025-12-07 21:45:40,991", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.00s"}
+{"asctime": "2025-12-07 21:45:41,007", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2025-12-07 21:45:41,009", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.00s"}
+{"asctime": "2025-12-07 21:45:41,163", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2025-12-07 21:45:41,163", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.00s"}
+{"asctime": "2025-12-07 21:45:41,372", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2025-12-07 21:45:41,374", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.00s"}
+{"asctime": "2025-12-08 13:08:27,676", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2025-12-08 13:08:27,678", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.00s"}
+{"asctime": "2025-12-08 13:08:27,721", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2025-12-08 13:08:27,773", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.05s"}
+{"asctime": "2025-12-08 18:30:58,518", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2025-12-08 18:30:58,519", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.00s"}
+{"asctime": "2025-12-08 18:30:58,566", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2025-12-08 18:30:58,615", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.05s"}
+{"asctime": "2025-12-08 18:31:00,740", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2025-12-08 18:31:00,741", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.00s"}
+{"asctime": "2025-12-08 18:31:00,772", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2025-12-08 18:31:00,775", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.00s"}

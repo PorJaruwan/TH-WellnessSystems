@@ -23,11 +23,11 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     JWT_SECRET_KEY: str | None = None
 
-    # --- Firebase ---
-    FIREBASE_CREDENTIALS_PATH: str | None = None
-    FIREBASE_EMAIL: EmailStr | None = None
-    FIREBASE_PASSWORD: SecretStr | None = None
-    FIREBASE_WEB_API_KEY: str | None = None
+    # # --- Firebase ---
+    # FIREBASE_CREDENTIALS_PATH: str | None = None
+    # FIREBASE_EMAIL: EmailStr | None = None
+    # FIREBASE_PASSWORD: SecretStr | None = None
+    # FIREBASE_WEB_API_KEY: str | None = None
 
 @lru_cache()   # ✅ ต้องมีวงเล็บ
 def get_settings() -> Settings:

@@ -5,10 +5,10 @@ from fastapi import Response
 from datetime import date
 import json
 
-# ✅ # authentication by kanchitk
-from app.api.v1.users.auth_firebase import router as user_router
-app = FastAPI(title="FastAPI + Firebase Auth")
-app.include_router(user_router)
+# # ✅ # authentication by kanchitk
+# from app.api.v1.users.auth_firebase import router as user_router
+# app = FastAPI(title="FastAPI + Firebase Auth")
+# app.include_router(user_router)
 
 # ✅ ติดตั้ง FastAPI และ Uvicorn by por 
 from fastapi.middleware.cors import CORSMiddleware
@@ -82,7 +82,7 @@ from app.api.v1.staff import (
 
 from app.api.v1.users import (
     #user & role settings
-    auth_firebase, user_profiles, roles, permissions, groups, user_roles, user_groups, role_permissions, protected_routes, group_roles, check_access, 
+    user_profiles, roles, permissions, groups, user_roles, user_groups, role_permissions, protected_routes, group_roles, check_access, 
     auth_controller, resend_confirm,
     #authenticate
     #auth, users, user_password_resets, user_sessions, user_activity_logs, user_audit_logs
@@ -158,7 +158,6 @@ app.include_router(group_roles.router)
 app.include_router(role_permissions.router)
 app.include_router(protected_routes.router)
 app.include_router(check_access.router)
-app.include_router(auth_firebase.router)
 app.include_router(auth_controller.router)
 app.include_router(resend_confirm.router)
 
