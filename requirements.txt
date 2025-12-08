@@ -46,5 +46,11 @@ websockets==14.2
 yarl==1.20.0
 python-json-logger>=2.0.7
 firebase-admin
+
+fastapi>=0.115
+uvicorn>=0.30
+pydantic>=2.6
 pydantic-settings>=2.2
+python-multipart>=0.0.9
+supabase>=2.4.0   
 
