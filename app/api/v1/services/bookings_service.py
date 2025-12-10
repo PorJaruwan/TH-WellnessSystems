@@ -229,7 +229,7 @@ async def get_booking_grid_service(
         .eq("building_id", str(building_id))
         .eq("is_active", True)
         .order("is_default", desc=True)
-        .order("created_at", asc=True)
+        .order("created_at")
         .limit(1)
         .execute()
     )
@@ -660,7 +660,7 @@ async def search_bookings_service(
     res = (
         query
         .order("booking_date", desc=True)
-        .order("start_time", asc=True)
+        .order("start_time")
         .range(from_idx, to_idx)
         .execute()
     )
