@@ -1,0 +1,980 @@
+{
+    "date": "2025-12-01",
+    "time_from": "09:00",
+    "time_to": "17:00",
+    "slot_min": 30,
+    "rooms": [
+        {
+            "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+            "room_name": "A1"
+        },
+        {
+            "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+            "room_name": "A1"
+        },
+        {
+            "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+            "room_name": "อาคารเอ - ห้อง 101"
+        },
+        {
+            "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+            "room_name": "อาคารเอ - ห้อง 102"
+        },
+        {
+            "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+            "room_name": "เอ3"
+        },
+        {
+            "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+            "room_name": "เอ4"
+        }
+    ],
+    "timeslots": [
+        {
+            "time": "09:00",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "09:30",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "10:00",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "10:30",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "11:00",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "11:30",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "12:00",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "12:30",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "13:00",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "13:30",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "14:00",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "14:30",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "15:00",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "15:30",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "16:00",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        },
+        {
+            "time": "16:30",
+            "slots": [
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f1",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f2",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf7",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "14176cc5-4ed0-4527-8fb3-e4eaab1bbdf8",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f3",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                },
+                {
+                    "room_id": "f9d1bfcd-7b95-4beb-9877-a656f065a2f4",
+                    "status": "available",
+                    "booking_id": null,
+                    "patient_name": null,
+                    "doctor_name": null,
+                    "service_name": null,
+                    "status_label": "Available"
+                }
+            ]
+        }
+    ],
+    "page": 1,
+    "total_pages": 2
+}

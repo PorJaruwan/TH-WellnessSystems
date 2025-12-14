@@ -3,9 +3,7 @@
 from datetime import date, time, datetime, timedelta
 from typing import List, Dict
 from uuid import UUID
-
 from fastapi import HTTPException
-
 from app.services.supabase_client import supabase
 
 from app.api.v1.models.bookings_model import (
@@ -31,6 +29,9 @@ from app.api.v1.models.bookings_model import (
     BookingListItem,
     AvailabilityResponse,
     AvailableSlot,
+    BookingGridFlatItem,
+    BookingGridFlatData,
+    BookingGridFlatResponse,
 )
 
 
@@ -381,20 +382,82 @@ async def get_booking_grid_service(
                         status_label="Available",
                     )
                 )
-        timeslots_out.append(
-            BookingGridTimeRow(time=_format_time(t), slots=slots_row)
-        )
+            # ... (โค้ดเดิมจนได้ rooms_out, booking_map, time_points) ...
 
-    return BookingGridResponse(
+    # สร้าง map room_id -> room_name เพื่อใส่ในแต่ละ item (FlutterFlow ใช้ง่าย)
+    room_name_map = {str(r.room_id): r.room_name for r in rooms_out}
+
+    items_out: List[BookingGridFlatItem] = []
+
+    for t in time_points:
+        t_str = _format_time(t)
+        for room in rooms_out:
+            key = (str(room.room_id), t)
+            b_row = booking_map.get(key)
+
+            if b_row:
+                status = b_row["status"]
+                items_out.append(
+                    BookingGridFlatItem(
+                        time=t_str,
+                        room_id=room.room_id,
+                        room_name=room.room_name,
+                        status=status,
+                        status_label=status.replace("_", " ").title(),
+                        booking_id=b_row["booking_id"],
+                        patient_name=b_row["patient_name"],
+                        doctor_name=b_row["doctor_name"],
+                        service_name=b_row["service_name"],
+                    )
+                )
+            else:
+                items_out.append(
+                    BookingGridFlatItem(
+                        time=t_str,
+                        room_id=room.room_id,
+                        room_name=room.room_name,
+                        status="available",
+                        status_label="Available",
+                        booking_id=None,
+                        patient_name=None,
+                        doctor_name=None,
+                        service_name=None,
+                    )
+                )
+
+    data = BookingGridFlatData(
         date=booking_date,
         time_from=_format_time(time_from),
         time_to=_format_time(time_to),
         slot_min=slot_min,
         rooms=rooms_out,
-        timeslots=timeslots_out,
         page=page,
         total_pages=total_pages,
+        total=len(items_out),
+        items=items_out,
     )
+
+    return BookingGridFlatResponse(
+        status="success",
+        message="Data retrieved successfully.",
+        data=data,
+    )
+
+
+    #     timeslots_out.append(
+    #         BookingGridTimeRow(time=_format_time(t), slots=slots_row)
+    #     )
+
+    # return BookingGridResponse(
+    #     date=booking_date,
+    #     time_from=_format_time(time_from),
+    #     time_to=_format_time(time_to),
+    #     slot_min=slot_min,
+    #     rooms=rooms_out,
+    #     timeslots=timeslots_out,
+    #     page=page,
+    #     total_pages=total_pages,
+    # )
 
 
 # ---------- Booking CRUD / Status / History ----------

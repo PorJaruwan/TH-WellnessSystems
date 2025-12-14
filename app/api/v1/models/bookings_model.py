@@ -1,9 +1,10 @@
+
 # app/models/booking_models.py
-from pydantic import BaseModel, Field
 from datetime import date
 from typing import List, Optional
 from uuid import UUID
 from pydantic import BaseModel
+
 
 # ---------- Lookup Models ----------
 
@@ -188,3 +189,37 @@ class AvailabilityResponse(BaseModel):
     resource_track_id: UUID
     date: date
     available_slots: List[AvailableSlot]
+
+# ---------- เพิ่มท้ายไฟล์ ----------
+class BookingGridFlatItem(BaseModel):
+    time: str                        # "HH:MM"
+    room_id: UUID
+    room_name: str
+
+    status: str
+    status_label: Optional[str] = None
+
+    booking_id: Optional[UUID] = None
+    patient_name: Optional[str] = None
+    doctor_name: Optional[str] = None
+    service_name: Optional[str] = None
+
+
+class BookingGridFlatData(BaseModel):
+    date: date
+    time_from: str
+    time_to: str
+    slot_min: int
+
+    page: int
+    total_pages: int
+    total: int                        # จำนวน items ทั้งหมดในหน้านี้
+
+    rooms: List[BookingGridRoom]      # ใช้ของเดิมได้เลย
+    items: List[BookingGridFlatItem]
+
+
+class BookingGridFlatResponse(BaseModel):
+    status: str
+    message: str
+    data: BookingGridFlatData

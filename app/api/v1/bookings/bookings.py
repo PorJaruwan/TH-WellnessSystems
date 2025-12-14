@@ -19,6 +19,7 @@ from app.api.v1.models.bookings_model import (
     BookingHistoryResponse,
     BookingSearchResponse,
     AvailabilityResponse,
+    BookingGridFlatResponse,
 )
 
 from app.api.v1.services.bookings_service import (
@@ -95,8 +96,7 @@ async def get_rooms(
 
 
 # ---------- Booking Grid ----------
-
-@router.get("/booking-grid", response_model=BookingGridResponse)
+@router.get("/booking-grid", response_model=BookingGridFlatResponse)
 async def get_booking_grid(
     date_: date = Query(..., alias="date"),
     company_code: str = Query(...),
@@ -113,6 +113,25 @@ async def get_booking_grid(
         view_mode=view_mode,
         page=page,
     )
+
+
+# @router.get("/booking-grid", response_model=BookingGridResponse)
+# async def get_booking_grid(
+#     date_: date = Query(..., alias="date"),
+#     company_code: str = Query(...),
+#     location_id: UUID = Query(...),
+#     building_id: UUID = Query(...),
+#     view_mode: str = Query("full", regex="^(full|am|pm)$"),
+#     page: int = Query(1, ge=1),
+# ):
+#     return await get_booking_grid_service(
+#         booking_date=date_,
+#         company_code=company_code,
+#         location_id=location_id,
+#         building_id=building_id,
+#         view_mode=view_mode,
+#         page=page,
+#     )
 
 
 # ---------- Booking CRUD ----------
