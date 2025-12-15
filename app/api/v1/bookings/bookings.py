@@ -2,7 +2,7 @@
 
 from datetime import date
 from uuid import UUID
-
+from typing import Union
 from fastapi import APIRouter, Query, Body
 from app.utils.ResponseHandler import ResponseHandler, ResponseCode, UnicodeJSONResponse
 
@@ -96,7 +96,13 @@ async def get_rooms(
 
 
 # ---------- Booking Grid ----------
-@router.get("/booking-grid", response_model=BookingGridFlatResponse)
+@router.get(
+    "/booking-grid",
+    response_model=Union[
+        BookingGridResponse,        # แบบเดิม
+        BookingGridFlatResponse     # แบบใหม่
+    ],
+)
 async def get_booking_grid(
     date_: date = Query(..., alias="date"),
     company_code: str = Query(...),
@@ -104,6 +110,7 @@ async def get_booking_grid(
     building_id: UUID = Query(...),
     view_mode: str = Query("full", regex="^(full|am|pm)$"),
     page: int = Query(1, ge=1),
+    format: str = Query("grid", regex="^(grid|flat)$"),  # 👈 เพิ่ม
 ):
     return await get_booking_grid_service(
         booking_date=date_,
@@ -112,6 +119,7 @@ async def get_booking_grid(
         building_id=building_id,
         view_mode=view_mode,
         page=page,
+        format=format,   # 👈 ส่งต่อ
     )
 
 
