@@ -1,10 +1,9 @@
-
 # app/models/booking_models.py
+from pydantic import BaseModel, Field
 from datetime import date
 from typing import List, Optional
 from uuid import UUID
 from pydantic import BaseModel
-
 
 # ---------- Lookup Models ----------
 
@@ -84,6 +83,74 @@ class BookingGridResponse(BaseModel):
     timeslots: List[BookingGridTimeRow]
     page: int
     total_pages: int
+
+
+# ---------- Booking Grid (Flat) ----------
+
+class BookingGridFlatItem(BaseModel):
+    time: str
+    room_id: UUID
+    room_name: str
+    status: str
+    status_label: str
+    booking_id: Optional[UUID] = None
+    patient_name: Optional[str] = None
+    doctor_name: Optional[str] = None
+    service_name: Optional[str] = None
+
+
+class BookingGridFlatData(BaseModel):
+    date: date
+    time_from: str
+    time_to: str
+    slot_min: int
+    rooms: List[BookingGridRoom]
+    page: int
+    total_pages: int
+    total: int
+    items: List[BookingGridFlatItem]
+
+
+class BookingGridFlatResponse(BaseModel):
+    status: str = "success"
+    data: BookingGridFlatData
+
+
+# ---------- Booking Grid (Columns) ----------
+
+class BookingGridColumn(BaseModel):
+    col: int
+    room_id: Optional[UUID] = None
+    room_name: Optional[str] = None
+
+
+class BookingGridCell(BaseModel):
+    room_id: Optional[UUID] = None
+    status: str
+    status_label: Optional[str] = None
+    booking_id: Optional[UUID] = None
+    patient_name: Optional[str] = None
+    doctor_name: Optional[str] = None
+    service_name: Optional[str] = None
+
+
+class BookingGridColumnsRow(BaseModel):
+    time: str
+
+    class Config:
+        extra = "allow"  # ✅ allow dynamic fields col1..colN
+
+
+class BookingGridColumnsResponse(BaseModel):
+    date: date
+    time_from: str
+    time_to: str
+    slot_min: int
+    page: int
+    total_pages: int
+    columns: List[BookingGridColumn]
+    rows: List[BookingGridColumnsRow]
+
 
 # ---------- Booking CRUD / Detail / Status ----------
 class BookingCreate(BaseModel):
@@ -189,37 +256,3 @@ class AvailabilityResponse(BaseModel):
     resource_track_id: UUID
     date: date
     available_slots: List[AvailableSlot]
-
-# ---------- เพิ่มท้ายไฟล์ ----------
-class BookingGridFlatItem(BaseModel):
-    time: str                        # "HH:MM"
-    room_id: UUID
-    room_name: str
-
-    status: str
-    status_label: Optional[str] = None
-
-    booking_id: Optional[UUID] = None
-    patient_name: Optional[str] = None
-    doctor_name: Optional[str] = None
-    service_name: Optional[str] = None
-
-
-class BookingGridFlatData(BaseModel):
-    date: date
-    time_from: str
-    time_to: str
-    slot_min: int
-
-    page: int
-    total_pages: int
-    total: int                        # จำนวน items ทั้งหมดในหน้านี้
-
-    rooms: List[BookingGridRoom]      # ใช้ของเดิมได้เลย
-    items: List[BookingGridFlatItem]
-
-
-class BookingGridFlatResponse(BaseModel):
-    status: str
-    message: str
-    data: BookingGridFlatData

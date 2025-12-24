@@ -32,6 +32,10 @@ from app.api.v1.models.bookings_model import (
     BookingGridFlatItem,
     BookingGridFlatData,
     BookingGridFlatResponse,
+    BookingGridColumnsResponse,
+    BookingGridColumn,
+    BookingGridCell,
+    BookingGridColumnsRow,
 )
 
 
@@ -50,6 +54,22 @@ def _time_range(start: time, end: time, slot_min: int) -> List[time]:
 
 def _format_time(t: time) -> str:
     return t.strftime("%H:%M")
+
+
+def _status_label(status: str) -> str:
+    s = (status or "").strip().lower()
+    return {
+        "pending": "Pending",
+        "booked": "Booked",
+        "in_progress": "In Progress",
+        "completed": "Completed",
+        "done": "Done",
+        "no_show": "No Show",
+        "cancelled": "Cancelled",
+        "available": "Available",
+        "locked": "Lock",
+        "closed": "Closed",
+    }.get(s, s.replace("_", " ").title())
 
 
 def _handle_supabase_error(res, context: str):
@@ -220,7 +240,8 @@ async def get_booking_grid_service(
     view_mode: str = "full",
     page: int = 1,
     format: str = "grid",
-) -> Union[BookingGridResponse, BookingGridFlatResponse]:
+    columns: int | None = None,
+) -> Union[BookingGridResponse, BookingGridFlatResponse, BookingGridColumnsResponse]:
     # 1) max_columns จาก booking_view_config
     cfg_res = (
         supabase.table("booking_view_config")
@@ -237,6 +258,8 @@ async def get_booking_grid_service(
     _handle_supabase_error(cfg_res, "booking_view_config")
     cfg_row = (cfg_res.data or [None])[0]
     max_columns = cfg_row["max_columns"] if cfg_row and cfg_row.get("max_columns") else 5
+    # ✅ parameter columns มาก่อน ถ้ามี
+    max_columns = columns or max_columns
 
     # 2) exception ของวันนั้น
     exc_res = (
@@ -343,12 +366,69 @@ async def get_booking_grid_service(
 
     booking_map: Dict[tuple, dict] = {}
     for row in rows:
+        room_id = str(row["room_id"])
         start_t = time.fromisoformat(row["start_time"])
-        booking_map[(str(row["room_id"]), start_t)] = row
+        end_t = time.fromisoformat(row["end_time"])
+
+        # fill every slot between start_time (inclusive) and end_time (exclusive)
+        cur_dt = datetime.combine(date.today(), start_t)
+        end_dt = datetime.combine(date.today(), end_t)
+        step = timedelta(minutes=slot_min)
+        while cur_dt < end_dt:
+            booking_map[(room_id, cur_dt.time())] = row
+            cur_dt += step
 
     time_points = _time_range(time_from, time_to, slot_min)
 
     # ✅ 6) เลือกรูปแบบ response
+    if format == "columns":
+        # header meta
+        columns_meta: List[BookingGridColumn] = [
+            BookingGridColumn(col=i + 1, room_id=r.room_id, room_name=r.room_name)
+            for i, r in enumerate(rooms_out)
+        ]
+
+        rows_out: List[BookingGridColumnsRow] = []
+        for t in time_points:
+            row_dict = {"time": _format_time(t)}
+
+            for i, room in enumerate(rooms_out, start=1):
+                key = f"col{i}"
+                b_row = booking_map.get((str(room.room_id), t))
+
+                if b_row:
+                    status = b_row["status"]
+                    cell = BookingGridCell(
+                        room_id=room.room_id,
+                        status=status,
+                        status_label=_status_label(status),
+                        booking_id=b_row["booking_id"],
+                        patient_name=b_row.get("patient_name"),
+                        doctor_name=b_row.get("doctor_name"),
+                        service_name=b_row.get("service_name"),
+                    )
+                else:
+                    cell = BookingGridCell(
+                        room_id=room.room_id,
+                        status="available",
+                        status_label=_status_label("available"),
+                    )
+
+                row_dict[key] = cell.dict()
+
+            rows_out.append(BookingGridColumnsRow(**row_dict))
+
+        return BookingGridColumnsResponse(
+            date=booking_date,
+            time_from=_format_time(time_from),
+            time_to=_format_time(time_to),
+            slot_min=slot_min,
+            page=page,
+            total_pages=total_pages,
+            columns=columns_meta,
+            rows=rows_out,
+        )
+
     if format == "grid":
         timeslots_out: List[BookingGridTimeRow] = []
 
@@ -368,7 +448,7 @@ async def get_booking_grid_service(
                             patient_name=b_row["patient_name"],
                             doctor_name=b_row["doctor_name"],
                             service_name=b_row["service_name"],
-                            status_label=status.replace("_", " ").title(),
+                            status_label=_status_label(status),
                         )
                     )
                 else:
@@ -416,7 +496,7 @@ async def get_booking_grid_service(
                         room_id=room.room_id,
                         room_name=room.room_name,
                         status=status,
-                        status_label=status.replace("_", " ").title(),
+                        status_label=_status_label(status),
                         booking_id=b_row["booking_id"],
                         patient_name=b_row["patient_name"],
                         doctor_name=b_row["doctor_name"],
@@ -1306,7 +1386,7 @@ async def get_resource_availability_service(
 #                         patient_name=b_row["patient_name"],
 #                         doctor_name=b_row["doctor_name"],
 #                         service_name=b_row["service_name"],
-#                         status_label=status.replace("_", " ").title(),
+#                         status_label=_status_label(status),
 #                     )
 #                 )
 #             else:

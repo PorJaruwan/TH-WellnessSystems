@@ -111,3 +111,9 @@
 {"asctime": "2025-12-15 19:44:49,552", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.05s"}
 {"asctime": "2025-12-15 19:47:21,692", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /bookings/booking-grid"}
 {"asctime": "2025-12-15 19:47:23,519", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /bookings/booking-grid in 1.83s"}
+{"asctime": "2025-12-24 14:20:45,550", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2025-12-24 14:20:45,551", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.00s"}
+{"asctime": "2025-12-24 14:20:45,774", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2025-12-24 14:20:45,829", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.06s"}
+{"asctime": "2025-12-24 14:23:50,427", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/bookings/booking-grid"}
+{"asctime": "2025-12-24 14:23:52,482", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/bookings/booking-grid in 2.05s"}
