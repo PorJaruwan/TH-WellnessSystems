@@ -16,6 +16,8 @@ def get_all_patients() -> List[dict]:
     res = supabase.table("patients").select("*").order("id", desc=True).execute()
     return res.data or []
 
+def get_patient_by_id(patient_id: UUID):
+    return supabase.table("patients").select("*").eq("id", str(patient_id)).execute()
 
 def get_patient_by_name(find_name: str, status: str) -> List[dict]:
     headers = {
