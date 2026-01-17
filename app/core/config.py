@@ -18,10 +18,16 @@ class Settings(BaseSettings):
     SUPABASE_ANON_KEY: str | None = None
     SUPABASE_KEY: str
 
+
     # --- Database / App ---
     DATABASE_URL: str | None = None
     LOG_LEVEL: str = "INFO"
     JWT_SECRET_KEY: str | None = None
+
+
+    # --- Database SSL ---
+    SSL_MODE: str = "require"  # require | verify | disable
+
 
     # # --- Firebase ---kanchitk-2025-08-12
     # FIREBASE_CREDENTIALS_PATH: str | None = None

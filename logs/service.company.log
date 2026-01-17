@@ -66,3 +66,11 @@
 {"asctime": "2026-01-15 15:15:43,717", "levelname": "WARNING", "name": "service.company", "message": "\u26a0\ufe0f Cannot delete. Company not found: LNV-02"}
 {"asctime": "2026-01-15 15:15:52,510", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [DELETE] Delete company: LNV-03"}
 {"asctime": "2026-01-15 15:15:52,816", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company deleted: LNV-03"}
+{"asctime": "2026-01-17 17:19:46,279", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [POST] Create company request received: string"}
+{"asctime": "2026-01-17 17:19:47,025", "levelname": "ERROR", "name": "service.company", "message": "\u274c Exception in create_company: {'code': '23514', 'details': 'Failing row contains (string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, 0.00, string, t, t, 2026-01-17 10:19:47.177229+00, string, 2026-01-17 10:19:47.177229+00, string).', 'hint': None, 'message': 'new row for relation \"companies\" violates check constraint \"ckc_company_type_companies\"'}"}
+{"asctime": "2026-01-17 17:19:56,203", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2026-01-17 17:19:56,359", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 2 companies"}
+{"asctime": "2026-01-17 17:35:24,436", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2026-01-17 17:35:26,241", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 2 companies"}
+{"asctime": "2026-01-17 20:23:33,079", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2026-01-17 20:23:33,686", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 2 companies"}
