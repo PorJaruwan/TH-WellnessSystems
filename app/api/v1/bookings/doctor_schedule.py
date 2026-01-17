@@ -12,15 +12,15 @@ from fastapi.encoders import jsonable_encoder
 from app.api.v1.models.doctor_schedule_model import ScheduleRequest, ScheduleResponse
 
 router = APIRouter(
-    prefix="/api/v1/bookings/doctor-schedule",
+    prefix="/api/v1/doctors",
     tags=["Bookings"]
 )
 
 @router.post(
-    "/get-doctor-schedule",
+    "/doctors-schedule",
     response_class=UnicodeJSONResponse,
     response_model=ScheduleResponse,
-    summary="Get doctor availability schedule",
+    summary="Check doctor availability schedule",
     response_description="List of available and unavailable time slots with appointment details"
 )
 async def get_doctor_schedule(request: ScheduleRequest):

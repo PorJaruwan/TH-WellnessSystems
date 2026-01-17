@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     JWT_SECRET_KEY: str | None = None
 
-    # # --- Firebase ---
+    # # --- Firebase ---kanchitk-2025-08-12
     # FIREBASE_CREDENTIALS_PATH: str | None = None
     # FIREBASE_EMAIL: EmailStr | None = None
     # FIREBASE_PASSWORD: SecretStr | None = None

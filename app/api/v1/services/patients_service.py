@@ -7,114 +7,93 @@ from fastapi.encoders import jsonable_encoder
 from datetime import datetime
 from typing import List
 import requests
-from app.api.v1.models.patients_model import PatientsCreateModel, PatientsUpdateModel
+#from app.api.v1.models.patients_model import PatientsCreateModel, PatientsUpdateModel
 
-# ==============================
-#Patients 
-# ==============================
-def get_all_patients() -> List[dict]:
-    res = supabase.table("patients").select("*").order("id", desc=True).execute()
-    return res.data or []
+# # ==============================
+# #Patients 
+# # ==============================
+# def get_all_patients() -> List[dict]:
+#     res = supabase.table("patients").select("*").order("id", desc=True).execute()
+#     return res.data or []
 
-def get_patient_by_id(patient_id: UUID):
-    return supabase.table("patients").select("*").eq("id", str(patient_id)).execute()
+# def get_patient_by_id(patient_id: UUID):
+#     return supabase.table("patients").select("*").eq("id", str(patient_id)).execute()
 
-def get_patient_by_name(find_name: str, status: str) -> List[dict]:
-    headers = {
-        "apikey": settings.SUPABASE_KEY,
-        "Authorization": f"Bearer {settings.SUPABASE_KEY}",
-        "Content-Type": "application/json",
-    }
+# def get_patient_by_name(find_name: str, status: str) -> List[dict]:
+#     headers = {
+#         "apikey": settings.SUPABASE_KEY,
+#         "Authorization": f"Bearer {settings.SUPABASE_KEY}",
+#         "Content-Type": "application/json",
+#     }
 
-    params = {
-        "select": "*",
-        "is_active": "is.true",
-    }
+#     params = {
+#         "select": "*",
+#         "is_active": "is.true",
+#     }
 
-    if find_name:
-        params["or"] = (
-            f"(first_name_lo.ilike.*{find_name}*,last_name_lo.ilike.*{find_name}*,"
-            f"first_name_en.ilike.*{find_name}*,last_name_en.ilike.*{find_name}*)"
-        )
+#     if find_name:
+#         params["or"] = (
+#             f"(first_name_lo.ilike.*{find_name}*,last_name_lo.ilike.*{find_name}*,"
+#             f"first_name_en.ilike.*{find_name}*,last_name_en.ilike.*{find_name}*)"
+#         )
 
-    if status:
-        params["status"] = f"eq.{status}"
+#     if status:
+#         params["status"] = f"eq.{status}"
 
-    url = f"{settings.SUPABASE_URL}/rest/v1/patients"
-    response = requests.get(url, headers=headers, params=params)
+#     url = f"{settings.SUPABASE_URL}/rest/v1/patients"
+#     response = requests.get(url, headers=headers, params=params)
 
-    if response.status_code != 200:
-        raise Exception(f"Supabase error: {response.text}")
+#     if response.status_code != 200:
+#         raise Exception(f"Supabase error: {response.text}")
 
-    patients = response.json()
-    result = []
-    for p in patients:
-        result.append({
-            "find_name": f"{p.get('first_name_lo', '')} {p.get('last_name_lo', '')} {p.get('first_name_en', '')} {p.get('last_name_en', '')}".strip(),
-            "id": p.get("id"),
-            "patient_code": p.get("patient_code"),
-            "patient_name_lo": f"{p.get('first_name_lo', '')} {p.get('last_name_lo', '')}",
-            "patient_name_en": f"{p.get('first_name_en', '')} {p.get('last_name_en', '')}",
-            "sex": p.get("sex"),
-            "email": p.get("email"),
-            "telephone": p.get("telephone"),
-            "status": p.get("status"),
-        })
+#     patients = response.json()
+#     result = []
+#     for p in patients:
+#         result.append({
+#             "find_name": f"{p.get('first_name_lo', '')} {p.get('last_name_lo', '')} {p.get('first_name_en', '')} {p.get('last_name_en', '')}".strip(),
+#             "id": p.get("id"),
+#             "patient_code": p.get("patient_code"),
+#             "patient_name_lo": f"{p.get('first_name_lo', '')} {p.get('last_name_lo', '')}",
+#             "patient_name_en": f"{p.get('first_name_en', '')} {p.get('last_name_en', '')}",
+#             "sex": p.get("sex"),
+#             "email": p.get("email"),
+#             "telephone": p.get("telephone"),
+#             "status": p.get("status"),
+#         })
 
-    return result
+#     return result
 
 
-# def get_patient_by_code(patient_code: str) -> dict:
-#     res = supabase.table("patients").select("""
-#     *,
-#     locations(location_name),
-#     professions(profession_name),
-#     patient_types(type_name),
-#     alerts(alert_type),
-#     sale_staff(sale_staff_name),
-#     marketing_staff(marketing_name),
-#     customer_profiles(medical_history),
-#     sources(source_name),
-#     payments(description),
-#     allergies(allergy_name)
-#     """).eq("patient_code", patient_code).execute()
+# def create_patient(patient: PatientsCreateModel) -> dict:
+#     data = jsonable_encoder(patient)
+#     data["created_at"] = datetime.utcnow().isoformat()
+#     data["updated_at"] = datetime.utcnow().isoformat()
+
+#     cleaned_data = {k: (None if v == "" else v) for k, v in data.items()}
+#     res = supabase.table("patients").insert(cleaned_data).execute()
 
 #     if not res.data:
-#         raise Exception("Patient not found.")
+#         raise Exception("Insert failed or no data returned.")
 
 #     return res.data[0]
 
 
-def create_patient(patient: PatientsCreateModel) -> dict:
-    data = jsonable_encoder(patient)
-    data["created_at"] = datetime.utcnow().isoformat()
-    data["updated_at"] = datetime.utcnow().isoformat()
+# def update_patient(patient_id: str, patient: PatientsUpdateModel) -> dict:
+#     updated = jsonable_encoder(patient)
+#     updated["updated_at"] = datetime.utcnow().isoformat()
+#     res = supabase.table("patients").update(updated).eq("id", patient_id).execute()
 
-    cleaned_data = {k: (None if v == "" else v) for k, v in data.items()}
-    res = supabase.table("patients").insert(cleaned_data).execute()
+#     if not res.data:
+#         raise Exception("Update failed or patient not found.")
 
-    if not res.data:
-        raise Exception("Insert failed or no data returned.")
-
-    return res.data[0]
+#     return res.data[0]
 
 
-def update_patient(patient_id: str, patient: PatientsUpdateModel) -> dict:
-    updated = jsonable_encoder(patient)
-    updated["updated_at"] = datetime.utcnow().isoformat()
-    res = supabase.table("patients").update(updated).eq("id", patient_id).execute()
-
-    if not res.data:
-        raise Exception("Update failed or patient not found.")
-
-    return res.data[0]
-
-
-def delete_patient(patient_id: str) -> str:
-    res = supabase.table("patients").delete().eq("id", patient_id).execute()
-    if not res.data:
-        raise Exception("Delete failed or patient not found.")
-    return patient_id
+# def delete_patient(patient_id: str) -> str:
+#     res = supabase.table("patients").delete().eq("id", patient_id).execute()
+#     if not res.data:
+#         raise Exception("Delete failed or patient not found.")
+#     return patient_id
 
 
 # ==============================

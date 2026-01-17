@@ -72,42 +72,47 @@ from app.api.v1.settings import (
 
 from app.api.v1.patients import (
     #patient settings
-    patient_photos, patient_addresses, alerts, patients, sources, allergies, sale_staff, marketing_staff, patient_types,
+    patient_photos, patient_addresses, alerts, sources, allergies, sale_staff, marketing_staff, patient_types,
+    #patients,
+)
+
+from app.api.v1.routers import (
+    #patient settings
+    patient_router,
 )
 
 from app.api.v1.staff import (
     #staff settings
-    staff, staff_departments, staff_locations, staff_availabilities, staff_unavailabilities, staff_services,
+    staff, staff_departments, staff_locations, staff_services,
+    staff_template, staff_work_pattern, staff_leave,
+    #staff_availabilities, staff_unavailabilities,
 )
 
 from app.api.v1.users import (
     #user & role settings
     user_profiles, roles, permissions, groups, user_roles, user_groups, role_permissions, protected_routes, group_roles, check_access, 
     auth_controller, resend_confirm,
-    #authenticate
+    #auth_firebase, 
+    #authenticate,
     #auth, users, user_password_resets, user_sessions, user_activity_logs, user_audit_logs
 )
 
 from app.api.v1.bookings import (
-    bookings, doctor_availability, doctor_schedule, 
+    #tags: booking 
+    bookings, bookings_staff, 
+    #tags: doctor
+    doctor_eligible, 
+    #doctor_schedule, #doctor_availability, 
 )
 
-# from app.api.v1.contracts import (
-#     contract_items, contracts,
-# )
-# from app.api.v1.orders import (
-#     orders,
-# )
-# from app.api.v1.billings import (
-#     billing_items, billings, 
+# from app.api.v1.comm_logs import (
+#     booking_service_logging, payment_service_logging, patient_service_logging,
 # )
 
-from app.api.v1.checks import (
-    check_document_number,
-    #booking_service_logging, payment_service_logging, patient_service_logging,
-    #document controls settings
-    #document_controls, geographies, document_sequences, document_content_template,
-)
+# from app.api.v1.doc_control import (
+#     check_document_number,
+#     #document_controls, geographies, document_sequences, document_content_template,
+# )
 
 # ✅ รวม router --Settings
 app.include_router(companies.router)
@@ -128,7 +133,8 @@ app.include_router(room_availabilities.router)
 app.include_router(services.router)
 app.include_router(service_types.router)
 
-app.include_router(patients.router)
+app.include_router(patient_router.router)
+#app.include_router(patients.router)
 app.include_router(patient_addresses.router)
 app.include_router(patient_photos.router)
 app.include_router(patient_types.router)
@@ -142,10 +148,11 @@ app.include_router(staff.router)
 app.include_router(staff_locations.router)
 app.include_router(staff_departments.router)
 app.include_router(staff_services.router)
-app.include_router(staff_availabilities.router)
-app.include_router(staff_unavailabilities.router)
-app.include_router(doctor_availability.router)
-app.include_router(doctor_schedule.router)
+#app.include_router(staff_availabilities.router)
+#app.include_router(staff_unavailabilities.router)
+app.include_router(staff_template.router)
+app.include_router(staff_work_pattern.router)
+app.include_router(staff_leave.router)
 
 # ✅ รวม router --User Settings
 app.include_router(user_profiles.router)
@@ -160,9 +167,16 @@ app.include_router(protected_routes.router)
 app.include_router(check_access.router)
 app.include_router(auth_controller.router)
 app.include_router(resend_confirm.router)
+#app.include_router(auth_firebase.router)
 
-# ✅ รวม router --Transaction
+# ✅ รวม router --Transaction: bookings
 app.include_router(bookings.router)
+app.include_router(bookings_staff.router)
+#app.include_router(doctor_availability.router)
+app.include_router(doctor_eligible.router)
+
+
+# ✅ รวม router --Transaction: ...
 # app.include_router(contracts.router)
 # app.include_router(contract_items.router)
 # app.include_router(booking_services.router)
@@ -170,9 +184,10 @@ app.include_router(bookings.router)
 # app.include_router(billings.router)
 # app.include_router(billing_items.router)
 
-# ✅ รวม router --Checks
-app.include_router(check_document_number.router)
-# Test Logging
+# ✅ รวม router --Document control
+#app.include_router(check_document_number.router)
+
+# ✅ รวม router --Test Logging
 # app.include_router(companies.router)
 # app.include_router(booking_service_logging.router)
 # app.include_router(payment_service.router)

@@ -1,2 +1,68 @@
-{"asctime": "2025-12-07 17:31:40,047", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
-{"asctime": "2025-12-07 17:31:41,343", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 4 companies"}
+{"asctime": "2025-07-18 16:52:00,291", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [DELETE] Delete company: LNV-02"}
+{"asctime": "2025-07-18 16:52:00,846", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company deleted: LNV-02"}
+{"asctime": "2025-07-22 21:24:14,588", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2025-07-22 21:24:15,348", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 3 companies"}
+{"asctime": "2025-08-04 20:55:45,095", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2025-08-04 20:55:45,739", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 3 companies"}
+{"asctime": "2025-08-04 20:56:05,727", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read company by code: LNV"}
+{"asctime": "2025-08-04 20:56:06,431", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved company: LNV"}
+{"asctime": "2025-10-16 06:02:09,321", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2025-10-16 06:02:10,172", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 4 companies"}
+{"asctime": "2025-11-07 15:12:16,794", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2025-11-07 15:12:18,362", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 4 companies"}
+{"asctime": "2025-11-12 14:58:18,718", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2025-11-12 14:58:20,039", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 4 companies"}
+{"asctime": "2025-11-12 16:45:30,979", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2025-11-12 16:45:31,395", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 4 companies"}
+{"asctime": "2025-11-12 16:53:04,717", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2025-11-12 16:53:05,618", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 4 companies"}
+{"asctime": "2025-11-20 14:37:48,764", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2025-11-20 14:37:50,051", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 4 companies"}
+{"asctime": "2025-11-20 14:39:04,895", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read company by code: LNV"}
+{"asctime": "2025-11-20 14:39:05,381", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved company: LNV"}
+{"asctime": "2025-11-20 14:39:53,088", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [DELETE] Delete company: a"}
+{"asctime": "2025-11-20 14:39:53,459", "levelname": "WARNING", "name": "service.company", "message": "\u26a0\ufe0f Cannot delete. Company not found: a"}
+{"asctime": "2025-12-08 22:12:47,203", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2025-12-08 22:12:48,895", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 4 companies"}
+{"asctime": "2025-12-19 20:55:09,630", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2025-12-19 20:55:10,592", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 4 companies"}
+{"asctime": "2026-01-10 11:35:39,553", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2026-01-10 11:35:40,696", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 4 companies"}
+{"asctime": "2026-01-15 13:52:57,628", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2026-01-15 13:52:59,226", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 4 companies"}
+{"asctime": "2026-01-15 14:14:59,914", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read all companies"}
+{"asctime": "2026-01-15 14:15:00,906", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved 4 companies"}
+{"asctime": "2026-01-15 14:15:55,910", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read company by code: lnv"}
+{"asctime": "2026-01-15 14:15:56,506", "levelname": "WARNING", "name": "service.company", "message": "\u26a0\ufe0f Company not found for code: lnv"}
+{"asctime": "2026-01-15 14:16:06,075", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [GET] Read company by code: LNV"}
+{"asctime": "2026-01-15 14:16:06,254", "levelname": "INFO", "name": "service.company", "message": "\u2705 Retrieved company: LNV"}
+{"asctime": "2026-01-15 14:39:07,865", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [POST] Create company request received: LNL"}
+{"asctime": "2026-01-15 14:39:09,297", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company created: LNL"}
+{"asctime": "2026-01-15 14:42:44,177", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [POST] Create company request received: LNS"}
+{"asctime": "2026-01-15 14:42:45,130", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company created: LNS"}
+{"asctime": "2026-01-15 14:46:14,702", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [POST] Create company request received: LNP"}
+{"asctime": "2026-01-15 14:46:15,418", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company created: LNP"}
+{"asctime": "2026-01-15 14:56:09,620", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [POST] Create company request received: ANP"}
+{"asctime": "2026-01-15 14:56:10,817", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company created: ANP"}
+{"asctime": "2026-01-15 15:03:12,284", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [POST] Create company request received: BNP"}
+{"asctime": "2026-01-15 15:03:13,062", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company created: BNP"}
+{"asctime": "2026-01-15 15:06:22,767", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [PUT] Update company: ANP"}
+{"asctime": "2026-01-15 15:06:24,212", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company updated: ANP"}
+{"asctime": "2026-01-15 15:13:58,582", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [DELETE] Delete company: ANP"}
+{"asctime": "2026-01-15 15:13:59,047", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company deleted: ANP"}
+{"asctime": "2026-01-15 15:14:04,882", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [DELETE] Delete company: BNP"}
+{"asctime": "2026-01-15 15:14:05,292", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company deleted: BNP"}
+{"asctime": "2026-01-15 15:14:18,112", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [DELETE] Delete company: LNL"}
+{"asctime": "2026-01-15 15:14:18,544", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company deleted: LNL"}
+{"asctime": "2026-01-15 15:14:26,093", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [DELETE] Delete company: LNS"}
+{"asctime": "2026-01-15 15:14:26,230", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company deleted: LNS"}
+{"asctime": "2026-01-15 15:14:45,041", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [DELETE] Delete company: LNP"}
+{"asctime": "2026-01-15 15:14:45,218", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company deleted: LNP"}
+{"asctime": "2026-01-15 15:15:11,469", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [DELETE] Delete company: LNV"}
+{"asctime": "2026-01-15 15:15:11,657", "levelname": "ERROR", "name": "service.company", "message": "\u274c Exception in delete_company: {'code': '23503', 'details': 'Key (company_code)=(LNV) is still referenced from table \"groups\".', 'hint': None, 'message': 'update or delete on table \"companies\" violates foreign key constraint \"fk_groups_company_code\" on table \"groups\"'}"}
+{"asctime": "2026-01-15 15:15:35,751", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [DELETE] Delete company: LNV-01"}
+{"asctime": "2026-01-15 15:15:35,935", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company deleted: LNV-01"}
+{"asctime": "2026-01-15 15:15:43,401", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [DELETE] Delete company: LNV-02"}
+{"asctime": "2026-01-15 15:15:43,717", "levelname": "WARNING", "name": "service.company", "message": "\u26a0\ufe0f Cannot delete. Company not found: LNV-02"}
+{"asctime": "2026-01-15 15:15:52,510", "levelname": "INFO", "name": "service.company", "message": "\ud83d\udce5 [DELETE] Delete company: LNV-03"}
+{"asctime": "2026-01-15 15:15:52,816", "levelname": "INFO", "name": "service.company", "message": "\u2705 Company deleted: LNV-03"}

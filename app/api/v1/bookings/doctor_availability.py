@@ -17,11 +17,11 @@ from app.database.database import get_async_session  # ต้องมีฟั�
 
 
 router = APIRouter(
-    prefix="/api/v1/doctor-availability",
+    prefix="/api/v1/doctors",
     tags=["Bookings"]
 )
 
-@router.get("/check-availability")
+@router.get("/doctors-availability")
 async def check_availability(
     service_id: UUID = Query(..., description="Service ID"),
     target_date: date = Query(..., description="Date to check"),

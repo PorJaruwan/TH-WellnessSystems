@@ -1,7 +1,8 @@
 # app/models/booking_models.py
 from pydantic import BaseModel, Field
 from datetime import date
-from typing import List, Optional
+#from datetime import datetime
+from typing import Optional, List, Any
 from uuid import UUID
 from pydantic import BaseModel
 
@@ -256,3 +257,34 @@ class AvailabilityResponse(BaseModel):
     resource_track_id: UUID
     date: date
     available_slots: List[AvailableSlot]
+
+
+# ==============================
+#Booking Staff
+#===============================
+class BookingStaffCreateModel(BaseModel):
+    id: UUID
+    booking_id: str
+    staff_id: str
+    role: str
+    is_primary: bool
+    note: str
+    is_active: bool
+    #created_at: datetime
+    #updated_at: datetime
+
+class BookingStaffUpdateModel(BaseModel):
+    booking_id: str
+    staff_id: str
+    role: str
+    is_primary: bool
+    note: str
+    is_active: bool
+    #updated_at: datetime
+
+class BookingStaffQueryByBookingId(BaseModel):
+    booking_id: UUID = Field(..., description="Booking UUID")
+    role: Optional[str] = Field(None, description="Optional role filter เช่น doctor/nurse")
+
+class BookingStaffListResponse(BaseModel):
+    booking_staff: List[Any] = []  # ถ้าคุณมี schema ของ row ชัดเจน ค่อยเปลี่ยนเป็น List[BookingStaffOut]

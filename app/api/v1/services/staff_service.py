@@ -80,4 +80,58 @@ def update_staff_department_by_id(staff_department_id: UUID, updated_data: dict)
 def delete_staff_department_by_id(staff_department_id: UUID):
     return supabase.table("staff_departments").delete().eq("id", str(staff_department_id)).execute()
 
+# ==============================
+#staff work pattern
+# ==============================
+def create_staff_work_pattern(data: dict):
+    return supabase.table("staff_work_pattern").insert(data).execute()
 
+def get_all_staff_work_pattern():
+    return supabase.table("staff_work_pattern").select("*").order("id", desc=False).execute()
+
+def get_staff_work_pattern_by_id(staff_work_pattern_id: UUID):
+    return supabase.table("staff_work_pattern").select("*").eq("id", str(staff_work_pattern_id)).execute()
+
+def update_staff_work_pattern_by_id(staff_work_pattern_id: UUID, updated_data: dict):
+    return supabase.table("staff_work_pattern").update(updated_data).eq("id", str(staff_work_pattern_id)).execute()
+
+def delete_staff_work_pattern_by_id(staff_work_pattern_id: UUID):
+    return supabase.table("staff_work_pattern").delete().eq("id", str(staff_work_pattern_id)).execute()
+
+
+# ==============================
+#staff template
+# ==============================
+def create_staff_template(data: dict):
+    return supabase.table("staff_template").insert(data).execute()
+
+def get_all_staff_template():
+    return supabase.table("staff_template").select("*").order("id", desc=False).execute()
+
+def get_staff_template_by_id(staff_template_id: UUID):
+    return supabase.table("staff_template").select("*").eq("id", str(staff_template_id)).execute()
+
+def update_staff_template_by_id(staff_template_id: UUID, updated_data: dict):
+    return supabase.table("staff_template").update(updated_data).eq("id", str(staff_template_id)).execute()
+
+def delete_staff_template_by_id(staff_template_id: UUID):
+    return supabase.table("staff_template").delete().eq("id", str(staff_template_id)).execute()
+
+
+# ==============================
+#staff leave
+# ==============================
+def create_staff_leave(data: dict):
+    return supabase.table("staff_leave").insert(data).execute()
+
+def get_all_staff_leave():
+    return supabase.table("staff_leave").select("*").order("id", desc=False).execute()
+
+def get_staff_leave_by_id(staff_leave_id: UUID):
+    return supabase.table("staff_leave").select("*").eq("id", str(staff_leave_id)).execute()
+
+def update_staff_leave_by_id(staff_leave_id: UUID, updated_data: dict):
+    return supabase.table("staff_leave").update(updated_data).eq("id", str(staff_leave_id)).execute()
+
+def delete_staff_leave_by_id(staff_leave_id: UUID):
+    return supabase.table("staff_leave").delete().eq("id", str(staff_leave_id)).execute()

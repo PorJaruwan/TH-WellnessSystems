@@ -1,0 +1,12 @@
+{"asctime": "2025-07-24 12:39:26,024", "levelname": "INFO", "name": "service.user_profiles", "message": "\ud83d\udce5 [GET] Read all user_profiles"}
+{"asctime": "2025-07-24 12:39:26,775", "levelname": "INFO", "name": "service.user_profiles", "message": "\u2705 Retrieved 4 user_profiles"}
+{"asctime": "2025-07-24 13:03:12,231", "levelname": "INFO", "name": "service.user_profiles", "message": "\ud83d\udce5 [GET] Read all user_profiles"}
+{"asctime": "2025-07-24 13:03:12,439", "levelname": "INFO", "name": "service.user_profiles", "message": "\u2705 Retrieved 4 user_profiles"}
+{"asctime": "2025-08-04 20:50:13,571", "levelname": "INFO", "name": "service.user_profiles", "message": "\ud83d\udce5 [GET] Read all user_profiles"}
+{"asctime": "2025-08-04 20:50:14,952", "levelname": "INFO", "name": "service.user_profiles", "message": "\u2705 Retrieved 4 user_profiles"}
+{"asctime": "2025-10-16 06:04:36,916", "levelname": "INFO", "name": "service.user_profiles", "message": "\ud83d\udce5 [GET] Read all user_profiles"}
+{"asctime": "2025-10-16 06:04:37,264", "levelname": "INFO", "name": "service.user_profiles", "message": "\u2705 Retrieved 5 user_profiles"}
+{"asctime": "2025-10-16 06:04:39,327", "levelname": "INFO", "name": "service.user_profiles", "message": "\ud83d\udce5 [GET] Read all user_profiles"}
+{"asctime": "2025-10-16 06:04:39,387", "levelname": "INFO", "name": "service.user_profiles", "message": "\u2705 Retrieved 5 user_profiles"}
+{"asctime": "2025-12-08 16:54:05,317", "levelname": "INFO", "name": "service.user_profiles", "message": "\ud83d\udce5 [GET] Read all user_profiles"}
+{"asctime": "2025-12-08 16:54:06,852", "levelname": "INFO", "name": "service.user_profiles", "message": "\u2705 Retrieved 5 user_profiles"}
