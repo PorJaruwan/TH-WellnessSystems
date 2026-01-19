@@ -781,6 +781,14 @@ async def search_bookings_service(
 
     keyword = (q or "").strip()
 
+    # 🔹 พยายาม parse เป็น UUID ถ้าได้ = ใช้เป็น patient_id
+    patient_uuid: UUID | None = None
+    if keyword:
+        try:
+            patient_uuid = UUID(keyword)
+        except ValueError:
+            patient_uuid = None
+
     query = supabase.table("booking_grid_view").select(
         "booking_id,booking_date,start_time,end_time,status,"
         "room_name,patient_name,doctor_name,service_name",
@@ -794,7 +802,11 @@ async def search_bookings_service(
     if booking_date:
         query = query.eq("booking_date", booking_date.isoformat())
 
-    if keyword:
+    # ✅ ถ้า q เป็น UUID → filter ด้วย patient_id
+    if patient_uuid:
+        query = query.eq("patient_id", str(patient_uuid))
+    # ❗ ถ้าไม่ใช่ UUID → ใช้เป็น keyword ค้นชื่อ / service แบบเดิม
+    elif keyword:
         or_filter = (
             f"patient_name.ilike.%{keyword}%,"
             f"doctor_name.ilike.%{keyword}%,"
@@ -837,6 +849,76 @@ async def search_bookings_service(
         total=total,
     )
 
+###===old version - befor add patient_id
+# async def search_bookings_service(
+#     *,
+#     q: str | None,
+#     company_code: str | None,
+#     location_id: UUID | None,
+#     booking_date: date | None,
+#     page: int,
+#     page_size: int,
+# ) -> BookingSearchResponse:
+#     from_idx = (page - 1) * page_size
+#     to_idx = from_idx + page_size - 1
+
+#     keyword = (q or "").strip()
+
+#     query = supabase.table("booking_grid_view").select(
+#         "booking_id,booking_date,start_time,end_time,status,"
+#         "room_name,patient_name,doctor_name,service_name",
+#         count="exact",
+#     )
+
+#     if company_code:
+#         query = query.eq("company_code", company_code)
+#     if location_id:
+#         query = query.eq("location_id", str(location_id))
+#     if booking_date:
+#         query = query.eq("booking_date", booking_date.isoformat())
+
+#     if keyword:
+#         or_filter = (
+#             f"patient_name.ilike.%{keyword}%,"
+#             f"doctor_name.ilike.%{keyword}%,"
+#             f"service_name.ilike.%{keyword}%"
+#         )
+#         query = query.or_(or_filter)
+
+#     res = (
+#         query
+#         .order("booking_date", desc=True)
+#         .order("start_time")
+#         .range(from_idx, to_idx)
+#         .execute()
+#     )
+#     _handle_supabase_error(res, "search_bookings")
+
+#     rows = res.data or []
+#     total = res.count or 0
+
+#     items = []
+#     for row in rows:
+#         items.append(
+#             BookingListItem(
+#                 id=row["booking_id"],
+#                 booking_date=date.fromisoformat(row["booking_date"]),
+#                 start_time=time.fromisoformat(row["start_time"]).strftime("%H:%M"),
+#                 end_time=time.fromisoformat(row["end_time"]).strftime("%H:%M"),
+#                 status=row["status"],
+#                 room_name=row["room_name"],
+#                 patient_name=row["patient_name"],
+#                 doctor_name=row["doctor_name"],
+#                 service_name=row["service_name"],
+#             )
+#         )
+
+#     return BookingSearchResponse(
+#         items=items,
+#         page=page,
+#         page_size=page_size,
+#         total=total,
+#     )
 
 # ---------- Availability (simple sample – ไม่แตะ DB) ----------
 

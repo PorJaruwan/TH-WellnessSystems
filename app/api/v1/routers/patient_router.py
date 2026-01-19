@@ -53,7 +53,7 @@ async def get_patients(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/{patient_id}", response_class=UnicodeJSONResponse)
+@router.get("/search-by-id", response_class=UnicodeJSONResponse)
 async def get_patient_by_id(
     patient_id: UUID,
     db: AsyncSession = Depends(get_db),
@@ -91,7 +91,7 @@ async def post_patient(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.patch("/{patient_id}", response_class=UnicodeJSONResponse)
+@router.patch("/update-by-id", response_class=UnicodeJSONResponse)
 async def patch_patient_by_id(
     patient_id: UUID,
     payload: PatientUpdate,
@@ -114,7 +114,7 @@ async def patch_patient_by_id(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete("/{patient_id}", response_class=UnicodeJSONResponse)
+@router.delete("/delete-by-id", response_class=UnicodeJSONResponse)
 async def delete_patient_by_id(
     patient_id: UUID,
     db: AsyncSession = Depends(get_db),

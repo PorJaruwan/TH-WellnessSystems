@@ -248,27 +248,6 @@ async def search_bookings(
         page_size=page_size,
     )
 
-# ###
-# @router.get("/bookings", response_model=BookingSearchResponse)
-# async def search_bookings(
-#     q: str | None = Query(None),
-#     company_code: str | None = Query(None),
-#     location_id: UUID | None = Query(None),
-#     booking_date: date | None = Query(None),
-#     page: int = Query(1, ge=1),
-#     page_size: int = Query(10, ge=1, le=100),
-#     db: AsyncSession = Depends(get_db),
-# ):
-#     return await search_bookings_service(
-#         db,
-#         q=q,
-#         company_code=company_code,
-#         location_id=location_id,
-#         booking_date=booking_date,
-#         page=page,
-#         page_size=page_size,
-#     )
-
 
 # ---------- Availability ----------
 
