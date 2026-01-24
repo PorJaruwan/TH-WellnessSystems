@@ -1,16 +1,40 @@
-# app/api/v1/settings/setting_model.py
-from pydantic import BaseModel, Field
-from uuid import UUID
-from datetime import datetime
-from typing import Optional
+# app/api/v1/models/settings_model.py
 
-# ==============================
-#Companies
-# ==============================
-class CompanyCreateModel(BaseModel):
+from __future__ import annotations
+
+from datetime import datetime, date, time
+from typing import Optional
+from uuid import UUID
+
+from pydantic import BaseModel, Field, ConfigDict, field_validator
+
+# =========================================================
+# Base: normalize input ("" -> None), strip strings
+# =========================================================
+class _BaseIn(BaseModel):
+    """
+    Shared input base model for Create/Update schemas.
+    - strip whitespace on all strings
+    - convert empty strings "" to None (before validation)
+    """
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    @field_validator("*", mode="before")
+    @classmethod
+    def _empty_str_to_none(cls, v):
+        if isinstance(v, str) and v.strip() == "":
+            return None
+        return v
+
+
+# =========================================================
+# Companies
+# =========================================================
+class CompanyCreate(_BaseIn):
     company_code: str
     company_name: str
     company_name_en: str
+
     address_line1: Optional[str] = None
     address_line2: Optional[str] = None
     address_line3: Optional[str] = None
@@ -24,16 +48,21 @@ class CompanyCreateModel(BaseModel):
     email: Optional[str] = None
     domain_name: Optional[str] = None
     tax_id: Optional[str] = None
-    vat_rate: float
+
+    vat_rate: float = 0
     branch_id: Optional[str] = None
     branch_name: Optional[str] = None
-    head_office: Optional[bool] = None
-    is_active: bool = Field(None, description="default true")
-    company_type: Optional[str] = Field(None, description="check: Hospital Group, Clinic Chain, Wellness Center, Partner")
+    head_office: Optional[bool] = False
+    is_active: Optional[bool] = True
+    company_type: Optional[str] = Field(
+        None, description="check: Hospital Group, Clinic Chain, Wellness Center, Partner"
+    )
 
-class CompanyUpdateModel(BaseModel):
-    company_name: str
-    company_name_en: str
+
+class CompanyUpdate(_BaseIn):
+    company_name: Optional[str] = None
+    company_name_en: Optional[str] = None
+
     address_line1: Optional[str] = None
     address_line2: Optional[str] = None
     address_line3: Optional[str] = None
@@ -47,304 +76,320 @@ class CompanyUpdateModel(BaseModel):
     email: Optional[str] = None
     domain_name: Optional[str] = None
     tax_id: Optional[str] = None
-    vat_rate: float
+
+    vat_rate: Optional[float] = None
     branch_id: Optional[str] = None
     branch_name: Optional[str] = None
     head_office: Optional[bool] = None
-    is_active: bool = Field(None, description="default true")
-    updated_at: Optional[datetime] = Field(None, description="Timestamp")
-    company_type: Optional[str] = Field(None, description="check: Hospital Group, Clinic Chain, Wellness Center, Partner")
+    is_active: Optional[bool] = None
+    company_type: Optional[str] = Field(
+        None, description="check: Hospital Group, Clinic Chain, Wellness Center, Partner"
+    )
 
-# ==============================
-#room_availabilities
-# ==============================
-class RoomAvailabilitiesCreateModel(BaseModel):
-    id: UUID
-    room_id: str
-    available_date: datetime
-    start_time: datetime
-    end_time: datetime
-    created_at: datetime
-class RoomAvailabilitiesUpdateModel(BaseModel):
-    room_id: str
-    available_date: datetime
-    start_time: datetime
-    end_time: datetime
-    created_at: datetime
-class RoomAvailabilitiesResponseModel(BaseModel):
-    id: UUID
-    room_id: str
-    available_date: datetime
-    start_time: datetime
-    end_time: datetime
-    created_at: datetime
-    
-# ==============================
-#rooms
-# ==============================
-class RoomsCreateModel(BaseModel):
-    id: UUID
-    location_id: str
-    building_id: str
+
+# =========================================================
+# Locations
+# =========================================================
+class LocationCreate(_BaseIn):
+    id: Optional[UUID] = None  # DB default gen_random_uuid()
+    company_code: str = Field(..., description="foreign key: companies.company_code")
+    location_name: str = Field(..., description="location name")
+
+    location_type: Optional[str] = None
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+
+    is_active: Optional[bool] = True
+    location_code: Optional[str] = None
+    manager_id: Optional[UUID] = Field(None, description="foreign key: staff.id (optional)")
+
+    # server managed in DB; keep optional to avoid client forcing values
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class LocationUpdate(_BaseIn):
+    location_name: Optional[str] = None
+    location_type: Optional[str] = None
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    is_active: Optional[bool] = None
+    location_code: Optional[str] = None
+    manager_id: Optional[UUID] = None
+
+
+# =========================================================
+# Buildings
+# =========================================================
+class BuildingCreate(_BaseIn):
+    id: Optional[UUID] = None  # DB default gen_random_uuid()
+    company_code: str
+    location_id: UUID
+
+    building_code: str
+    building_name: str
+
+    floors: Optional[int] = None
+    is_active: Optional[bool] = True
+    building_type: Optional[str] = Field(
+        None, description="check: clinical, service, facility, office, lab, ward, other"
+    )
+    reason: Optional[str] = None
+
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class BuildingUpdate(_BaseIn):
+    company_code: Optional[str] = None
+    location_id: Optional[UUID] = None
+    building_code: Optional[str] = None
+    building_name: Optional[str] = None
+    floors: Optional[int] = None
+    is_active: Optional[bool] = None
+    building_type: Optional[str] = None
+    reason: Optional[str] = None
+
+
+# =========================================================
+# Rooms
+# =========================================================
+class RoomCreate(_BaseIn):
+    id: Optional[UUID] = None
+    location_id: UUID
+    building_id: UUID
+
     room_code: str
     room_name: str
-    capacity: int
-    is_available: bool
-    is_active: bool
-    created_at: Optional[datetime] = Field(None, description="Timestamp")
-    updated_at: Optional[datetime] = Field(None, description="Timestamp")
-    room_type_id: str = Field(None, description="select from room_type table")
-    floor_number: int
-class RoomsUpdateModel(BaseModel):
-    location_id: str
-    building_id: str
-    room_code: str
-    room_name: str
-    capacity: int
-    is_available: bool
-    is_active: bool
-    updated_at: Optional[datetime] = Field(None, description="Timestamp")
-    room_type_id: str = Field(None, description="select from room_type table")
-    floor_number: int
-class RoomResponseModel(BaseModel):
-    id: UUID
-    location_id: str
-    building_id: str
-    room_code: str
-    room_name: str
-    capacity: int
-    is_available: bool
-    is_active: bool
-    created_at: datetime
-    updated_at: datetime
-    room_type_id: str
-    floor_number: int
+    capacity: int = 1
 
-# ==============================
-#room_services
-# ==============================
-class RoomServiceCreateModel(BaseModel):
-    id: UUID
-    room_id: str
-    service_id: str
-    is_default: bool = Field(None, description="default false")
-    is_active: bool = Field(None, description="default true")
-    created_at: Optional[datetime] = Field(None, description="Timestamp")
-    updated_at: Optional[datetime] = Field(None, description="Timestamp")
-class RoomServiceUpdateModel(BaseModel):
-    room_id: str
-    service_id: str
-    is_default: bool = Field(None, description="default false")
-    is_active: bool = Field(None, description="default true")
-    updated_at: Optional[datetime] = Field(None, description="Timestamp")
+    is_available: Optional[bool] = True
+    is_active: Optional[bool] = True
 
-# ==============================
-#services
-# ==============================
-class ServicesCreateModel(BaseModel):
-    id: UUID
+    room_type_id: Optional[UUID] = Field(None, description="select from room_type table (optional)")
+    floor_number: Optional[int] = None
+
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class RoomUpdate(_BaseIn):
+    location_id: Optional[UUID] = None
+    building_id: Optional[UUID] = None
+    room_code: Optional[str] = None
+    room_name: Optional[str] = None
+    capacity: Optional[int] = None
+    is_available: Optional[bool] = None
+    is_active: Optional[bool] = None
+    room_type_id: Optional[UUID] = None
+    floor_number: Optional[int] = None
+
+
+# =========================================================
+# Room Services
+# =========================================================
+class RoomServiceCreate(_BaseIn):
+    id: Optional[UUID] = None
+    room_id: UUID
+    service_id: UUID
+    is_default: Optional[bool] = False
+    is_active: Optional[bool] = True
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class RoomServiceUpdate(_BaseIn):
+    room_id: Optional[UUID] = None
+    service_id: Optional[UUID] = None
+    is_default: Optional[bool] = None
+    is_active: Optional[bool] = None
+
+
+# =========================================================
+# Room Availabilities
+# =========================================================
+class RoomAvailabilityCreate(_BaseIn):
+    id: Optional[UUID] = None
+    room_id: UUID
+    available_date: date
+    start_time: time
+    end_time: time
+    created_at: Optional[datetime] = None
+
+
+class RoomAvailabilityUpdate(_BaseIn):
+    room_id: Optional[UUID] = None
+    available_date: Optional[date] = None
+    start_time: Optional[time] = None
+    end_time: Optional[time] = None
+
+
+# =========================================================
+# Services
+# =========================================================
+class ServiceCreate(_BaseIn):
+    id: Optional[UUID] = None
     service_name: str
     service_type_id: UUID
     service_price: float
     duration: int
-    description: Optional[str] = Field(None, description="Additional note")
-    is_active: bool = Field(None, description="default true")
-    created_at: Optional[datetime] = Field(None, description="Timestamp")
-    updated_at: Optional[datetime] = Field(None, description="Timestamp")
 
-class ServicesUpdateModel(BaseModel):
-    service_name: str
-    service_type_id: UUID
-    service_price: float
-    duration: int
-    description: Optional[str] = Field(None, description="Additional note")
-    is_active: bool = Field(None, description="default true")
-    updated_at: Optional[datetime] = Field(None, description="Timestamp")
+    description: Optional[str] = None
+    is_active: Optional[bool] = True
 
-# ==============================
-#service types
-#===============================
-class ServiceTypesCreateModel(BaseModel):
-    id: UUID
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class ServiceUpdate(_BaseIn):
+    service_name: Optional[str] = None
+    service_type_id: Optional[UUID] = None
+    service_price: Optional[float] = None
+    duration: Optional[int] = None
+    description: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
+# =========================================================
+# Service Types
+# =========================================================
+class ServiceTypeCreate(_BaseIn):
+    id: Optional[UUID] = None
     service_type_name: str
-    description: Optional[str] = Field(None, description="Additional note")
-    is_active: bool = Field(None, description="default true")
-    created_at: Optional[datetime] = Field(None, description="Timestamp")
-    updated_at: Optional[datetime] = Field(None, description="Timestamp")
+    description: Optional[str] = None
+    is_active: Optional[bool] = True
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
-class ServiceTypesUpdateModel(BaseModel):
-    service_type_name: str
-    description: Optional[str] = Field(None, description="Additional note")
-    is_active: bool = Field(None, description="default true")
-    updated_at: Optional[datetime] = Field(None, description="Timestamp")
 
-# ==============================
-#Cities
-#===============================
-class CityCreateModel(BaseModel):
-    id: int
+class ServiceTypeUpdate(_BaseIn):
+    service_type_name: Optional[str] = None
+    description: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
+# =========================================================
+# Countries
+# =========================================================
+class CountryCreate(_BaseIn):
+    id: Optional[UUID] = None
+    name_lo: str
+    name_en: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class CountryUpdate(_BaseIn):
+    name_lo: Optional[str] = None
+    name_en: Optional[str] = None
+
+
+# =========================================================
+# Provinces
+# =========================================================
+class ProvinceCreate(_BaseIn):
+    id: Optional[int] = None
+    name_lo: str
+    name_en: str
+    geography_id: Optional[int] = None
+    country_code: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+class ProvinceUpdate(_BaseIn):
+    name_lo: Optional[str] = None
+    name_en: Optional[str] = None
+    geography_id: Optional[int] = None
+    country_code: Optional[str] = None
+
+
+# =========================================================
+# Cities
+# =========================================================
+class CityCreate(_BaseIn):
+    id: Optional[int] = None
     name_lo: str
     name_en: str
     province_id: int
     country_code: str
-    created_at: datetime
-    updated_at: datetime
-
-class CityUpdateModel(BaseModel):
-    name_lo: str
-    name_en: str
-    province_id: Optional[int]
-    country_code: str
-    updated_at: datetime
-
-# ==============================
-#Countries
-#===============================
-class CountriesCreateModel(BaseModel):
-    id: UUID
-    name_lo: str
-    name_en: str
-    created_at: datetime
-    updated_at: datetime
-
-class CountriesUpdateModel(BaseModel):
-    name_lo: str
-    name_en: str
-    updated_at: datetime
-
-# ==============================
-#Currencies
-#===============================
-class CurrenciesCreateModel(BaseModel):
-    currency_code: str
-    currency_name: str
-    symbol: str
-    decimal_places: int
-
-class CurrenciesUpdateModel(BaseModel):
-    currency_name: str
-    symbol: str
-    decimal_places: int
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 
-# ==============================
-#Departments
-#===============================
-class DepartmentsCreateModel(BaseModel):
-    id: UUID
-    company_code: str = Field(None, description="foreign key: company code")
-    department_name: str
-    is_active: bool = Field(None, description="default true")
-    department_code: str = Field(None, description="unique: company code + department code")
-    department_type_id: Optional[str] = Field(None, description="foreign key: department type id")
-    head_id: Optional[str] = Field(None, description="foreign key: staff id")
+class CityUpdate(_BaseIn):
+    name_lo: Optional[str] = None
+    name_en: Optional[str] = None
+    province_id: Optional[int] = None
+    country_code: Optional[str] = None
 
-class DepartmentsUpdateModel(BaseModel):
-    department_name: str
-    is_active: bool = Field(None, description="default true")
-    updated_at: Optional[datetime] = Field(None, description="Timestamp")
-    department_type_id: Optional[str] = Field(None, description="foreign key: department type id")
-    head_id: Optional[str] = Field(None, description="foreign key: staff id")
 
-# ==============================
-#District
-#===============================
-class DistrictCreateModel(BaseModel):
-    id: int
+# =========================================================
+# Districts
+# =========================================================
+class DistrictCreate(_BaseIn):
+    id: Optional[int] = None
     zip_code: int
     name_lo: str
     name_en: str
     city_id: int
-    created_at: datetime
-    updated_at: datetime
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
-class DistrictUpdateModel(BaseModel):
-    zip_code: int
-    name_lo: str
-    name_en: str
-    city_id: Optional[int]
-    updated_at: datetime
 
-# ==============================
-#Languages
-#===============================
-class LanguagesCreateModel(BaseModel):
+class DistrictUpdate(_BaseIn):
+    zip_code: Optional[int] = None
+    name_lo: Optional[str] = None
+    name_en: Optional[str] = None
+    city_id: Optional[int] = None
+
+
+# =========================================================
+# Currencies
+# =========================================================
+class CurrencyCreate(_BaseIn):
+    currency_code: str
+    currency_name: str
+    symbol: Optional[str] = None
+    decimal_places: int = 2
+
+
+class CurrencyUpdate(_BaseIn):
+    currency_name: Optional[str] = None
+    symbol: Optional[str] = None
+    decimal_places: Optional[int] = None
+
+
+# =========================================================
+# Languages
+# =========================================================
+class LanguageCreate(_BaseIn):
     language_code: str
     language_name: str
 
-class LanguagesUpdateModel(BaseModel):
-    language_name: str
 
-# ==============================
-#Locations
-#===============================
-class LocationsCreateModel(BaseModel):
-    id: UUID
-    company_code: str = Field(None, description="foreign key: company code")
-    location_name: str = Field(None, description="unique: company code + location code")
-    location_type: str
-    address: str
-    phone: str
-    email: str
-    is_active: bool = Field(None, description="default true")
-    created_at: Optional[datetime] = Field(None, description="Timestamp")
-    updated_at: Optional[datetime] = Field(None, description="Timestamp")
-    location_code: str 
-    manager_id: Optional[str] = Field(None, description="foreign key: staff id")
+class LanguageUpdate(_BaseIn):
+    language_name: Optional[str] = None
 
-class LocationsUpdateModel(BaseModel):
-    location_name: str = Field(None, description="unique: company code + location code")
-    location_type: str
-    address: str
-    phone: str
-    email: str
-    is_active: bool = Field(None, description="default true")
-    updated_at: Optional[datetime] = Field(None, description="Timestamp")
-    location_code: str 
-    manager_id: Optional[str] = Field(None, description="foreign key: staff id")
 
-# ==============================
-#Buildings
-#===============================
-class BuildingsCreateModel(BaseModel):
-    id: UUID
-    company_code: str
-    location_id: str
-    building_code: str
-    building_name: str
-    floors: int
-    is_active: bool
-    created_at: datetime
-    updated_at: datetime
-    building_type: str
-    reason: str
+# =========================================================
+# Departments
+# =========================================================
+class DepartmentCreate(_BaseIn):
+    id: Optional[UUID] = None
+    company_code: str = Field(..., description="foreign key: companies.company_code")
+    department_name: str
+    is_active: Optional[bool] = True
+    department_code: Optional[str] = Field(None, description="unique: company_code + department_code")
+    department_type_id: Optional[UUID] = Field(None, description="foreign key: department type id")
+    head_id: Optional[UUID] = Field(None, description="foreign key: staff id")
 
-class BuildingsUpdateModel(BaseModel):
-    company_code: str
-    location_id: str
-    building_code: str
-    building_name: str
-    floors: int
-    is_active: bool
-    updated_at: datetime
-    building_type: str
-    reason: str
 
-# ==============================
-#Provinces
-#===============================
-class ProvinceCreateModel(BaseModel):
-    id: int
-    name_lo: str
-    name_en: str
-    geography_id: int
-    country_code: str
-    created_at: datetime
-    updated_at: datetime
-
-class ProvinceUpdateModel(BaseModel):
-    name_lo: str
-    name_en: str
-    geography_id: Optional[int]
-    country_code: str
-    updated_at: datetime
+class DepartmentUpdate(_BaseIn):
+    department_name: Optional[str] = None
+    is_active: Optional[bool] = None
+    department_code: Optional[str] = None
+    department_type_id: Optional[UUID] = None
+    head_id: Optional[UUID] = None

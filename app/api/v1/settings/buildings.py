@@ -1,102 +1,119 @@
-from app.services.supabase_client import supabase
-from app.core.config import get_settings
-settings = get_settings()  # ✅ โหลดค่าจาก .env ผ่าน config
+# app/api/v1/settings/buildings.py
 
-from app.utils.ResponseHandler import ResponseHandler, ResponseCode, UnicodeJSONResponse
-import json
-import requests
-from fastapi import APIRouter, Request, HTTPException, Response
-from fastapi.encoders import jsonable_encoder
-from urllib.parse import unquote
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
-from datetime import datetime
-from pathlib import Path
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
-from fastapi.encoders import jsonable_encoder
-from uuid import UUID
-from datetime import datetime
-
+from app.database.session import get_db
+from app.utils.payload_cleaner import clean_create, clean_update
 from app.utils.ResponseHandler import ResponseHandler, ResponseCode, UnicodeJSONResponse
-from app.api.v1.models.settings_model import BuildingsCreateModel, BuildingsUpdateModel
-from app.api.v1.services.settings_service import (
-    create_building, get_all_buildings, get_building_by_id,
-    update_building_by_id, delete_building_by_id
+from app.api.v1.models.settings_model import BuildingCreate, BuildingUpdate
+from app.api.v1.models.settings_response_model import BuildingResponse
+from app.api.v1.services.settings_orm_service import (
+    orm_create_building,
+    orm_get_all_buildings,
+    orm_get_building_by_id,
+    orm_update_building_by_id,
+    orm_delete_building_by_id,
+    #orm_get_buildings_by_location_id,
+    orm_get_buildings_active,
+    orm_get_buildings_by_location_id_active,
 )
 
 router = APIRouter(
     prefix="/api/v1/buildings",
-    tags=["Room_Settings"]
+    tags=["Core_Settings"]
 )
 
-@router.post("/create-by-id", response_class=UnicodeJSONResponse)
-def create_building_by_id(buildings: BuildingsCreateModel):
-    try:
-        data = jsonable_encoder(buildings)
-        cleaned_data = {k: (None if v == "" else v) for k, v in data.items()}
-        res = create_building(cleaned_data)
-
-        if not res.data:
-            raise HTTPException(status_code=400, detail="Insert failed or no data returned.")
-        return ResponseHandler.success(
-            message=ResponseCode.SUCCESS["REGISTERED"][1],
-            data={"buildings": res.data[0]}
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.get("/search-by-all", response_class=UnicodeJSONResponse)
-def read_building_by_all():
-    res = get_all_buildings()
-    if not res.data:
-        return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={})
+@router.post("/create", response_class=UnicodeJSONResponse)
+async def create_building(payload: BuildingCreate, session: AsyncSession = Depends(get_db)):
+    obj = await orm_create_building(session, clean_create(payload))
     return ResponseHandler.success(
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
-        data={"total": len(res.data), "buildings": res.data}
+        ResponseCode.SUCCESS["REGISTERED"][1],
+        data={"building": BuildingResponse.model_validate(obj).model_dump(exclude_none=True)},
     )
 
-@router.get("/search-by-id", response_class=UnicodeJSONResponse)
-def read_building(building_id: UUID):
-    res = get_building_by_id(building_id)
-    if not res.data:
+@router.get("/search", response_class=UnicodeJSONResponse)
+async def get_buildings(session: AsyncSession = Depends(get_db)):
+    items = await orm_get_all_buildings(session)
+    if not items:
+        return ResponseHandler.error(*ResponseCode.DATA["EMPTY"])
+    return ResponseHandler.success(
+        ResponseCode.SUCCESS["RETRIEVED"][1],
+        data={"buildings": [BuildingResponse.model_validate(x).model_dump(exclude_none=True) for x in items]},
+    )
+
+
+@router.get(
+    "/search-by-id",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+    response_model_exclude_none=True,
+)
+async def read_building(building_id: UUID, session: AsyncSession = Depends(get_db)):
+    obj = await orm_get_building_by_id(session, building_id)
+    if not obj:
         return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"building_id": str(building_id)})
-    return ResponseHandler.success(
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
-        data={"buildings": res.data[0]}
-    )
+
+    payload = BuildingResponse.model_validate(obj).model_dump(exclude_none=True)
+    return ResponseHandler.success(ResponseCode.SUCCESS["RETRIEVED"][1], data={"building": payload})
+
 
 @router.put("/update-by-id", response_class=UnicodeJSONResponse)
-def update_building(buildingsId: UUID, buildings: BuildingsUpdateModel):
+async def update_building(buildingId: UUID, payload: BuildingUpdate, session: AsyncSession = Depends(get_db)):
+    obj = await orm_update_building_by_id(session, buildingId, clean_update(payload))
+    if not obj:
+        return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"])
+    return ResponseHandler.success(
+        ResponseCode.SUCCESS["UPDATED"][1],
+        data={"building": BuildingResponse.model_validate(obj).model_dump(exclude_none=True)},
+    )
+
+
+@router.delete(
+    "/delete-by-id",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+)
+async def delete_building(buildingId: UUID, session: AsyncSession = Depends(get_db)):
     try:
-        updated = {
-            "building_name": buildings.building_name,
-            "company_code": buildings.company_code,
-            "address": buildings.address,
-            "phone": buildings.phone,
-            "email": buildings.email,
-            "updated_at": datetime.utcnow().isoformat()
-        }
-        res = update_building_by_id(buildingsId, updated)
-        if not res.data:
-            return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"buildingsId": str(buildingsId)})
+        ok = await orm_delete_building_by_id(session, buildingId)
+        if not ok:
+            return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"building_id": str(buildingId)})
+
         return ResponseHandler.success(
-            message=ResponseCode.SUCCESS["UPDATED"][1],
-            data={"buildings": res.data[0]}
+            message=f"building with ID {buildingId} deleted.",
+            data={"building_id": str(buildingId)},
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.delete("/delete-by-id", response_class=UnicodeJSONResponse)
-def delete_building(buildingsId: UUID):
-    try:
-        res = delete_building_by_id(buildingsId)
-        if not res.data:
-            return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"buildingsId": str(buildingsId)})
-        return ResponseHandler.success(
-            message=f"building with ID {buildingsId} deleted.",
-            data={"buildingsId": str(buildingsId)}
+
+@router.get(
+    "/search-active",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+    response_model_exclude_none=True,
+)
+async def search_buildings_active(
+    location_id: Optional[UUID] = None,
+    is_active: bool = True,
+    session: AsyncSession = Depends(get_db),
+):
+    if location_id:
+        items = await orm_get_buildings_by_location_id_active(session, location_id, is_active=is_active)
+    else:
+        items = await orm_get_buildings_active(session, is_active=is_active)
+
+    if not items:
+        return ResponseHandler.error(
+            *ResponseCode.DATA["EMPTY"],
+            details={"location_id": str(location_id) if location_id else None, "is_active": is_active},
         )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+
+    payload = [BuildingResponse.model_validate(x).model_dump(exclude_none=True) for x in items]
+    return ResponseHandler.success(
+        ResponseCode.SUCCESS["RETRIEVED"][1],
+        data={"total": len(payload), "buildings": payload},
+    )

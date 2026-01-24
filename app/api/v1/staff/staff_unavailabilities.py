@@ -37,7 +37,7 @@ class StaffUnavailabilitiesUpdateModel(BaseModel):
     reason: str
 
 # ✅ CREATE
-@router.post("/create-by-id", response_class=UnicodeJSONResponse)
+@router.post("/create", response_class=UnicodeJSONResponse)
 def create_staff_unavailability_by_id(staff_unavailabilities: StaffUnavailabilitiesCreateModel):
     try:
         data = jsonable_encoder(staff_unavailabilities)
@@ -66,7 +66,7 @@ def create_staff_unavailability_by_id(staff_unavailabilities: StaffUnavailabilit
         raise HTTPException(status_code=500, detail=str(e))
 
 # ✅ READ ALL
-@router.get("/search-by-all", response_class=UnicodeJSONResponse)
+@router.get("/search", response_class=UnicodeJSONResponse)
 def read_staff_unavailability_by_all():
     res = supabase.table("staff_unavailabilities").select("*").order("id", desc=False).execute()
     if not res.data:

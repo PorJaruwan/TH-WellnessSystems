@@ -8,7 +8,7 @@ from fastapi.encoders import jsonable_encoder
 from urllib.parse import unquote
 from datetime import datetime
 
-from app.api.v1.models.settings_model import DistrictCreateModel, DistrictUpdateModel
+from app.api.v1.models.settings_model import DistrictCreate, DistrictUpdate
 from app.api.v1.services.settings_service import (
     get_all_districts, get_districts_by_city_id, get_districts_by_name,
     create_district, update_district_by_id, delete_district_by_id
@@ -16,10 +16,10 @@ from app.api.v1.services.settings_service import (
 
 router = APIRouter(
     prefix="/api/v1/districts",
-    tags=["General_Settings"]
+    tags=["Core_Settings"]
 )
 
-@router.get("/search-by-all", response_class=UnicodeJSONResponse)
+@router.get("/search", response_class=UnicodeJSONResponse)
 def read_district_by_all():
     res = get_all_districts()
     if not res.data:
@@ -67,8 +67,8 @@ def read_district_by_name(request: Request, find_name: str = ""):
         data={"total": len(districts_with_findname), "districts": districts_with_findname}
     )
 
-@router.post("/create-by-id", response_class=UnicodeJSONResponse)
-def create_district_endpoint(district: DistrictCreateModel):
+@router.post("/create", response_class=UnicodeJSONResponse)
+def create_district_endpoint(district: DistrictCreate):
     try:
         data = jsonable_encoder(district)
         cleaned_data = {k: (None if v == "" else v) for k, v in data.items()}
@@ -84,7 +84,7 @@ def create_district_endpoint(district: DistrictCreateModel):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/update-by-id", response_class=UnicodeJSONResponse)
-def update_district_endpoint(district_id: int, district: DistrictUpdateModel):
+def update_district_endpoint(district_id: int, district: DistrictUpdate):
     updated_data = {
         "zip_code": district.zip_code,
         "name_lo": district.name_lo,

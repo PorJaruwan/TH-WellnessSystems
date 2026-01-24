@@ -8,7 +8,7 @@ from fastapi.encoders import jsonable_encoder
 from urllib.parse import unquote
 from datetime import datetime
 
-from app.api.v1.models.settings_model import ProvinceCreateModel, ProvinceUpdateModel
+from app.api.v1.models.settings_model import ProvinceCreate, ProvinceUpdate
 from app.api.v1.services.settings_service import (
     get_all_provinces, get_provinces_by_country_code, get_provinces_by_name,
     create_province, update_province_by_id, delete_province_by_id
@@ -17,11 +17,11 @@ from app.api.v1.services.settings_service import (
 
 router = APIRouter(
     prefix="/api/v1/provinces",
-    tags=["General_Settings"]
+    tags=["Core_Settings"]
 )
 
 
-@router.get("/search-by-all", response_class=UnicodeJSONResponse)
+@router.get("/search", response_class=UnicodeJSONResponse)
 def read_province_by_all():
     res = get_all_provinces()
     if not res.data:
@@ -69,8 +69,8 @@ def read_province_by_name(request: Request, find_name: str = ""):
         data={"total": len(provinces_with_findname), "provinces": provinces_with_findname}
     )
 
-@router.post("/create-by-id", response_class=UnicodeJSONResponse)
-def create_province_endpoint(provinces: ProvinceCreateModel):
+@router.post("/create", response_class=UnicodeJSONResponse)
+def create_province_endpoint(provinces: ProvinceCreate):
     try:
         data = jsonable_encoder(provinces)
         cleaned_data = {k: (None if v == "" else v) for k, v in data.items()}
@@ -86,7 +86,7 @@ def create_province_endpoint(provinces: ProvinceCreateModel):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/update-by-id", response_class=UnicodeJSONResponse)
-def update_province_endpoint(province_id: int, province: ProvinceUpdateModel):
+def update_province_endpoint(province_id: int, province: ProvinceUpdate):
     updated = {
         "name_lo": province.name_lo,
         "name_en": province.name_en,

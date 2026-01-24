@@ -35,7 +35,7 @@ def create_booking_staff_by_id(booking_staff: BookingStaffCreateModel):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/search-by-all", response_class=UnicodeJSONResponse)
+@router.get("/search", response_class=UnicodeJSONResponse)
 def read_booking_staff_by_all():
     res = get_all_booking_staff()
     if not res.data:

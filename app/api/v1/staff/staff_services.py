@@ -18,7 +18,7 @@ router = APIRouter(
     tags=["Staff_Settings"]
 )
 
-@router.post("/create-by-id", response_class=UnicodeJSONResponse)
+@router.post("/create", response_class=UnicodeJSONResponse)
 def create_staff_service_by_id(staff_services: StaffServicesCreateModel):
     try:
         data = jsonable_encoder(staff_services)
@@ -34,7 +34,7 @@ def create_staff_service_by_id(staff_services: StaffServicesCreateModel):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/search-by-all", response_class=UnicodeJSONResponse)
+@router.get("/search", response_class=UnicodeJSONResponse)
 def read_staff_service_by_all():
     res = get_all_staff_services()
     if not res.data:

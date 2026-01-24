@@ -5,7 +5,7 @@ from app.utils.ResponseHandler import ResponseHandler, ResponseCode, UnicodeJSON
 from fastapi import APIRouter, Request, HTTPException, Response
 from fastapi.encoders import jsonable_encoder
 
-from app.api.v1.models.settings_model import CurrenciesCreateModel, CurrenciesUpdateModel
+from app.api.v1.models.settings_model import CurrencyCreate, CurrencyUpdate
 from app.api.v1.services.settings_service import (
     create_currency, get_all_currencies, get_currency_by_code,
     update_currency_by_code, delete_currency_by_code
@@ -13,11 +13,11 @@ from app.api.v1.services.settings_service import (
 
 router = APIRouter(
     prefix="/api/v1/currencies",
-    tags=["General_Settings"]
+    tags=["Core_Settings"]
 )
 
-@router.post("/create-by-code", response_class=UnicodeJSONResponse)
-def create_currency_by_code(currencies: CurrenciesCreateModel):
+@router.post("/create", response_class=UnicodeJSONResponse)
+def create_currency_by_code(currencies: CurrencyCreate):
     try:
         data = jsonable_encoder(currencies)
         cleaned_data = {k: (None if v == "" else v) for k, v in data.items()}
@@ -34,7 +34,7 @@ def create_currency_by_code(currencies: CurrenciesCreateModel):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/search-by-all", response_class=UnicodeJSONResponse)
+@router.get("/search", response_class=UnicodeJSONResponse)
 def read_currency_by_all():
     res = get_all_currencies()
     if not res.data:
@@ -55,7 +55,7 @@ def read_currency_by_code(currency_code: str):
     )
 
 @router.put("/update-by-code", response_class=UnicodeJSONResponse)
-def update_currency(currencyCode: str, currencies: CurrenciesUpdateModel):
+def update_currency(currencyCode: str, currencies: CurrencyUpdate):
     try:
         updated = {
             "currency_name": currencies.currency_name,

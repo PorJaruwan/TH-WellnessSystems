@@ -13,10 +13,10 @@ from app.api.v1.services.settings_service import (
 
 router = APIRouter(
     prefix="/api/v1/languages",
-    tags=["General_Settings"]
+    tags=["Core_Settings"]
 )
 
-@router.post("/create-by-code", response_class=UnicodeJSONResponse)
+@router.post("/create", response_class=UnicodeJSONResponse)
 def create_language_by_code(languages: LanguagesCreateModel):
     try:
         data = jsonable_encoder(languages)
@@ -32,7 +32,7 @@ def create_language_by_code(languages: LanguagesCreateModel):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/search-by-all", response_class=UnicodeJSONResponse)
+@router.get("/search", response_class=UnicodeJSONResponse)
 def read_language_by_all():
     res = get_all_languages()
     if not res.data:

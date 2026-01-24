@@ -1,79 +1,111 @@
-from fastapi import APIRouter, HTTPException
-from fastapi.encoders import jsonable_encoder
+# app/api/v1/settings/services.py
+
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
-from app.api.v1.models.settings_model import ServicesCreateModel, ServicesUpdateModel
-from app.api.v1.services.settings_service import (
-    post_service,
-    get_all_services,
-    get_service_by_id,
-    put_service_by_id,
-    delete_service_by_id,
-    generate_service_update_payload,
-    format_service_results
-)
+from app.database.session import get_db
 from app.utils.ResponseHandler import ResponseHandler, ResponseCode, UnicodeJSONResponse
+from app.utils.payload_cleaner import clean_create, clean_update
+
+from app.api.v1.models.settings_model import ServiceCreate, ServiceUpdate
+from app.api.v1.models.settings_response_model import ServiceResponse
+from app.api.v1.services.settings_orm_service import (
+    orm_create_service,
+    orm_get_all_services,
+    orm_get_service_by_id,
+    orm_update_service_by_id,
+    orm_delete_service_by_id,
+)
 
 router = APIRouter(
     prefix="/api/v1/services",
-    tags=["Service_Settings"]
+    tags=["Core_Settings"]
 )
 
-@router.post("/create-by-id", response_class=UnicodeJSONResponse)
-def create_service_by_id(service: ServicesCreateModel):
+
+@router.post(
+    "/create",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+    response_model_exclude_none=True,
+)
+async def create_service_by_id(service: ServiceCreate, session: AsyncSession = Depends(get_db)):
     try:
-        data = jsonable_encoder(service)
-        res = post_service(data)
-        if not res.data:
-            raise HTTPException(status_code=400, detail="Insert failed or no data returned.")
+        cleaned = clean_create(service)  # ✅ replaces local clean_payload
+
+        obj = await orm_create_service(session, cleaned)
+        payload = ServiceResponse.model_validate(obj).model_dump(exclude_none=True)
+
         return ResponseHandler.success(
             message=ResponseCode.SUCCESS["REGISTERED"][1],
-            data=jsonable_encoder({"services": res.data[0]})
+            data={"service": payload},
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/search-by-all", response_class=UnicodeJSONResponse)
-def read_service_by_all():
-    res = get_all_services()
-    if not res.data:
+
+@router.get(
+    "/search",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+    response_model_exclude_none=True,
+)
+async def read_services(session: AsyncSession = Depends(get_db)):
+    items = await orm_get_all_services(session)
+    if not items:
         return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={})
-    result_list = format_service_results(res.data)
+
+    payload = [ServiceResponse.model_validate(x).model_dump(exclude_none=True) for x in items]
     return ResponseHandler.success(
         message=ResponseCode.SUCCESS["RETRIEVED"][1],
-        data=jsonable_encoder({"total": len(result_list), "services": result_list})
+        data={"total": len(payload), "services": payload},
     )
 
-@router.get("/search-by-id", response_class=UnicodeJSONResponse)
-def read_service_by_id(service_id: UUID):
-    res = get_service_by_id(service_id)
-    if not res.data:
+
+@router.get(
+    "/search-by-id",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+    response_model_exclude_none=True,
+)
+async def read_service_by_id(service_id: UUID, session: AsyncSession = Depends(get_db)):
+    obj = await orm_get_service_by_id(session, service_id)
+    if not obj:
         return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"service_id": str(service_id)})
+
+    payload = ServiceResponse.model_validate(obj).model_dump(exclude_none=True)
     return ResponseHandler.success(
         message=ResponseCode.SUCCESS["RETRIEVED"][1],
-        data=jsonable_encoder({"services": res.data[0]})
+        data={"service": payload},
     )
+
 
 @router.put("/update-by-id", response_class=UnicodeJSONResponse)
-def update_service_by_id(service_id: UUID, service: ServicesUpdateModel):
-    updated = generate_service_update_payload(service)
-    res = put_service_by_id(service_id, updated)
-    if not res.data:
-        return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"service_id": str(service_id)})
+async def update_service_by_id(service_id: UUID, payload: ServiceUpdate, session: AsyncSession = Depends(get_db)):
+    obj = await orm_update_service_by_id(session, service_id, clean_update(payload))
+    if not obj:
+        return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"])
     return ResponseHandler.success(
-        message=ResponseCode.SUCCESS["UPDATED"][1],
-        data=jsonable_encoder({"services": res.data[0]})
+        ResponseCode.SUCCESS["UPDATED"][1],
+        data={"service": ServiceResponse.model_validate(obj).model_dump(exclude_none=True)},
     )
 
-@router.delete("/delete-by-id", response_class=UnicodeJSONResponse)
-def delete_service_by_id(service_id: UUID):
+
+@router.delete(
+    "/delete-by-id",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+)
+async def delete_service_by_id(service_id: UUID, session: AsyncSession = Depends(get_db)):
     try:
-        res = delete_service_by_id(service_id)
-        if not res.data:
+        ok = await orm_delete_service_by_id(session, service_id)
+        if not ok:
             return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"service_id": str(service_id)})
+
         return ResponseHandler.success(
             message=f"Services with ID {service_id} deleted.",
-            data=jsonable_encoder({"service_id": str(service_id)})
+            data={"service_id": str(service_id)},
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

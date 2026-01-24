@@ -1,110 +1,105 @@
 # app/api/v1/settings/room_availabilities.py
 
-from fastapi import APIRouter, HTTPException
-from fastapi.encoders import jsonable_encoder
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
+from app.database.session import get_db
+from app.utils.payload_cleaner import clean_create, clean_update
 from app.utils.ResponseHandler import ResponseHandler, ResponseCode, UnicodeJSONResponse
-from app.api.v1.models.settings_model import RoomAvailabilitiesCreateModel, RoomAvailabilitiesUpdateModel
-from app.api.v1.services.settings_service import (
-    post_room_availability,
-    get_all_room_availability,
-    get_room_availability_by_id,
-    put_room_availability_by_id,
-    delete_room_availability_by_id,
+
+from app.api.v1.models.settings_model import RoomAvailabilityCreate, RoomAvailabilityUpdate
+from app.api.v1.models.settings_response_model import RoomAvailabilityResponse
+from app.api.v1.services.settings_orm_service import (
+    orm_create_room_availability,
+    orm_get_all_room_availabilities,
+    orm_get_room_availability_by_id,
+    orm_update_room_availability_by_id,
+    orm_delete_room_availability_by_id,
 )
 
 router = APIRouter(
     prefix="/api/v1/room_availabilities",
-    tags=["Room_Settings"]
+    tags=["Core_Settings"]
 )
 
-@router.post("/create-by-id", response_class=UnicodeJSONResponse)
-def create_room_availability(room_availabilities: RoomAvailabilitiesCreateModel):
-    try:
-        data = jsonable_encoder(room_availabilities)
-        cleaned_data = {k: (None if v == "" else v) for k, v in data.items()}
-        res = post_room_availability(cleaned_data)
-        if not res.data:
-            raise HTTPException(status_code=400, detail="Insert failed.")
-        return ResponseHandler.success(ResponseCode.SUCCESS["REGISTERED"][1], data={"room_availabilities": res.data[0]})
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/create", response_class=UnicodeJSONResponse)
+async def create_room_availability(payload: RoomAvailabilityCreate, session: AsyncSession = Depends(get_db)):
+    obj = await orm_create_room_availability(session, clean_create(payload))
+    return ResponseHandler.success(
+        ResponseCode.SUCCESS["REGISTERED"][1],
+        data={"room_availability": RoomAvailabilityResponse.model_validate(obj).model_dump(exclude_none=True)},
+    )
 
 
-@router.get("/search-by-all", response_class=UnicodeJSONResponse)
-def read_all_room_availabilities():
-    res = get_all_room_availability()
-    if not res.data:
+@router.get(
+    "/search",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+    response_model_exclude_none=True,
+)
+async def read_room_availabilities(session: AsyncSession = Depends(get_db)):
+    items = await orm_get_all_room_availabilities(session)
+    if not items:
         return ResponseHandler.error(*ResponseCode.DATA["EMPTY"])
-    return ResponseHandler.success(ResponseCode.SUCCESS["RETRIEVED"][1], data={"total": len(res.data), "room_availabilities": res.data})
+
+    payload = [RoomAvailabilityResponse.model_validate(x).model_dump(exclude_none=True) for x in items]
+    return ResponseHandler.success(
+        ResponseCode.SUCCESS["RETRIEVED"][1],
+        data={"total": len(payload), "room_availabilities": payload},
+    )
 
 
-@router.get("/search-by-id", response_class=UnicodeJSONResponse)
-def read_room_availability(room_availability_id: UUID):
-    res = get_room_availability_by_id(room_availability_id)
-    if not res.data:
-        return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"room_availability_id": str(room_availability_id)})
-    return ResponseHandler.success(ResponseCode.SUCCESS["RETRIEVED"][1], data={"room_availabilities": res.data[0]})
+@router.get(
+    "/search-by-id",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+    response_model_exclude_none=True,
+)
+async def read_room_availability(room_availability_id: UUID, session: AsyncSession = Depends(get_db)):
+    obj = await orm_get_room_availability_by_id(session, room_availability_id)
+    if not obj:
+        return ResponseHandler.error(
+            *ResponseCode.DATA["NOT_FOUND"],
+            details={"room_availability_id": str(room_availability_id)},
+        )
+
+    payload = RoomAvailabilityResponse.model_validate(obj).model_dump(exclude_none=True)
+    return ResponseHandler.success(
+        ResponseCode.SUCCESS["RETRIEVED"][1],
+        data={"room_availability": payload},
+    )
 
 
 @router.put("/update-by-id", response_class=UnicodeJSONResponse)
-def update_room_availability(room_availability_id: UUID, room_availabilities: RoomAvailabilitiesUpdateModel):
-    updated = jsonable_encoder(room_availabilities)
-    res = put_room_availability_by_id(room_availability_id, updated)
-
-    if not res.data:
-        return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"room_availability_id": str(room_availability_id)})
-
-    return ResponseHandler.success(ResponseCode.SUCCESS["UPDATED"][1], data={"room_availabilities": res.data[0]})
-
-
-@router.delete("/delete-by-id", response_class=UnicodeJSONResponse)
-def delete_room_availability(room_availability_id: UUID):
-    res = delete_room_availability_by_id(room_availability_id)
-    if not res.data:
-        return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"room_availability_id": str(room_availability_id)})
-    return ResponseHandler.success(f"Deleted successfully.", data={"room_availability_id": str(room_availability_id)})
+async def update_room_availability(room_availability_id: UUID, payload: RoomAvailabilityUpdate, session: AsyncSession = Depends(get_db)):
+    obj = await orm_update_room_availability_by_id(session, room_availability_id, clean_update(payload))
+    if not obj:
+        return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"])
+    return ResponseHandler.success(
+        ResponseCode.SUCCESS["UPDATED"][1],
+        data={"room_availability": RoomAvailabilityResponse.model_validate(obj).model_dump(exclude_none=True)},
+    )
 
 
+@router.delete(
+    "/delete-by-id",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+)
+async def delete_room_availability(room_availability_id: UUID, session: AsyncSession = Depends(get_db)):
+    try:
+        ok = await orm_delete_room_availability_by_id(session, room_availability_id)
+        if not ok:
+            return ResponseHandler.error(
+                *ResponseCode.DATA["NOT_FOUND"],
+                details={"room_availability_id": str(room_availability_id)},
+            )
 
-# @router.post("/create-by-id/", response_class=UnicodeJSONResponse)
-# def create_room_availability_by_id(room_availabilities: RoomAvailabilitiesCreateModel):
-#     try:
-#         data = jsonable_encoder(room_availabilities)
-#         cleaned_data = {k: (None if v == "" else v) for k, v in data.items()}
-#         res = insert_room_availability(cleaned_data)
-#         if not res.data:
-#             raise HTTPException(status_code=400, detail="Insert failed.")
-#         return ResponseHandler.success(ResponseCode.SUCCESS["REGISTERED"][1], data={"room_availabilities": res.data[0]})
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
-
-# @router.get("/search-by-all/", response_class=UnicodeJSONResponse)
-# def read_room_availability_by_all():
-#     res = get_all_room_availabilities()
-#     if not res.data:
-#         return ResponseHandler.error(*ResponseCode.DATA["EMPTY"])
-#     return ResponseHandler.success(ResponseCode.SUCCESS["RETRIEVED"][1], data={"total": len(res.data), "room_availabilities": res.data})
-
-# @router.get("/search-by-id/", response_class=UnicodeJSONResponse)
-# def read_room_availability_by_id(room_availability_id: UUID):
-#     res = get_room_availability_by_id(room_availability_id)
-#     if not res.data:
-#         return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"room_availability_id": str(room_availability_id)})
-#     return ResponseHandler.success(ResponseCode.SUCCESS["RETRIEVED"][1], data={"room_availabilities": res.data[0]})
-
-# @router.put("/update-by-id/", response_class=UnicodeJSONResponse)
-# def update_room_availability_by_id(room_availability_id: UUID, room_availabilities: RoomAvailabilitiesUpdateModel):
-#     updated = room_availabilities.dict()
-#     res = update_room_availability_by_id(room_availability_id, updated)
-#     if not res.data:
-#         return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"room_availability_id": str(room_availability_id)})
-#     return ResponseHandler.success(ResponseCode.SUCCESS["UPDATED"][1], data={"room_availabilities": res.data[0]})
-
-# @router.delete("/delete-by-id/", response_class=UnicodeJSONResponse)
-# def delete_room_availability_by_id(room_availability_id: UUID):
-#     res = delete_room_availability_by_id(room_availability_id)
-#     if not res.data:
-#         return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"room_availability_id": str(room_availability_id)})
-#     return ResponseHandler.success(f"Deleted successfully.", data={"room_availability_id": str(room_availability_id)})
+        return ResponseHandler.success(
+            "Deleted successfully.",
+            data={"room_availability_id": str(room_availability_id)},
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
