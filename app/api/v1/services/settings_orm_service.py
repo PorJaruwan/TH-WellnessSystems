@@ -18,7 +18,16 @@ from app.db.models import (
     RoomAvailability,
     Service,
     ServiceType,
+    Country,
+    Province,
+    City,
+    District,
+    Currency,
+    Language,
+    Geography,
 )
+
+
 
 # --- fields that must be server-managed ---
 _AUDIT_FIELDS = {"created_at", "updated_at"}
@@ -417,6 +426,311 @@ async def orm_update_service_by_id(session: AsyncSession, service_id: UUID, data
 
 async def orm_delete_service_by_id(session: AsyncSession, service_id: UUID) -> bool:
     obj = await orm_get_service_by_id(session, service_id)
+    if not obj:
+        return False
+    return await _delete(session, obj)
+
+
+
+# =========================
+# Countries (Address Settings)
+# =========================
+async def orm_create_country(session: AsyncSession, data: dict[str, Any]) -> Country:
+    return await _create_model(session, Country, data)
+
+
+async def orm_get_all_countries(session: AsyncSession) -> list[Country]:
+    res = await session.execute(select(Country).order_by(Country.name_lo.asc()))
+    return list(res.scalars().all())
+
+
+async def orm_get_country_by_code(session: AsyncSession, country_code: str) -> Optional[Country]:
+    res = await session.execute(select(Country).where(Country.country_code == country_code))
+    return res.scalar_one_or_none()
+
+
+async def orm_update_country_by_code(
+    session: AsyncSession, country_code: str, data: dict[str, Any]
+) -> Optional[Country]:
+    obj = await orm_get_country_by_code(session, country_code)
+    if not obj:
+        return None
+    return await _update(session, obj, data)
+
+
+async def orm_delete_country_by_code(session: AsyncSession, country_code: str) -> bool:
+    obj = await orm_get_country_by_code(session, country_code)
+    if not obj:
+        return False
+    return await _delete(session, obj)
+
+
+async def orm_get_countries_active(session: AsyncSession, is_active: bool = True) -> list[Country]:
+    res = await session.execute(
+        select(Country)
+        .where(Country.is_active == is_active)
+        .order_by(Country.name_lo.asc())
+    )
+    return list(res.scalars().all())
+
+
+# =========================
+# Provinces (Address Settings)
+# =========================
+async def orm_create_province(session: AsyncSession, data: dict[str, Any]) -> Province:
+    return await _create_model(session, Province, data)
+
+
+async def orm_get_all_provinces(session: AsyncSession) -> list[Province]:
+    res = await session.execute(select(Province).order_by(Province.name_lo.asc()))
+    return list(res.scalars().all())
+
+
+async def orm_get_province_by_id(session: AsyncSession, province_id: int) -> Optional[Province]:
+    return await session.get(Province, province_id)
+
+
+async def orm_update_province_by_id(
+    session: AsyncSession, province_id: int, data: dict[str, Any]
+) -> Optional[Province]:
+    obj = await orm_get_province_by_id(session, province_id)
+    if not obj:
+        return None
+    return await _update(session, obj, data)
+
+
+async def orm_delete_province_by_id(session: AsyncSession, province_id: int) -> bool:
+    obj = await orm_get_province_by_id(session, province_id)
+    if not obj:
+        return False
+    return await _delete(session, obj)
+
+
+async def orm_get_provinces_by_country_code(
+    session: AsyncSession, country_code: str
+) -> list[Province]:
+    res = await session.execute(
+        select(Province)
+        .where(Province.country_code == country_code)
+        .order_by(Province.name_lo.asc())
+    )
+    return list(res.scalars().all())
+
+
+async def orm_get_provinces_by_country_code_active(
+    session: AsyncSession,
+    country_code: str,
+    is_active: bool = True,
+) -> list[Province]:
+    res = await session.execute(
+        select(Province)
+        .where(Province.country_code == country_code)
+        .where(Province.is_active == is_active)
+        .order_by(Province.name_lo.asc())
+    )
+    return list(res.scalars().all())
+
+
+# =========================
+# Cities (Address Settings)
+# =========================
+async def orm_create_city(session: AsyncSession, data: dict[str, Any]) -> City:
+    return await _create_model(session, City, data)
+
+
+async def orm_get_all_cities(session: AsyncSession) -> list[City]:
+    # ตามมาตรฐาน router เมือง: order by id
+    res = await session.execute(select(City).order_by(City.id.asc()))
+    return list(res.scalars().all())
+
+
+async def orm_get_city_by_id(session: AsyncSession, city_id: int) -> Optional[City]:
+    return await session.get(City, city_id)
+
+
+async def orm_update_city_by_id(session: AsyncSession, city_id: int, data: dict[str, Any]) -> Optional[City]:
+    obj = await orm_get_city_by_id(session, city_id)
+    if not obj:
+        return None
+    return await _update(session, obj, data)
+
+
+async def orm_delete_city_by_id(session: AsyncSession, city_id: int) -> bool:
+    obj = await orm_get_city_by_id(session, city_id)
+    if not obj:
+        return False
+    return await _delete(session, obj)
+
+
+async def orm_get_cities_by_province_id(session: AsyncSession, province_id: int) -> list[City]:
+    res = await session.execute(
+        select(City)
+        .where(City.province_id == province_id)
+        .order_by(City.id.asc())
+    )
+    return list(res.scalars().all())
+
+
+async def orm_get_cities_by_province_id_active(
+    session: AsyncSession,
+    province_id: int,
+    is_active: bool = True,
+) -> list[City]:
+    res = await session.execute(
+        select(City)
+        .where(City.province_id == province_id)
+        .where(City.is_active == is_active)
+        .order_by(City.id.asc())
+    )
+    return list(res.scalars().all())
+
+
+# =========================
+# Districts (Address Settings)
+# =========================
+async def orm_create_district(session: AsyncSession, data: dict[str, Any]) -> District:
+    return await _create_model(session, District, data)
+
+
+async def orm_get_all_districts(session: AsyncSession) -> list[District]:
+    res = await session.execute(select(District).order_by(District.name_lo.asc()))
+    return list(res.scalars().all())
+
+
+async def orm_get_district_by_id(session: AsyncSession, district_id: int) -> Optional[District]:
+    return await session.get(District, district_id)
+
+
+async def orm_update_district_by_id(
+    session: AsyncSession, district_id: int, data: dict[str, Any]
+) -> Optional[District]:
+    obj = await orm_get_district_by_id(session, district_id)
+    if not obj:
+        return None
+    return await _update(session, obj, data)
+
+
+async def orm_delete_district_by_id(session: AsyncSession, district_id: int) -> bool:
+    obj = await orm_get_district_by_id(session, district_id)
+    if not obj:
+        return False
+    return await _delete(session, obj)
+
+
+async def orm_get_districts_by_city_id(session: AsyncSession, city_id: int) -> list[District]:
+    res = await session.execute(
+        select(District)
+        .where(District.city_id == city_id)
+        .order_by(District.name_lo.asc())
+    )
+    return list(res.scalars().all())
+
+
+async def orm_get_districts_by_city_id_active(
+    session: AsyncSession,
+    city_id: int,
+    is_active: bool = True,
+) -> list[District]:
+    res = await session.execute(
+        select(District)
+        .where(District.city_id == city_id)
+        .where(District.is_active == is_active)
+        .order_by(District.name_lo.asc())
+    )
+    return list(res.scalars().all())
+
+
+# =========================
+# Currencies
+# =========================
+async def orm_create_currency(session: AsyncSession, data: dict[str, Any]) -> Currency:
+    return await _create_model(session, Currency, data)
+
+
+async def orm_get_all_currencies(session: AsyncSession) -> list[Currency]:
+    res = await session.execute(select(Currency).order_by(Currency.currency_code.asc()))
+    return list(res.scalars().all())
+
+
+async def orm_get_currency_by_code(session: AsyncSession, currency_code: str) -> Optional[Currency]:
+    return await session.get(Currency, currency_code)
+
+
+async def orm_update_currency_by_code(
+    session: AsyncSession, currency_code: str, data: dict[str, Any]
+) -> Optional[Currency]:
+    obj = await orm_get_currency_by_code(session, currency_code)
+    if not obj:
+        return None
+    return await _update(session, obj, data)
+
+
+async def orm_delete_currency_by_code(session: AsyncSession, currency_code: str) -> bool:
+    obj = await orm_get_currency_by_code(session, currency_code)
+    if not obj:
+        return False
+    return await _delete(session, obj)
+
+
+# =========================
+# Languages
+# =========================
+async def orm_create_language(session: AsyncSession, data: dict[str, Any]) -> Language:
+    return await _create_model(session, Language, data)
+
+
+async def orm_get_all_languages(session: AsyncSession) -> list[Language]:
+    res = await session.execute(select(Language).order_by(Language.language_code.asc()))
+    return list(res.scalars().all())
+
+
+async def orm_get_language_by_code(session: AsyncSession, language_code: str) -> Optional[Language]:
+    return await session.get(Language, language_code)
+
+
+async def orm_update_language_by_code(
+    session: AsyncSession, language_code: str, data: dict[str, Any]
+) -> Optional[Language]:
+    obj = await orm_get_language_by_code(session, language_code)
+    if not obj:
+        return None
+    return await _update(session, obj, data)
+
+
+async def orm_delete_language_by_code(session: AsyncSession, language_code: str) -> bool:
+    obj = await orm_get_language_by_code(session, language_code)
+    if not obj:
+        return False
+    return await _delete(session, obj)
+
+
+# =========================
+# Geographies
+# =========================
+async def orm_create_geography(session: AsyncSession, data: dict[str, Any]) -> Geography:
+    return await _create_model(session, Geography, data)
+
+
+async def orm_get_all_geographies(session: AsyncSession) -> list[Geography]:
+    res = await session.execute(select(Geography).order_by(Geography.id.asc()))
+    return list(res.scalars().all())
+
+
+async def orm_get_geography_by_id(session: AsyncSession, geography_id: int) -> Optional[Geography]:
+    return await session.get(Geography, geography_id)
+
+
+async def orm_update_geography_by_id(
+    session: AsyncSession, geography_id: int, data: dict[str, Any]
+) -> Optional[Geography]:
+    obj = await orm_get_geography_by_id(session, geography_id)
+    if not obj:
+        return None
+    return await _update(session, obj, data)
+
+
+async def orm_delete_geography_by_id(session: AsyncSession, geography_id: int) -> bool:
+    obj = await orm_get_geography_by_id(session, geography_id)
     if not obj:
         return False
     return await _delete(session, obj)

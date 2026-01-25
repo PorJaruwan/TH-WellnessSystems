@@ -46,7 +46,7 @@ class PatientBase(BaseModel):
     email: EmailStr
     #payment_status: str = Field(..., max_length=25)
     status: str = Field(..., max_length=25)
-    full_name_lo: str = Field(..., max_length=255)
+    #full_name_lo: str = Field(..., max_length=255)
 
     # --- Optional ---
     title_en: Optional[str] = Field(None, max_length=25)
@@ -102,7 +102,7 @@ class PatientBase(BaseModel):
 
     is_active: bool = True
 
-    full_name_en: Optional[str] = Field(None, max_length=255)
+    #full_name_en: Optional[str] = Field(None, max_length=255)
     main_contact_method: Optional[MainContactMethodEnum] = None
 
     alert_level: Optional[str] = None
@@ -149,6 +149,8 @@ class PatientRead(PatientBase):
     id: UUID
     created_at: datetime
     updated_at: datetime
+    full_name_lo: str = Field(..., max_length=255)
+    full_name_en: Optional[str] = Field(None, max_length=255)
 
 ###=====Patient-child=====###
 # =========================================================

@@ -393,3 +393,16 @@ class DepartmentUpdate(_BaseIn):
     department_code: Optional[str] = None
     department_type_id: Optional[UUID] = None
     head_id: Optional[UUID] = None
+
+
+# =========================================================
+# Geographies
+# =========================================================
+class GeographyCreate(_BaseIn):
+    # DDL: id integer not null (ไม่มี default) → ให้ client ส่งมา
+    id: int = Field(..., ge=1)
+    name: str = Field(..., max_length=255)
+
+
+class GeographyUpdate(_BaseIn):
+    name: Optional[str] = Field(default=None, max_length=255)

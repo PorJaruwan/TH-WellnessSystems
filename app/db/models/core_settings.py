@@ -19,8 +19,10 @@ if TYPE_CHECKING:
     from app.db.models.core_settings import RoomAvailability
     from app.db.models.core_settings import Room
     from app.db.models.core_settings import Service
-###=======
-
+    from app.db.models.core_settings import Country
+    from app.db.models.core_settings import Province
+    from app.db.models.core_settings import City
+    from app.db.models.core_settings import District
 
 
 ###=====companies=====###
@@ -269,3 +271,143 @@ class Service(Base):
 
     service_type: Mapped["ServiceType"] = relationship("ServiceType", back_populates="services")
     room_services: Mapped[list["RoomService"]] = relationship("RoomService", back_populates="service")
+
+
+###=====country=====###
+
+class Country(Base):
+    __tablename__ = "countries"
+
+    country_code: Mapped[str] = mapped_column(String(2), primary_key=True)
+    name_lo: Mapped[str] = mapped_column(String(150), nullable=False)
+    name_en: Mapped[str] = mapped_column(String(150), nullable=False)
+
+    created_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
+
+    provinces: Mapped[List["Province"]] = relationship(
+        "Province",
+        back_populates="country",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+
+
+###=====province=====###
+
+class Province(Base):
+    __tablename__ = "provinces"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name_lo: Mapped[str] = mapped_column(String(150), nullable=False)
+    name_en: Mapped[str] = mapped_column(String(150), nullable=False)
+
+    geography_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+    country_code: Mapped[str] = mapped_column(
+        String(2),
+        ForeignKey("countries.country_code", ondelete="RESTRICT"),
+        nullable=False,
+    )
+
+    created_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
+
+    country: Mapped["Country"] = relationship("Country", back_populates="provinces")
+    cities: Mapped[List["City"]] = relationship(
+        "City",
+        back_populates="province",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+
+
+###=====city=====###
+
+class City(Base):
+    __tablename__ = "cities"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name_lo: Mapped[str] = mapped_column(String(150), nullable=False)
+    name_en: Mapped[str] = mapped_column(String(150), nullable=False)
+
+    province_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("provinces.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+
+    created_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
+
+    province: Mapped["Province"] = relationship("Province", back_populates="cities")
+    districts: Mapped[List["District"]] = relationship(
+        "District",
+        back_populates="city",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+
+
+###=====district=====###
+
+class District(Base):
+    __tablename__ = "districts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    zip_code: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    name_lo: Mapped[str] = mapped_column(String(150), nullable=False)
+    name_en: Mapped[str] = mapped_column(String(150), nullable=False)
+
+    city_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("cities.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+
+    created_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
+
+    city: Mapped["City"] = relationship("City", back_populates="districts")
+
+
+###=====Currency=====###
+
+class Currency(Base):
+    __tablename__ = "currencies"
+
+    currency_code: Mapped[str] = mapped_column(String(10), primary_key=True)
+    currency_name: Mapped[str] = mapped_column(String(50), nullable=False)
+
+    symbol: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    decimal_places: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+
+###=====Language=====###
+
+class Language(Base):
+    __tablename__ = "languages"
+
+    language_code: Mapped[str] = mapped_column(String(10), primary_key=True)
+    language_name: Mapped[str] = mapped_column(String(50), nullable=False)
+
+
+###=====Geography=====###
+
+class Geography(Base):
+    __tablename__ = "geographies"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    provinces: Mapped[List["Province"]] = relationship(
+        "Province",
+        primaryjoin="Geography.id==foreign(Province.geography_id)",
+        viewonly=True,
+    )
+
