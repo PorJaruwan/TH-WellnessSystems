@@ -18,7 +18,7 @@ router = APIRouter(
     tags=["Bookings"]
 )
 
-@router.post("/create-by-id", response_class=UnicodeJSONResponse)
+@router.post("/create", response_class=UnicodeJSONResponse)
 def create_booking_staff_by_id(booking_staff: BookingStaffCreateModel):
     try:
         data = jsonable_encoder(booking_staff)
@@ -90,7 +90,7 @@ def delete_booking_staff(bookingStaffId: UUID):
         raise HTTPException(status_code=500, detail=str(e))
 
 # app/api/v1/bookings/booking_staff.py
-@router.get("/search-by-booking-id")
+@router.get("/search-by-bookingId")
 def read_booking_staff_by_booking_id(bookingId: UUID, role: str | None = None):
     try:
         res = get_booking_staff_by_booking_id(bookingId, role)

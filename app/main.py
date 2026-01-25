@@ -67,7 +67,7 @@ from app.api.v1.settings import (
     rooms, room_services, room_availabilities,  
     services, service_types,
     provinces, countries, cities, districts, 
-    #languages, currencies, geographies,
+    # languages, currencies, geographies,
 )
 
 from app.api.v1.patients import (
@@ -95,7 +95,8 @@ from app.api.v1.users import (
 
 from app.api.v1.bookings import (
     ###tags: booking 
-    bookings, bookings_staff, 
+    bookings, 
+    #bookings_staff, 
     ###tags: doctor
     doctor_eligible, 
     #doctor_schedule, #doctor_availability, 
@@ -115,10 +116,6 @@ from app.api.v1.bookings import (
 #  --Core-Settings
 app.include_router(companies.router)
 app.include_router(departments.router)
-app.include_router(countries.router)
-app.include_router(provinces.router)
-app.include_router(cities.router)
-app.include_router(districts.router)
 app.include_router(locations.router)
 app.include_router(buildings.router)
 app.include_router(rooms.router)
@@ -126,6 +123,14 @@ app.include_router(room_services.router)
 app.include_router(room_availabilities.router)
 app.include_router(services.router)
 app.include_router(service_types.router)
+app.include_router(countries.router)
+app.include_router(provinces.router)
+app.include_router(cities.router)
+app.include_router(districts.router)
+# app.include_router(languages.router)
+# app.include_router(currencies.router)
+# app.include_router(geographies.router)
+
 #  --Patients-Settings
 app.include_router(patients.router)
 app.include_router(patient_addresses.router)
@@ -163,7 +168,7 @@ app.include_router(resend_confirm.router)
 
 #  --Transaction-bookings
 app.include_router(bookings.router)
-app.include_router(bookings_staff.router)
+# app.include_router(bookings_staff.router)
 #app.include_router(doctor_availability.router)
 app.include_router(doctor_eligible.router)
 

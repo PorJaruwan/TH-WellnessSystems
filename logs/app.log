@@ -2965,3 +2965,7 @@
 {"asctime": "2026-01-24 16:56:57,414", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/bookings/patients/search in 0.53s"}
 {"asctime": "2026-01-24 16:57:56,682", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/bookings/bookings"}
 {"asctime": "2026-01-24 16:57:57,114", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/bookings/bookings in 0.43s"}
+{"asctime": "2026-01-25 11:30:59,198", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2026-01-25 11:30:59,201", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.00s"}
+{"asctime": "2026-01-25 11:30:59,285", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2026-01-25 11:30:59,372", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.09s"}

@@ -25,8 +25,7 @@ router = APIRouter(
 )
 
 
-@router.get(
-    "",
+@router.get("/search",
     response_class=UnicodeJSONResponse,
     response_model=dict,
     response_model_exclude_none=True,
