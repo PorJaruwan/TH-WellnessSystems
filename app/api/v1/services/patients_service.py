@@ -78,23 +78,74 @@ async def get_patient(db: AsyncSession, patient_id: UUID) -> Optional[dict]:
     return _to_read_dict(obj) if obj else None
 
 
+# async def search_patients(
+#     db: AsyncSession,
+#     q_text: str = "",
+#     status: str = "",
+#     limit: int = 50,
+#     offset: int = 0,
+# ) -> Tuple[List[dict], int]:
+#     """
+#     Search patients with pagination
+#     Returns:
+#       - items: list[dict]  (เฉพาะหน้าปัจจุบัน)
+#       - total: int         (จำนวนทั้งหมดจริง ก่อน limit/offset)
+#     """
+
+#     # -----------------------------
+#     # Build filters (ใช้ร่วมกันทั้ง total และ items)
+#     # -----------------------------
+#     filters = [Patient.is_active.is_(True)]
+
+#     if q_text:
+#         kw = f"%{q_text}%"
+#         filters.append(
+#             or_(
+#                 Patient.first_name_lo.ilike(kw),
+#                 Patient.last_name_lo.ilike(kw),
+#                 func.coalesce(Patient.first_name_en, "").ilike(kw),
+#                 func.coalesce(Patient.last_name_en, "").ilike(kw),
+#                 Patient.patient_code.ilike(kw),
+#                 func.coalesce(Patient.telephone, "").ilike(kw),
+#                 Patient.id_card_no.ilike(kw),
+#             )
+#         )
+
+#     if status:
+#         filters.append(Patient.status == status)
+
+#     # -----------------------------
+#     # Total count (ทั้งหมดจริง)
+#     # -----------------------------
+#     total_stmt = select(func.count()).select_from(Patient).where(*filters)
+#     total_res = await db.execute(total_stmt)
+#     total = int(total_res.scalar() or 0)
+
+#     # -----------------------------
+#     # Page items
+#     # -----------------------------
+#     stmt = (
+#         _with_refs(select(Patient))
+#         .where(*filters)
+#         .order_by(Patient.created_at.desc())
+#         .limit(limit)
+#         .offset(offset)
+#     )
+
+#     res = await db.execute(stmt)
+#     items = [_to_read_dict(p) for p in res.scalars().all()]
+
+#     return items, total
+
+
 async def search_patients(
     db: AsyncSession,
     q_text: str = "",
     status: str = "",
+    source_type: str = "",   # ✅ NEW
     limit: int = 50,
     offset: int = 0,
-) -> Tuple[List[dict], int]:
-    """
-    Search patients with pagination
-    Returns:
-      - items: list[dict]  (เฉพาะหน้าปัจจุบัน)
-      - total: int         (จำนวนทั้งหมดจริง ก่อน limit/offset)
-    """
-
-    # -----------------------------
-    # Build filters (ใช้ร่วมกันทั้ง total และ items)
-    # -----------------------------
+):
     filters = [Patient.is_active.is_(True)]
 
     if q_text:
@@ -114,16 +165,20 @@ async def search_patients(
     if status:
         filters.append(Patient.status == status)
 
-    # -----------------------------
-    # Total count (ทั้งหมดจริง)
-    # -----------------------------
+    # ✅ NEW: filter by sources.source_type
+    if source_type:
+        src_ids_subq = select(Source.id).where(Source.source_type == source_type)
+        filters.append(
+            or_(
+                Patient.source_id.in_(src_ids_subq),
+                Patient.market_source_id.in_(src_ids_subq),
+            )
+        )
+
     total_stmt = select(func.count()).select_from(Patient).where(*filters)
     total_res = await db.execute(total_stmt)
     total = int(total_res.scalar() or 0)
 
-    # -----------------------------
-    # Page items
-    # -----------------------------
     stmt = (
         _with_refs(select(Patient))
         .where(*filters)
@@ -131,12 +186,9 @@ async def search_patients(
         .limit(limit)
         .offset(offset)
     )
-
     res = await db.execute(stmt)
     items = [_to_read_dict(p) for p in res.scalars().all()]
-
     return items, total
-
 
 
 async def create_patient(db: AsyncSession, payload: PatientCreate) -> dict:
@@ -199,11 +251,33 @@ async def create_source(db: AsyncSession, data: SourceCreate) -> Source:
     return obj
 
 
-async def get_all_sources(db: AsyncSession) -> List[Source]:
-    result = await db.execute(
-        select(Source).order_by(Source.source_name)
-    )
+# async def get_all_sources(db: AsyncSession) -> List[Source]:
+#     result = await db.execute(
+#         select(Source).order_by(Source.source_name)
+#     )
+#     return list(result.scalars().all())
+# ✅ replace function เดิม
+async def get_all_sources(
+    db: AsyncSession,
+    q: str = "",
+    source_type: str = "",
+    is_active: Optional[bool] = None,
+) -> List[Source]:
+    stmt = select(Source)
+
+    if is_active is not None:
+        stmt = stmt.where(Source.is_active == is_active)
+
+    if source_type:
+        stmt = stmt.where(Source.source_type == source_type)
+
+    if q:
+        stmt = stmt.where(Source.source_name.ilike(f"%{q}%"))
+
+    stmt = stmt.order_by(Source.source_name)
+    result = await db.execute(stmt)
     return list(result.scalars().all())
+
 
 
 async def get_source_by_id(db: AsyncSession, source_id: UUID) -> Optional[Source]:
@@ -253,8 +327,16 @@ async def post_source_service(
     return await create_source(db, data)
 
 
-async def get_all_source_service(db: AsyncSession) -> List[Source]:
-    return await get_all_sources(db)
+# async def get_all_source_service(db: AsyncSession) -> List[Source]:
+#     return await get_all_sources(db)
+# ✅ ให้ wrapper เรียกอันใหม่
+async def get_all_source_service(
+    db: AsyncSession,
+    q: str = "",
+    source_type: str = "",
+    is_active: Optional[bool] = None,
+) -> List[Source]:
+    return await get_all_sources(db, q=q, source_type=source_type, is_active=is_active)
 
 
 async def get_source_by_id_service(

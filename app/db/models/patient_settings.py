@@ -20,6 +20,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from app.db.models.patient_settings import Alert, Allergy
 
+
+
 class Patient(Base):
     __tablename__ = "patients"
     __table_args__ = (
@@ -168,8 +170,9 @@ class Patient(Base):
         foreign_keys=[alert_id],
         lazy="selectin",
     )
-
-
+    market_source_id: Mapped[Optional[uuid.UUID]] = mapped_column(PG_UUID(as_uuid=True))  # ✅ NEW
+    referral_source_note: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)  # ✅ NEW
+    market_source_note: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)    # ✅ NEW
 
 
 ########################
@@ -458,6 +461,7 @@ class SaleStaff(Base):
     )
 
 
+
 class Source(Base):
     __tablename__ = "sources"
 
@@ -468,6 +472,7 @@ class Source(Base):
     )
     source_name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    source_type: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)  # ✅ NEW
 
     is_active: Mapped[bool] = mapped_column(
         Boolean,
@@ -486,3 +491,4 @@ class Source(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+    

@@ -2977,3 +2977,13 @@
 {"asctime": "2026-01-25 15:59:12,234", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/allergies/search in 1.09s"}
 {"asctime": "2026-01-25 15:59:24,272", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/allergies/search"}
 {"asctime": "2026-01-25 15:59:24,906", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/allergies/search in 0.63s"}
+{"asctime": "2026-01-25 19:29:04,897", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2026-01-25 19:29:04,899", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.00s"}
+{"asctime": "2026-01-25 19:29:04,962", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2026-01-25 19:29:05,084", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.12s"}
+{"asctime": "2026-01-25 19:29:18,445", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/patients/search"}
+{"asctime": "2026-01-25 19:29:19,907", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/patients/search in 1.46s"}
+{"asctime": "2026-01-25 19:29:24,533", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/patients/search"}
+{"asctime": "2026-01-25 19:29:25,462", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/patients/search in 0.93s"}
+{"asctime": "2026-01-25 19:31:02,727", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/sources/search"}
+{"asctime": "2026-01-25 19:31:03,402", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/sources/search in 0.68s"}

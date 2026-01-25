@@ -33,7 +33,7 @@ class MainContactMethodEnum(str, Enum):
     phone = "phone"
     email = "email"
     text = "text"
-
+    
 
 class PatientBase(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
@@ -108,6 +108,10 @@ class PatientBase(BaseModel):
     alert_level: Optional[str] = None
     critical_medical_note: Optional[str] = None
 
+    market_source_id: Optional[UUID] = None            # ✅ NEW
+    referral_source_note: Optional[str] = Field(None, max_length=500)  # ✅ NEW
+    market_source_note: Optional[str] = Field(None, max_length=500)    # ✅ NEW
+
 
 class PatientCreate(PatientBase):
     """POST /patients"""
@@ -141,6 +145,10 @@ class PatientUpdate(BaseModel):
 
     is_active: Optional[bool] = None
     status: Optional[str] = Field(None, max_length=25)
+
+    market_source_id: Optional[UUID] = None            # ✅ NEW
+    referral_source_note: Optional[str] = Field(None, max_length=500)  # ✅ NEW
+    market_source_note: Optional[str] = Field(None, max_length=500)    # ✅ NEW
 
 
 class PatientRead(PatientBase):
@@ -235,6 +243,7 @@ class SourceBase(BaseModel):
     source_name: str
     description: Optional[str] = None
     is_active: bool = True
+    source_type: Optional[str] = None   # ✅ NEW: 'referral' | 'market' | None
 
 
 class SourceCreate(SourceBase):
@@ -245,6 +254,7 @@ class SourceUpdate(BaseModel):
     source_name: Optional[str] = None
     description: Optional[str] = None
     is_active: Optional[bool] = None
+    source_type: Optional[str] = None   # ✅ NEW
 
 
 class SourceRead(SourceBase, ORMBaseModel):

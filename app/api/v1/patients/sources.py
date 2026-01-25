@@ -3,7 +3,8 @@ settings = get_settings()  # ✅ load settings
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query  # ✅ เพิ่ม Query
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import get_db
@@ -43,20 +44,39 @@ async def create_source_by_id(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# @router.get("/search", response_class=UnicodeJSONResponse)
+# async def read_source_by_all(
+#     db: AsyncSession = Depends(get_db),
+# ):
+#     raw = await get_all_source_service(db)
+#     if not raw:
+#         return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={})
+
+#     result_list = format_source_results(raw)
+
+#     return ResponseHandler.success(
+#         message=ResponseCode.SUCCESS["RETRIEVED"][1],
+#         data={"total": len(result_list), "sources": result_list},
+#     )
+
+
 @router.get("/search", response_class=UnicodeJSONResponse)
 async def read_source_by_all(
     db: AsyncSession = Depends(get_db),
+    q: str = Query(default="", description="search by source_name"),
+    source_type: str = Query(default="", description="filter: referral | market"),
+    is_active: bool | None = Query(default=None, description="filter is_active"),
 ):
-    raw = await get_all_source_service(db)
+    raw = await get_all_source_service(db, q=q, source_type=source_type, is_active=is_active)
     if not raw:
-        return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={})
+        return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={"q": q, "source_type": source_type})
 
     result_list = format_source_results(raw)
-
     return ResponseHandler.success(
         message=ResponseCode.SUCCESS["RETRIEVED"][1],
         data={"total": len(result_list), "sources": result_list},
     )
+
 
 
 @router.get("/search-by-id", response_class=UnicodeJSONResponse)

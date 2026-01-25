@@ -90,6 +90,50 @@ async def get_patients(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+###---มีการเพิ่ม paramiter: source_type
+# @router.get("/search", response_class=UnicodeJSONResponse, response_model=dict, response_model_exclude_none=True)
+# async def get_patients(
+#     db: AsyncSession = Depends(get_db),
+#     q: str = Query(default="", description="keyword: ชื่อ/นามสกุล/รหัส/โทร/id_card"),
+#     status: str = Query(default="", description="filter status"),
+#     source_type: str = Query(default="", description="filter by sources.source_type: referral|market"),  # ✅ NEW
+#     limit: int = Query(default=50, ge=1, le=200),
+#     offset: int = Query(default=0, ge=0),
+# ):
+#     """
+#     List/Search Patients (มาตรฐานเดียวกับ locations)
+#     - total   : จำนวนทั้งหมดจริง (ก่อน limit/offset)
+#     - count   : จำนวนรายการในหน้านี้
+#     - limit   : page size
+#     - offset  : page offset
+#     - filters : เงื่อนไขที่ใช้ค้นหา (ช่วย debug/UI)
+#     - policy  : ถ้าไม่พบข้อมูล -> DATA.EMPTY
+#     """
+#     try:
+#         filters = {"q": unquote(q), "status": status, "source_type": source_type}
+
+#         if filters["q"] or status or source_type:
+#             items, total = await search_patients(
+#                 db,
+#                 q_text=filters["q"],
+#                 status=status,
+#                 source_type=source_type,  # ✅ NEW
+#                 limit=limit,
+#                 offset=offset,
+#             )
+#         else:
+#             items, total = await list_patients(db, limit=limit, offset=offset)
+
+#         if total == 0:
+#             return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={"filters": filters})
+
+#         return ResponseHandler.success(
+#             message=ResponseCode.SUCCESS["RETRIEVED"][1],
+#             data={"total": total, "count": len(items), "limit": limit, "offset": offset, "filters": filters, "patients": items},
+#         )
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/search-by-id", response_class=UnicodeJSONResponse)
 async def get_patient_by_id(
