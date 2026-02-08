@@ -123,7 +123,7 @@ async def post_patient(
 
 
 @router.get(
-    "/{patient_id:uuid}",
+    "/patient_id",
     response_class=UnicodeJSONResponse,
     response_model=PatientByIdEnvelope,
     response_model_exclude_none=True,
