@@ -7,6 +7,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.db.models import (
     Company,
@@ -182,16 +183,58 @@ async def orm_get_locations_by_company_code_active(
 async def orm_create_building(session: AsyncSession, data: dict[str, Any]) -> Building:
     return await _create_model(session, Building, data)
 
-
 async def orm_get_all_buildings(session: AsyncSession) -> list[Building]:
-    res = await session.execute(select(Building).order_by(Building.building_name.asc()))
+    res = await session.execute(
+        select(Building)
+        .options(
+            selectinload(Building.location)  # ✅ IMPORTANT
+        )
+        .order_by(Building.building_name.asc())
+    )
     return list(res.scalars().all())
 
+async def orm_get_buildings_by_location_id(session: AsyncSession, location_id: UUID) -> list[Building]:
+    res = await session.execute(
+        select(Building)
+        .options(selectinload(Building.location))  #Add
+        .where(Building.location_id == location_id)
+        .order_by(Building.building_name.asc())
+    )
+    return list(res.scalars().all())
+
+async def orm_get_buildings_active(
+    session: AsyncSession,
+    is_active: bool = True,
+) -> list[Building]:
+    res = await session.execute(
+        select(Building)
+        .options(selectinload(Building.location))  #Add
+        .where(Building.is_active == is_active)
+        .order_by(Building.building_name.asc())
+    )
+    return list(res.scalars().all())
+
+async def orm_get_buildings_by_location_id_active(
+    session: AsyncSession,
+    location_id: UUID,
+    is_active: bool = True,
+) -> list[Building]:
+    res = await session.execute(
+        select(Building)
+        .options(selectinload(Building.location))   ##Add
+        .where(Building.location_id == location_id)
+        .where(Building.is_active == is_active)
+        .order_by(Building.building_name.asc())
+    )
+    return list(res.scalars().all())
 
 async def orm_get_building_by_id(session: AsyncSession, building_id: UUID) -> Optional[Building]:
-    res = await session.execute(select(Building).where(Building.id == building_id))
+    res = await session.execute(
+        select(Building)
+        .options(selectinload(Building.location))  #Add
+        .where(Building.id == building_id)
+        )
     return res.scalar_one_or_none()
-
 
 async def orm_update_building_by_id(
     session: AsyncSession, building_id: UUID, updated: dict[str, Any]
@@ -209,36 +252,6 @@ async def orm_delete_building_by_id(session: AsyncSession, building_id: UUID) ->
     return await _delete(session, obj)
 
 
-async def orm_get_buildings_by_location_id(session: AsyncSession, location_id: UUID) -> list[Building]:
-    res = await session.execute(
-        select(Building)
-        .where(Building.location_id == location_id)
-        .order_by(Building.building_name.asc())
-    )
-    return list(res.scalars().all())
-
-
-async def orm_get_buildings_active(session: AsyncSession, is_active: bool = True) -> list[Building]:
-    res = await session.execute(
-        select(Building)
-        .where(Building.is_active == is_active)
-        .order_by(Building.building_name.asc())
-    )
-    return list(res.scalars().all())
-
-
-async def orm_get_buildings_by_location_id_active(
-    session: AsyncSession,
-    location_id: UUID,
-    is_active: bool = True,
-) -> list[Building]:
-    res = await session.execute(
-        select(Building)
-        .where(Building.location_id == location_id)
-        .where(Building.is_active == is_active)
-        .order_by(Building.building_name.asc())
-    )
-    return list(res.scalars().all())
 
 
 # =========================
@@ -303,6 +316,19 @@ async def orm_delete_room_by_id(session: AsyncSession, room_id: UUID) -> bool:
     return await _delete(session, obj)
 
 
+async def orm_get_room_by_id_with_names(session: AsyncSession, room_id: UUID) -> Optional[Room]:
+    res = await session.execute(
+        select(Room)
+        .options(
+            selectinload(Room.location),
+            selectinload(Room.building),
+            selectinload(Room.room_type),
+        )
+        .where(Room.id == room_id)
+    )
+    return res.scalar_one_or_none()
+
+
 # =========================
 # Room Services
 # =========================
@@ -311,12 +337,26 @@ async def orm_create_room_service(session: AsyncSession, data: dict[str, Any]) -
 
 
 async def orm_get_all_room_services(session: AsyncSession) -> list[RoomService]:
-    res = await session.execute(select(RoomService).order_by(RoomService.created_at.desc()))
+    res = await session.execute(
+        select(RoomService)
+        .options(
+            selectinload(RoomService.room),
+            selectinload(RoomService.service),
+        )
+        .order_by(RoomService.created_at.desc()))
     return list(res.scalars().all())
 
 
 async def orm_get_room_service_by_id(session: AsyncSession, room_service_id: UUID) -> Optional[RoomService]:
-    return await session.get(RoomService, room_service_id)
+    stmt = (
+        select(RoomService)
+        .options(
+            selectinload(RoomService.room),
+            selectinload(RoomService.service),
+        )
+        .where(RoomService.id == room_service_id)
+    )
+    return (await session.execute(stmt)).scalars().first()
 
 
 async def orm_update_room_service_by_id(
@@ -414,7 +454,15 @@ async def orm_get_all_services(session: AsyncSession) -> list[Service]:
 
 
 async def orm_get_service_by_id(session: AsyncSession, service_id: UUID) -> Optional[Service]:
-    return await session.get(Service, service_id)
+    stmt = (
+        select(Service)
+        .options(selectinload(Service.service_type))  # ✅ CHANGED
+        .where(Service.id == service_id)
+    )
+    return (await session.execute(stmt)).scalars().first()
+
+# async def orm_get_service_by_id(session: AsyncSession, service_id: UUID) -> Optional[Service]:
+#     return await session.get(Service, service_id)
 
 
 async def orm_update_service_by_id(session: AsyncSession, service_id: UUID, data: dict[str, Any]) -> Optional[Service]:

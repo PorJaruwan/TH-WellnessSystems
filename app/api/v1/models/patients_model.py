@@ -160,6 +160,7 @@ class PatientRead(PatientBase):
     full_name_lo: str = Field(..., max_length=255)
     full_name_en: Optional[str] = Field(None, max_length=255)
 
+
 ###=====Patient-child=====###
 # =========================================================
 # Patient Addresses
@@ -233,8 +234,7 @@ class PatientImageRead(PatientImageBase, ORMBaseModel):
 
 
 
-###=====Patient-related=====###
-
+###=====Patient-related=====### 
 # =========================================================
 # Sources
 # =========================================================

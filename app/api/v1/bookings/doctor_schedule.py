@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 @router.post(
-    "/doctors-schedule",
+    "/schedule",
     response_class=UnicodeJSONResponse,
     response_model=ScheduleResponse,
     summary="Check doctor availability schedule",

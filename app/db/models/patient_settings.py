@@ -5,7 +5,7 @@ from uuid import UUID
 import uuid
 
 from datetime import date, datetime
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy import (Boolean, CheckConstraint, Date, DateTime, 
     ForeignKey, String, Text, text, UniqueConstraint,func,
@@ -19,7 +19,7 @@ from app.db.base import Base
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from app.db.models.patient_settings import Alert, Allergy
-
+    from app.db.models.booking_settings import Booking
 
 
 class Patient(Base):
@@ -173,6 +173,16 @@ class Patient(Base):
     market_source_id: Mapped[Optional[uuid.UUID]] = mapped_column(PG_UUID(as_uuid=True))  # ✅ NEW
     referral_source_note: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)  # ✅ NEW
     market_source_note: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)    # ✅ NEW
+    
+    # ==========================================================
+    # Bookings
+    # ==========================================================
+    bookings: Mapped[List["Booking"]] = relationship(
+        "Booking",
+        back_populates="patient",
+        lazy="selectin",
+    )
+
 
 
 ########################

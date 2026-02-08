@@ -1,4 +1,5 @@
 # app/db/models/staff_settings.py
+
 from __future__ import annotations
 
 import uuid
@@ -27,6 +28,7 @@ from app.db.base import Base
 
 if TYPE_CHECKING:
     from app.db.models.core_settings import Company, Department, Location, Building, Room, Service
+    from app.db.models.booking_settings import Booking, BookingStaff
 
 
 # =========================================================
@@ -105,6 +107,31 @@ class Staff(Base):
     services: Mapped[List["StaffService"]] = relationship(
         "StaffService", back_populates="staff", cascade="all, delete-orphan", lazy="selectin"
     )
+    
+    
+    # ==========================================================
+    # Bookings (doctor / primary person)
+    # ==========================================================
+    primary_bookings: Mapped[List["Booking"]] = relationship(
+        "Booking",
+        back_populates="primary_person",          # ✅ ต้องตรงกับ Booking.primary_person
+        foreign_keys="Booking.primary_person_id",
+        lazy="selectin",
+    )
+
+    # ==========================================================
+    # Booking staffs (many-to-many via booking_staff)
+    # ==========================================================
+    booking_staffs: Mapped[List["BookingStaff"]] = relationship(
+        "BookingStaff",
+        back_populates="staff",                   # ✅ ต้องตรงกับ BookingStaff.staff
+        lazy="selectin",
+    )
+
+
+
+
+
 
 
 # =========================================================
@@ -340,3 +367,14 @@ class StaffLeave(Base):
     company: Mapped[Optional["Company"]] = relationship("Company", lazy="selectin")
     location: Mapped[Optional["Location"]] = relationship("Location", lazy="selectin")
     staff: Mapped[Optional["Staff"]] = relationship("Staff", lazy="selectin")
+
+
+
+# -------------------------------------------------------------------
+# Backward-compatible aliases (fix ImportError from app.db.models.__init__)
+# -------------------------------------------------------------------
+# Some old modules import these names. Map them to current models.
+StaffAvailabilities = StaffWorkPattern
+StaffUnavailabilities = StaffLeave
+
+

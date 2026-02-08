@@ -1,5 +1,8 @@
-# app/api/v1/settings/locations.py
-from fastapi import APIRouter, HTTPException, Depends, Query
+# # app/api/v1/settings/locations.py
+
+from __future__ import annotations
+
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_, func
 from uuid import UUID
@@ -7,7 +10,14 @@ from typing import Optional
 
 from app.utils.ResponseHandler import ResponseHandler, ResponseCode, UnicodeJSONResponse
 from app.api.v1.models.settings_model import LocationCreate, LocationUpdate
-from app.api.v1.models.settings_response_model import LocationResponse
+from app.api.v1.models.settings_response_model import (
+    LocationResponse,
+    LocationCreateEnvelope,
+    LocationSearchEnvelope,
+    LocationGetEnvelope,
+    LocationUpdateEnvelope,
+    LocationDeleteEnvelope,
+)
 from app.api.v1.services.settings_orm_service import (
     orm_create_location,
     orm_get_location_by_id,
@@ -16,31 +26,72 @@ from app.api.v1.services.settings_orm_service import (
 )
 from app.database.session import get_db
 from app.utils.payload_cleaner import clean_create, clean_update
+from app.utils.openapi_responses import success_200_example, common_errors, success_example
+from app.api.v1.models.bookings_model import ErrorEnvelope
 from app.db.models import Location
 
-# ✅ DRY helpers
-from app.utils.router_helpers import (
-    respond_one,
-    respond_list_paged,
-    run_or_500,
+from app.utils.router_helpers import respond_one, respond_list_paged, run_or_500
+
+
+router = APIRouter(
+    # ✅ ให้เหมือน patients: ใส่ /api/v1 ที่ main.py ตอน include_router
+    prefix="/locations",
+    tags=["Core_Settings"],
 )
 
-router = APIRouter(prefix="/api/v1/locations", tags=["Core_Settings"])
 
-
-@router.post("/create", response_class=UnicodeJSONResponse, response_model=dict, response_model_exclude_none=True)
+@router.post(
+    "",
+    response_class=UnicodeJSONResponse,
+    response_model=LocationCreateEnvelope,
+    response_model_exclude_none=True,
+    responses={
+        **success_200_example(
+            example=success_example(
+                message=ResponseCode.SUCCESS["REGISTERED"][1],
+                data={"location": {"id": "<id>"}},
+            )
+        ),
+        **common_errors(error_model=ErrorEnvelope, include_500=True),
+    },
+)
 async def create_location(payload: LocationCreate, session: AsyncSession = Depends(get_db)):
+    """
+    Create (baseline = patients)
+    Response data shape:
+    - {"location": {...}}
+    """
+
     async def _work():
         obj = await orm_create_location(session, clean_create(payload))
+        out = LocationResponse.model_validate(obj).model_dump(exclude_none=True)
         return ResponseHandler.success(
-            ResponseCode.SUCCESS["REGISTERED"][1],
-            data={"location": LocationResponse.model_validate(obj).model_dump(exclude_none=True)},
+            message=ResponseCode.SUCCESS["REGISTERED"][1],
+            data={"location": out},
         )
 
     return await run_or_500(_work)
 
 
-@router.get("/search", response_class=UnicodeJSONResponse, response_model=dict, response_model_exclude_none=True)
+@router.get(
+    "/search",
+    response_class=UnicodeJSONResponse,
+    response_model=LocationSearchEnvelope,
+    response_model_exclude_none=True,
+    responses={
+        **success_200_example(
+            example=success_example(
+                message=ResponseCode.SUCCESS["RETRIEVED"][1],
+                data={
+                    "filters": {"q": "", "company_code": None, "is_active": True},
+                    "paging": {"total": 0, "limit": 50, "offset": 0},
+                    "locations": [],
+                },
+            )
+        ),
+        **common_errors(error_model=ErrorEnvelope, empty=True, include_500=True),
+    },
+)
 async def search_locations(
     session: AsyncSession = Depends(get_db),
     q: str = Query(default="", description="keyword (like): location_code / location_name"),
@@ -49,6 +100,14 @@ async def search_locations(
     limit: int = Query(default=50, ge=1, le=200, description="page size"),
     offset: int = Query(default=0, ge=0, description="row offset"),
 ):
+    """
+    Search/List (baseline = patients)
+    Response data shape:
+    - {"filters": {...}, "paging": {"total": N, "limit": L, "offset": O}, "locations": [...]}
+
+    Policy:
+    - total == 0 => 404 DATA.EMPTY
+    """
     filters = {"q": q, "company_code": company_code, "is_active": is_active}
 
     async def _work():
@@ -65,7 +124,7 @@ async def search_locations(
         count_stmt = select(func.count()).select_from(Location)
         for c in where:
             count_stmt = count_stmt.where(c)
-        total = (await session.execute(count_stmt)).scalar_one()
+        total = int((await session.execute(count_stmt)).scalar_one() or 0)
 
         # page
         stmt = select(Location)
@@ -80,7 +139,7 @@ async def search_locations(
             plural_key="locations",
             model_cls=LocationResponse,
             filters=filters,
-            total=int(total),
+            total=total,
             limit=limit,
             offset=offset,
         )
@@ -88,8 +147,30 @@ async def search_locations(
     return await run_or_500(_work)
 
 
-@router.get("/search-by-id", response_class=UnicodeJSONResponse, response_model=dict, response_model_exclude_none=True)
+@router.get(
+    "/{location_id:uuid}",
+    response_class=UnicodeJSONResponse,
+    response_model=LocationGetEnvelope,
+    response_model_exclude_none=True,
+    responses={
+        **success_200_example(
+            example=success_example(
+                message=ResponseCode.SUCCESS["RETRIEVED"][1],
+                data={"location": {"id": "<id>"}},
+            )
+        ),
+        **common_errors(error_model=ErrorEnvelope, not_found=True, include_500=True),
+    },
+)
 async def read_location(location_id: UUID, session: AsyncSession = Depends(get_db)):
+    """
+    Get by id (baseline = patients)
+    Response data shape:
+    - {"location": {...}}
+    Policy:
+    - not found => 404 DATA.NOT_FOUND
+    """
+
     async def _work():
         obj = await orm_get_location_by_id(session, location_id)
         return respond_one(
@@ -102,10 +183,41 @@ async def read_location(location_id: UUID, session: AsyncSession = Depends(get_d
     return await run_or_500(_work)
 
 
-@router.put("/update-by-id", response_class=UnicodeJSONResponse, response_model=dict, response_model_exclude_none=True)
+@router.put(
+    "/{location_id:uuid}",
+    response_class=UnicodeJSONResponse,
+    response_model=LocationUpdateEnvelope,
+    response_model_exclude_none=True,
+    responses={
+        **success_200_example(
+            example=success_example(
+                message=ResponseCode.SUCCESS["UPDATED"][1],
+                data={"location": {"id": "<id>"}},
+            )
+        ),
+        **common_errors(error_model=ErrorEnvelope, not_found=True, include_500=True),
+    },
+)
 async def update_location(location_id: UUID, payload: LocationUpdate, session: AsyncSession = Depends(get_db)):
+    """
+    Update (baseline = patients)
+    Response data shape:
+    - {"location": {...}}
+    Policy:
+    - payload empty => 422 DATA.INVALID
+    - not found => 404 DATA.NOT_FOUND
+    """
+
     async def _work():
-        obj = await orm_update_location_by_id(session, location_id, clean_update(payload))
+        data = clean_update(payload)
+        if not data:
+            return ResponseHandler.error(
+                *ResponseCode.DATA["INVALID"],
+                details={"reason": "empty payload", "location_id": str(location_id)},
+                status_code=422,
+            )
+
+        obj = await orm_update_location_by_id(session, location_id, data)
         return respond_one(
             obj=obj,
             key="location",
@@ -117,17 +229,41 @@ async def update_location(location_id: UUID, payload: LocationUpdate, session: A
     return await run_or_500(_work)
 
 
-@router.delete("/delete-by-id", response_class=UnicodeJSONResponse, response_model=dict)
+@router.delete(
+    "/{location_id:uuid}",
+    response_class=UnicodeJSONResponse,
+    response_model=LocationDeleteEnvelope,
+    response_model_exclude_none=True,
+    responses={
+        **success_200_example(
+            example=success_example(
+                message=ResponseCode.SUCCESS["DELETED"][1],
+                data={"location_id": "<id>"},
+            )
+        ),
+        **common_errors(error_model=ErrorEnvelope, not_found=True, include_500=True),
+    },
+)
 async def delete_location(location_id: UUID, session: AsyncSession = Depends(get_db)):
+    """
+    Delete (baseline = patients)
+    Response data shape:
+    - {"location_id": "..."}
+    Policy:
+    - not found => 404 DATA.NOT_FOUND
+    """
+
     async def _work():
         ok = await orm_delete_location_by_id(session, location_id)
         if not ok:
             return ResponseHandler.error(
                 *ResponseCode.DATA["NOT_FOUND"],
                 details={"location_id": str(location_id)},
+                status_code=404,
             )
+
         return ResponseHandler.success(
-            message=f"Location with ID {location_id} deleted.",
+            message=ResponseCode.SUCCESS["DELETED"][1],
             data={"location_id": str(location_id)},
         )
 
@@ -135,232 +271,161 @@ async def delete_location(location_id: UUID, session: AsyncSession = Depends(get
 
 
 
-
 # # app/api/v1/settings/locations.py
-# from fastapi import APIRouter, HTTPException, Depends
+# from fastapi import APIRouter, HTTPException, Depends, Query
 # from sqlalchemy.ext.asyncio import AsyncSession
+# from sqlalchemy import select, or_, func
 # from uuid import UUID
 # from typing import Optional
 
 # from app.utils.ResponseHandler import ResponseHandler, ResponseCode, UnicodeJSONResponse
 # from app.api.v1.models.settings_model import LocationCreate, LocationUpdate
-# from app.api.v1.models.settings_response_model import LocationResponse
+# from app.api.v1.models.settings_response_model import LocationResponse, LocationCreateEnvelope, LocationSearchEnvelope, LocationGetEnvelope, LocationUpdateEnvelope, LocationDeleteEnvelope
 # from app.api.v1.services.settings_orm_service import (
 #     orm_create_location,
-#     orm_get_all_locations,
 #     orm_get_location_by_id,
 #     orm_update_location_by_id,
 #     orm_delete_location_by_id,
-#     orm_get_locations_by_company_code,
-#     orm_get_locations_active,
-#     orm_get_locations_by_company_code_active,
 # )
 # from app.database.session import get_db
-
-# # ✅ [CHANGE] DRY: ใช้ util กลางเพื่อ
-# # - "" -> None
-# # - drop created_at/updated_at
 # from app.utils.payload_cleaner import clean_create, clean_update
+# from app.utils.api_response import ApiResponse
+# from app.utils.openapi_responses import success_200_example, common_errors, success_example
+# from app.api.v1.models.bookings_model import ErrorEnvelope
+# from app.db.models import Location
+
+# # ✅ DRY helpers
+# from app.utils.router_helpers import (
+#     respond_one,
+#     respond_list_paged,
+#     run_or_500,
+# )
 
 
 # router = APIRouter(
-#     prefix="/api/v1/locations",
+#     # ✅ ให้เหมือน patients: ใส่ /api/v1 ที่ main.py ตอน include_router
+#     prefix="/locations",
 #     tags=["Core_Settings"],
 # )
 
-# # ======================================================
-# # Standard response key rules (ตามแนวทางเดียวกันทั้งระบบ)
-# # - single: {"location": {...}}
-# # - list  : {"total": n, "locations": [...]}
-# # - params/details ใช้ snake_case เช่น location_id
-# # ======================================================
-
-
-# @router.post(
-#     "/create",
-#     response_class=UnicodeJSONResponse,
-#     response_model=dict,
-#     response_model_exclude_none=True,
-# )
+# @router.post("", response_class=UnicodeJSONResponse, response_model=LocationCreateEnvelope, response_model_exclude_none=True,
+#     responses={
+#         **success_200_example(example=success_example(message='Registered successfully.', data={'location': {'id': '<id>'}})),
+#         **common_errors(error_model=ErrorEnvelope, include_500=True),
+#     })
 # async def create_location(payload: LocationCreate, session: AsyncSession = Depends(get_db)):
-#     """
-#     Create: return key แบบเอกพจน์ => {"location": {...}}
-#     """
-#     try:
-#         # ✅ [CHANGE] DRY clean
-#         data = clean_create(payload)
-
-#         obj = await orm_create_location(session, data)
-#         out = LocationResponse.model_validate(obj).model_dump(exclude_none=True)
-
-#         # ✅ [CHANGE] key เป็นเอกพจน์ "location"
+#     async def _work():
+#         obj = await orm_create_location(session, clean_create(payload))
 #         return ResponseHandler.success(
 #             ResponseCode.SUCCESS["REGISTERED"][1],
-#             data={"location": out},
+#             data={"location": LocationResponse.model_validate(obj).model_dump(exclude_none=True)},
 #         )
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
+
+#     return await run_or_500(_work)
 
 
-# @router.get(
-#     "/search",
-#     response_class=UnicodeJSONResponse,
-#     response_model=dict,
-#     response_model_exclude_none=True,
-# )
+# @router.get("/search", response_class=UnicodeJSONResponse, response_model=LocationSearchEnvelope, response_model_exclude_none=True,
+#     responses={
+#         **success_200_example(example=success_example(message='Retrieved successfully.', data={'filters': {'q': ''}, 'paging': {'total': 0, 'limit': 50, 'offset': 0}, 'locations': []})),
+#         **common_errors(error_model=ErrorEnvelope, empty=True, include_500=True),
+#     })
 # async def search_locations(
-#     company_code: Optional[str] = None,
 #     session: AsyncSession = Depends(get_db),
+#     q: str = Query(default="", description="keyword (like): location_code / location_name"),
+#     company_code: Optional[str] = Query(default=None, description="filter by company_code"),
+#     is_active: bool = Query(default=True, description="default=true"),
+#     limit: int = Query(default=50, ge=1, le=200, description="page size"),
+#     offset: int = Query(default=0, ge=0, description="row offset"),
 # ):
-#     """
-#     List: return key แบบพหูพจน์ + total
-#     => {"total": n, "locations": [...]}
-#     """
-#     if company_code:
-#         items = await orm_get_locations_by_company_code(session, company_code)
-#     else:
-#         items = await orm_get_all_locations(session)
+#     filters = {"q": q, "company_code": company_code, "is_active": is_active}
 
-#     if not items:
-#         return ResponseHandler.error(
-#             *ResponseCode.DATA["EMPTY"],
-#             details={"company_code": company_code},
+#     async def _work():
+#         where = [Location.is_active == is_active]
+
+#         if company_code:
+#             where.append(Location.company_code == company_code)
+
+#         if q:
+#             kw = f"%{q}%"
+#             where.append(or_(Location.location_code.ilike(kw), Location.location_name.ilike(kw)))
+
+#         # total
+#         count_stmt = select(func.count()).select_from(Location)
+#         for c in where:
+#             count_stmt = count_stmt.where(c)
+#         total = (await session.execute(count_stmt)).scalar_one()
+
+#         # page
+#         stmt = select(Location)
+#         for c in where:
+#             stmt = stmt.where(c)
+
+#         stmt = stmt.order_by(Location.location_name.asc()).limit(limit).offset(offset)
+#         items = (await session.execute(stmt)).scalars().all()
+
+#         return respond_list_paged(
+#             items=items,
+#             plural_key="locations",
+#             model_cls=LocationResponse,
+#             filters=filters,
+#             total=int(total),
+#             limit=limit,
+#             offset=offset,
 #         )
 
-#     out = [LocationResponse.model_validate(x).model_dump(exclude_none=True) for x in items]
-
-#     # ✅ [CHANGE] ใส่ total + key เป็น "locations"
-#     return ResponseHandler.success(
-#         ResponseCode.SUCCESS["RETRIEVED"][1],
-#         data={"total": len(out), "locations": out},
-#     )
+#     return await run_or_500(_work)
 
 
-# @router.get(
-#     "/search-by-id",
-#     response_class=UnicodeJSONResponse,
-#     response_model=dict,
-#     response_model_exclude_none=True,
-# )
+# @router.get("/{location_id:uuid}", response_class=UnicodeJSONResponse, response_model=LocationGetEnvelope, response_model_exclude_none=True,
+#     responses={
+#         **success_200_example(example=success_example(message='Retrieved successfully.', data={'location': {'id': '<id>'}})),
+#         **common_errors(error_model=ErrorEnvelope, not_found=True, include_500=True),
+#     })
 # async def read_location(location_id: UUID, session: AsyncSession = Depends(get_db)):
-#     """
-#     Read-by-id: return key เอกพจน์
-#     => {"location": {...}}
-#     """
-#     obj = await orm_get_location_by_id(session, location_id)
-#     if not obj:
-#         # ✅ [CHANGE] details ใช้ snake_case "location_id"
-#         return ResponseHandler.error(
-#             *ResponseCode.DATA["NOT_FOUND"],
-#             details={"location_id": str(location_id)},
+#     async def _work():
+#         obj = await orm_get_location_by_id(session, location_id)
+#         return respond_one(
+#             obj=obj,
+#             key="location",
+#             model_cls=LocationResponse,
+#             not_found_details={"location_id": str(location_id)},
 #         )
 
-#     out = LocationResponse.model_validate(obj).model_dump(exclude_none=True)
-
-#     # ✅ [CHANGE] key เอกพจน์ "location"
-#     return ResponseHandler.success(
-#         ResponseCode.SUCCESS["RETRIEVED"][1],
-#         data={"location": out},
-#     )
+#     return await run_or_500(_work)
 
 
-# @router.put(
-#     "/update-by-id",
-#     response_class=UnicodeJSONResponse,
-#     response_model=dict,
-#     response_model_exclude_none=True,
-# )
-# async def update_location(
-#     location_id: UUID,  # ✅ [CHANGE] ใช้ snake_case (เดิมมักเป็น locationId)
-#     payload: LocationUpdate,
-#     session: AsyncSession = Depends(get_db),
-# ):
-#     """
-#     Update: return key เอกพจน์
-#     => {"location": {...}}
-#     """
-#     try:
-#         # ✅ [CHANGE] DRY clean update
-#         data = clean_update(payload)
-
-#         obj = await orm_update_location_by_id(session, location_id, data)
-#         if not obj:
-#             return ResponseHandler.error(
-#                 *ResponseCode.DATA["NOT_FOUND"],
-#                 details={"location_id": str(location_id)},  # ✅ snake_case
-#             )
-
-#         out = LocationResponse.model_validate(obj).model_dump(exclude_none=True)
-#         return ResponseHandler.success(
-#             ResponseCode.SUCCESS["UPDATED"][1],
-#             data={"location": out},  # ✅ [CHANGE] key เอกพจน์
+# @router.put("/{location_id:uuid}", response_class=UnicodeJSONResponse, response_model=LocationUpdateEnvelope, response_model_exclude_none=True,
+#     responses={
+#         **success_200_example(example=success_example(message='Retrieved successfully.', data={'location': {'id': '<id>'}})),
+#         **common_errors(error_model=ErrorEnvelope, not_found=True, include_500=True),
+#     })
+# async def update_location(location_id: UUID, payload: LocationUpdate, session: AsyncSession = Depends(get_db)):
+#     async def _work():
+#         obj = await orm_update_location_by_id(session, location_id, clean_update(payload))
+#         return respond_one(
+#             obj=obj,
+#             key="location",
+#             model_cls=LocationResponse,
+#             not_found_details={"location_id": str(location_id)},
+#             message=ResponseCode.SUCCESS["UPDATED"][1],
 #         )
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
+
+#     return await run_or_500(_work)
 
 
-# @router.delete(
-#     "/delete-by-id",
-#     response_class=UnicodeJSONResponse,
-#     response_model=dict,
-# )
-# async def delete_location(
-#     location_id: UUID,  # ✅ [CHANGE] snake_case
-#     session: AsyncSession = Depends(get_db),
-# ):
-#     """
-#     Delete: return data key snake_case
-#     => {"location_id": "..."}
-#     """
-#     try:
+# @router.delete("/{location_id:uuid}", response_class=UnicodeJSONResponse, response_model=LocationDeleteEnvelope,
+#     responses={
+#         **success_200_example(example=success_example(message='Deleted successfully.', data={'location_id': '<id>'})),
+#         **common_errors(error_model=ErrorEnvelope, not_found=True, include_500=True),
+#     })
+# async def delete_location(location_id: UUID, session: AsyncSession = Depends(get_db)):
+#     async def _work():
 #         ok = await orm_delete_location_by_id(session, location_id)
 #         if not ok:
-#             return ResponseHandler.error(
-#                 *ResponseCode.DATA["NOT_FOUND"],
-#                 details={"location_id": str(location_id)},  # ✅ snake_case
-#             )
-
-#         # ✅ [CHANGE] data ใช้ location_id snake_case
+#             return ApiResponse.err(data_key="NOT_FOUND", default_code="DATA_001", default_message="Data not found.", details={"location_id": str(location_id)}, status_code=404)
 #         return ResponseHandler.success(
 #             message=f"Location with ID {location_id} deleted.",
 #             data={"location_id": str(location_id)},
 #         )
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
 
-
-# @router.get(
-#     "/search-active",
-#     response_class=UnicodeJSONResponse,
-#     response_model=dict,
-#     response_model_exclude_none=True,
-# )
-# async def search_locations_active(
-#     company_code: Optional[str] = None,
-#     is_active: bool = True,
-#     session: AsyncSession = Depends(get_db),
-# ):
-#     """
-#     Active List: return key พหูพจน์ + total
-#     => {"total": n, "locations": [...]}
-#     """
-#     if company_code:
-#         items = await orm_get_locations_by_company_code_active(
-#             session, company_code, is_active=is_active
-#         )
-#     else:
-#         items = await orm_get_locations_active(session, is_active=is_active)
-
-#     if not items:
-#         return ResponseHandler.error(
-#             *ResponseCode.DATA["EMPTY"],
-#             details={"company_code": company_code, "is_active": is_active},
-#         )
-
-#     out = [LocationResponse.model_validate(x).model_dump(exclude_none=True) for x in items]
-
-#     # ✅ [CHANGE] ใส่ total + key เป็น "locations"
-#     return ResponseHandler.success(
-#         ResponseCode.SUCCESS["RETRIEVED"][1],
-#         data={"total": len(out), "locations": out},
-#     )
+#     return await run_or_500(_work)

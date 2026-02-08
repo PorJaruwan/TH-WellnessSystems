@@ -1,15 +1,17 @@
 # app/api/v1/services/setting_service.py
+
 #from fastapi.encoders import jsonable_encoder
 from uuid import UUID
 from app.services.supabase_client import supabase
+
 from app.core.config import get_settings
 settings = get_settings()  # ✅ โหลดค่าจาก .env ผ่าน config
+
 
 
 # ==============================
 #Countries
 #===============================
-from app.services.supabase_client import supabase
 
 def get_all_countries():
     return supabase.table("countries").select("*").order("name_lo", desc=False).execute()

@@ -1,10 +1,13 @@
+# app/db/models/core_settings.py
+
 from __future__ import annotations
 
 from datetime import datetime, date, time
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import Boolean, DateTime, Date ,Time, Float, String, text, Text, ForeignKey, Integer, Index
+
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
@@ -23,6 +26,7 @@ if TYPE_CHECKING:
     from app.db.models.core_settings import Province
     from app.db.models.core_settings import City
     from app.db.models.core_settings import District
+    from app.db.models.booking_settings import Booking
 
 
 ###=====companies=====###
@@ -65,6 +69,16 @@ class Company(Base):
         passive_deletes=True,
     )
 
+    # ==========================================================
+    # Bookings
+    # ==========================================================
+    bookings: Mapped[List["Booking"]] = relationship(
+        "Booking",
+        back_populates="company",
+        lazy="selectin",
+    )
+
+
 
 ###=====departments=====###
 class Department(Base):
@@ -78,7 +92,7 @@ class Department(Base):
     department_type_id: Mapped[Optional[str]] = mapped_column(String)
     head_id: Mapped[Optional[str]] = mapped_column(String)
 
-    is_active: Mapped[bool] = mapped_column(Boolean, server_default=text("true"))
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
@@ -116,6 +130,15 @@ class Location(Base):
         passive_deletes=True,
     )
 
+    # ==========================================================
+    # Bookings
+    # ==========================================================
+    bookings: Mapped[List["Booking"]] = relationship(
+        "Booking",
+        back_populates="location",
+        lazy="selectin",
+    )
+
 
 
 ###=====buildings=====###
@@ -149,10 +172,55 @@ class Building(Base):
 
     location: Mapped["Location"] = relationship("Location", back_populates="buildings")
 
+    # ✅ REQUIRED: computed property
+    @property
+    def location_name(self) -> Optional[str]:
+        return getattr(self.location, "location_name", None)
+    
+    # ✅ Bookings
+    bookings: Mapped[List["Booking"]] = relationship(
+        "Booking",
+        back_populates="building",
+        lazy="selectin",
+    )
+
+
+
+
+###=====room types=====###
+
+class RoomType(Base):
+    """
+    Room Types ✅
+    DB columns:
+    - type_code (unique, not null)
+    - type_name (nullable)
+    """
+    __tablename__ = "room_types"
+
+    id: Mapped[UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+    )
+
+    # ✅ FIX: ชื่อคอลัมน์ตรงกับ DB
+    type_code: Mapped[str] = mapped_column(String(50), nullable=False)
+    type_name: Mapped[Optional[str]] = mapped_column(String(255))
+
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+
+    rooms: Mapped[List["Room"]] = relationship(
+        "Room",
+        back_populates="room_type",
+    )
+
 
 
 ###=====rooms=====###
-
 class Room(Base):
     __tablename__ = "rooms"
 
@@ -162,25 +230,44 @@ class Room(Base):
 
     room_code: Mapped[str] = mapped_column(String, nullable=False)
     room_name: Mapped[str] = mapped_column(String, nullable=False)
-    capacity: Mapped[int] = mapped_column(Integer, server_default=text("1"))
 
-    is_available: Mapped[bool] = mapped_column(Boolean, server_default=text("true"))
-    is_active: Mapped[bool] = mapped_column(Boolean, server_default=text("true"))
+    # ✅ CHANGED: ทำให้ nullable=False เพื่อกันข้อมูลหลุดมาตรฐานเวลาทำ response
+    capacity: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("1"))
 
-    room_type_id: Mapped[Optional[UUID]] = mapped_column(PG_UUID(as_uuid=True), nullable=True)
+    # ✅ CHANGED: ทำให้ nullable=False เพื่อกัน NULL ใน response/logic
+    is_available: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
+
+    # ✅ CHANGED:
+    # - FK -> room_types.id ตาม constraint ที่คุณระบุ
+    # - ตั้ง nullable=True เพื่อรองรับข้อมูล legacy (ถ้าอยาก enforce ให้เป็น NOT NULL เปลี่ยนเป็น nullable=False)
+
+    room_type_id: Mapped[UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        ForeignKey("room_types.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    
+    # ✅ CHANGED:
+    # - เพิ่ม back_populates ให้สัมพันธ์กับ RoomType.rooms
+    room_type: Mapped["RoomType"] = relationship(
+        "RoomType",
+        foreign_keys=[room_type_id],
+        back_populates="rooms",
+    )
 
     floor_number: Mapped[Optional[int]] = mapped_column(Integer)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    room_services: Mapped[list["RoomService"]] = relationship(
+    room_services: Mapped[List["RoomService"]] = relationship(
         "RoomService",
         back_populates="room",
         cascade="all, delete-orphan",
     )
 
-    availabilities: Mapped[list["RoomAvailability"]] = relationship(
+    availabilities: Mapped[List["RoomAvailability"]] = relationship(
         "RoomAvailability",
         back_populates="room",
         cascade="all, delete-orphan",
@@ -195,6 +282,30 @@ class Room(Base):
         "Building",
         foreign_keys=[building_id],
     )
+
+    # ✅ CHANGED: computed properties (ให้ Pydantic from_attributes อ่านได้และแสดงใน API response)
+    @property
+    def location_name(self) -> Optional[str]:
+        return getattr(self.location, "location_name", None)
+
+    @property
+    def building_name(self) -> Optional[str]:
+        return getattr(self.building, "building_name", None)
+
+    @property
+    def room_type_name(self) -> Optional[str]:
+        # room_type อาจเป็น None ถ้า room_type_id เป็น NULL
+        return getattr(self.room_type, "type_name", None)
+
+    # ==========================================================
+    # Bookings
+    # ==========================================================
+    bookings: Mapped[List["Booking"]] = relationship(
+        "Booking",
+        back_populates="room",
+        lazy="selectin",
+    )
+
 
 
 ###=====room_availabilities=====###
@@ -223,14 +334,27 @@ class RoomService(Base):
     room_id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("rooms.id"), nullable=False)
     service_id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("services.id"), nullable=False)
 
-    is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
+    # ✅ CHANGED: server_default ควรเป็น text("false"/"true") เพื่อความ consistent กับที่อื่น
+    is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
     room: Mapped["Room"] = relationship("Room", back_populates="room_services")
     service: Mapped["Service"] = relationship("Service", back_populates="room_services")
+
+    # ✅ CHANGED: add computed display fields for API response
+    @property
+    def room_name(self) -> Optional[str]:
+        # rooms.room_name
+        return getattr(self.room, "room_name", None)
+
+    @property
+    def service_name(self) -> Optional[str]:
+        # services.service_name
+        return getattr(self.service, "service_name", None)
+
 
 
 ###=====service_types=====###
@@ -240,7 +364,7 @@ class ServiceType(Base):
     id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     service_type_name: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
@@ -264,13 +388,29 @@ class Service(Base):
     service_price: Mapped[float] = mapped_column(Float, nullable=False)
     duration: Mapped[int] = mapped_column(Integer, nullable=False)  # minutes
     description: Mapped[str | None] = mapped_column(String, nullable=True)
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    service_type: Mapped["ServiceType"] = relationship("ServiceType", back_populates="services")
+    # ✅ CHANGED: relationship to ServiceType
+    service_type = relationship("ServiceType", back_populates="services")
+    #service_type: Mapped["ServiceType"] = relationship("ServiceType", back_populates="services")
     room_services: Mapped[list["RoomService"]] = relationship("RoomService", back_populates="service")
+    
+    # Bookings
+    bookings: Mapped[List["Booking"]] = relationship(
+        "Booking",
+        back_populates="service",
+        lazy="selectin",
+    )
+
+    # ✅ CHANGED: computed display field for API response
+    @property
+    def service_type_name(self) -> Optional[str]:
+        # service_types.service_type_name
+        return getattr(self.service_type, "service_type_name", None)
+
 
 
 ###=====country=====###
@@ -343,13 +483,27 @@ class City(Base):
     updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
 
-    province: Mapped["Province"] = relationship("Province", back_populates="cities")
+    # ✅ CHANGED: add relationship
+    province = relationship("Province", back_populates="cities")
+    #province: Mapped["Province"] = relationship("Province", back_populates="cities")
+
+    #districts = relationship("District", back_populates="city")
     districts: Mapped[List["District"]] = relationship(
         "District",
         back_populates="city",
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
+
+    # ✅ CHANGED: computed fields for API response
+    @property
+    def province_name_lo(self) -> str | None:
+        return getattr(self.province, "name_lo", None)
+
+    @property
+    def province_name_en(self) -> str | None:
+        return getattr(self.province, "name_en", None)
+
 
 
 ###=====district=====###
@@ -373,7 +527,19 @@ class District(Base):
     updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
 
-    city: Mapped["City"] = relationship("City", back_populates="districts")
+    city = relationship("City", back_populates="districts")
+    #city: Mapped["City"] = relationship("City", back_populates="districts")
+
+    # ✅ CHANGED: computed display fields for API response
+    @property
+    def city_name_lo(self) -> str | None:
+        return getattr(self.city, "name_lo", None)
+
+    @property
+    def city_name_en(self) -> str | None:
+        return getattr(self.city, "name_en", None)
+
+
 
 
 ###=====Currency=====###

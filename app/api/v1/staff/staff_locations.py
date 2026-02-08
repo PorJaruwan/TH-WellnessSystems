@@ -1,4 +1,4 @@
-# app/api/v1/settings/staff_locations.py
+# app/api/v1/staff/staff_locations.py
 
 from __future__ import annotations
 
@@ -6,19 +6,26 @@ from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import get_db
+from app.db.models import StaffLocation
 from app.utils.ResponseHandler import ResponseHandler, ResponseCode, UnicodeJSONResponse
 from app.utils.payload_cleaner import clean_create, clean_update
-from app.utils.router_helpers import respond_one, respond_list_paged, run_or_500
 
-from app.db.models import StaffLocation  # ต้องมี ORM model
+from app.api.v1.models.staff_response_model import (
+    StaffLocationResponse,
+    StaffLocationSearchEnvelope,
+    StaffLocationByIdEnvelope,
+    StaffLocationCreateEnvelope,
+    StaffLocationUpdateEnvelope,
+    StaffLocationDeleteEnvelope,
+)
 
 try:
-    from app.api.v1.models.staff_model import StaffLocationsCreateModel, StaffLocationsUpdateModel  # :contentReference[oaicite:4]{index=4}
+    from app.api.v1.models.staff_model import StaffLocationsCreateModel, StaffLocationsUpdateModel
 except Exception:
     from pydantic import BaseModel
 
@@ -28,16 +35,13 @@ except Exception:
     class StaffLocationsUpdateModel(BaseModel):
         pass
 
-try:
-    from app.api.v1.models.staff_response_model import StaffLocationResponse
-except Exception:
-    from pydantic import BaseModel, ConfigDict
-
-    class StaffLocationResponse(BaseModel):
-        model_config = ConfigDict(from_attributes=True)
 
 
-router = APIRouter(prefix="/api/v1/staff_locations", tags=["Staff_Settings"])
+router = APIRouter(
+    # ✅ ให้เหมือน patients: ใส่ /api/v1 ที่ main.py ตอน include_router
+    prefix="/staff_locations",
+    tags=["Staff_Settings"],
+)
 
 
 def _utc_now() -> datetime:
@@ -48,7 +52,12 @@ def _only_model_columns(model_cls, data: dict) -> dict:
     return {k: v for k, v in data.items() if hasattr(model_cls, k)}
 
 
-@router.get("/search", response_class=UnicodeJSONResponse, response_model=dict, response_model_exclude_none=True)
+@router.get(
+    "/search",
+    response_class=UnicodeJSONResponse,
+    response_model=StaffLocationSearchEnvelope,
+    response_model_exclude_none=True,
+)
 async def search_staff_locations(
     session: AsyncSession = Depends(get_db),
     staff_id: Optional[UUID] = Query(default=None),
@@ -57,11 +66,19 @@ async def search_staff_locations(
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),
 ):
-    filters = {"staff_id": str(staff_id) if staff_id else None, "location_id": str(location_id) if location_id else None, "is_active": is_active}
+    """
+    Standard (same as patients.py)
+    - total/count/limit/offset/filters
+    - policy: if total==0 -> DATA.EMPTY (404 in envelope)
+    """
+    filters = {
+        "staff_id": str(staff_id) if staff_id else None,
+        "location_id": str(location_id) if location_id else None,
+        "is_active": is_active,
+    }
 
-    async def _work():
+    try:
         where = []
-
         if staff_id is not None:
             where.append(StaffLocation.staff_id == staff_id)
         if location_id is not None:
@@ -72,7 +89,7 @@ async def search_staff_locations(
         count_stmt = select(func.count()).select_from(StaffLocation)
         for c in where:
             count_stmt = count_stmt.where(c)
-        total = (await session.execute(count_stmt)).scalar_one()
+        total = int((await session.execute(count_stmt)).scalar_one())
 
         stmt = select(StaffLocation)
         for c in where:
@@ -81,36 +98,58 @@ async def search_staff_locations(
         stmt = stmt.order_by(StaffLocation.id.asc()).limit(limit).offset(offset)
         items = (await session.execute(stmt)).scalars().all()
 
-        return respond_list_paged(
-            items=items,
-            plural_key="staff_locations",
-            model_cls=StaffLocationResponse,
-            filters=filters,
-            total=int(total),
-            limit=limit,
-            offset=offset,
+        if total == 0:
+            return ResponseHandler.error(
+                *ResponseCode.DATA["EMPTY"],
+                details={"filters": filters},
+                status_code=404,
+            )
+
+        return ResponseHandler.success(
+            message=ResponseCode.SUCCESS["RETRIEVED"][1],
+            data={
+                "total": total,
+                "count": len(items),
+                "limit": limit,
+                "offset": offset,
+                "filters": filters,
+                "staff_locations": [StaffLocationResponse.model_validate(x) for x in items],
+            },
         )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    return await run_or_500(_work)
 
-
-@router.get("/search-by-id", response_class=UnicodeJSONResponse, response_model=dict, response_model_exclude_none=True)
+@router.get(
+    "/{staff_location_id:uuid}",
+    response_class=UnicodeJSONResponse,
+    response_model=StaffLocationByIdEnvelope,
+    response_model_exclude_none=True,
+)
 async def read_staff_location_by_id(staff_location_id: UUID, session: AsyncSession = Depends(get_db)):
-    async def _work():
+    try:
         obj = await session.get(StaffLocation, staff_location_id)
-        return respond_one(
-            obj=obj,
-            key="staff_locations",
-            model_cls=StaffLocationResponse,
-            not_found_details={"staff_location_id": str(staff_location_id)},
+        if not obj:
+            raise HTTPException(status_code=404, detail="staff_location not found")
+
+        return ResponseHandler.success(
+            message=ResponseCode.SUCCESS["RETRIEVED"][1],
+            data={"staff_locations": StaffLocationResponse.model_validate(obj)},
         )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    return await run_or_500(_work)
 
-
-@router.post("/create", response_class=UnicodeJSONResponse, response_model=dict, response_model_exclude_none=True)
+@router.post(
+    "",
+    response_class=UnicodeJSONResponse,
+    response_model=StaffLocationCreateEnvelope,
+    response_model_exclude_none=True,
+)
 async def create_staff_location(payload: StaffLocationsCreateModel, session: AsyncSession = Depends(get_db)):
-    async def _work():
+    try:
         data = _only_model_columns(StaffLocation, clean_create(payload))
         obj = StaffLocation(**data)
 
@@ -126,21 +165,34 @@ async def create_staff_location(payload: StaffLocationsCreateModel, session: Asy
         await session.refresh(obj)
 
         return ResponseHandler.success(
-            ResponseCode.SUCCESS["REGISTERED"][1],
-            data={"staff_locations": StaffLocationResponse.model_validate(obj).model_dump(exclude_none=True)},
+            message=ResponseCode.SUCCESS["REGISTERED"][1],
+            data={"staff_locations": StaffLocationResponse.model_validate(obj)},
         )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    return await run_or_500(_work)
 
-
-@router.put("/update-by-id", response_class=UnicodeJSONResponse, response_model=dict, response_model_exclude_none=True)
+@router.put(
+    "/{staff_location_id:uuid}",
+    response_class=UnicodeJSONResponse,
+    response_model=StaffLocationUpdateEnvelope,
+    response_model_exclude_none=True,
+)
 async def update_staff_location_by_id(
     staff_location_id: UUID, payload: StaffLocationsUpdateModel, session: AsyncSession = Depends(get_db)
 ):
-    async def _work():
+    try:
+        updates = payload.model_dump(exclude_unset=True)
+        if not updates:
+            return ResponseHandler.error(
+                *ResponseCode.DATA["INVALID"],
+                details={"staff_location_id": str(staff_location_id), "detail": "No fields to update"},
+                status_code=422,
+            )
+
         obj = await session.get(StaffLocation, staff_location_id)
         if not obj:
-            return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"staff_location_id": str(staff_location_id)})
+            raise HTTPException(status_code=404, detail="staff_location not found")
 
         data = _only_model_columns(StaffLocation, clean_update(payload))
         for k, v in data.items():
@@ -153,26 +205,35 @@ async def update_staff_location_by_id(
         await session.refresh(obj)
 
         return ResponseHandler.success(
-            ResponseCode.SUCCESS["UPDATED"][1],
-            data={"staff_locations": StaffLocationResponse.model_validate(obj).model_dump(exclude_none=True)},
+            message=ResponseCode.SUCCESS["UPDATED"][1],
+            data={"staff_locations": StaffLocationResponse.model_validate(obj)},
         )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    return await run_or_500(_work)
 
-
-@router.delete("/delete-by-id", response_class=UnicodeJSONResponse, response_model=dict)
+@router.delete(
+    "/{staff_location_id:uuid}",
+    response_class=UnicodeJSONResponse,
+    response_model=StaffLocationDeleteEnvelope,
+    response_model_exclude_none=True,
+)
 async def delete_staff_location_by_id(staff_location_id: UUID, session: AsyncSession = Depends(get_db)):
-    async def _work():
+    try:
         obj = await session.get(StaffLocation, staff_location_id)
         if not obj:
-            return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"staff_location_id": str(staff_location_id)})
+            raise HTTPException(status_code=404, detail="staff_location not found")
 
         await session.delete(obj)
         await session.commit()
 
         return ResponseHandler.success(
-            message=f"staff location with ID {staff_location_id} deleted.",
+            message=ResponseCode.SUCCESS["DELETED"][1],
             data={"staff_location_id": str(staff_location_id)},
         )
-
-    return await run_or_500(_work)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

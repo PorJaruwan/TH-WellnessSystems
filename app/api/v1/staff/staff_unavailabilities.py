@@ -1,130 +1,335 @@
-# from app.services.supabase_client import supabase
-# from app.core.config import get_settings
-# settings = get_settings()  # ✅ โหลดค่าจาก .env ผ่าน config
+# app/api/v1/staff/staff_unavailabilities.py
 
-# from app.utils.ResponseHandler import ResponseHandler, ResponseCode, UnicodeJSONResponse
-# import json
-# import requests
-# from fastapi import APIRouter, Request, HTTPException, Response
-# from fastapi.encoders import jsonable_encoder
-# from urllib.parse import unquote
-# from pydantic import BaseModel
-# from uuid import UUID
-# from datetime import datetime
-# from pathlib import Path
-# from typing import Optional
+from __future__ import annotations
 
+from datetime import date, datetime, timezone
+from typing import Optional
+from uuid import UUID
 
-# router = APIRouter(
-#     prefix="/api/v1/staff_unavailabilities",
-#     tags=["Staff_Settings"]
-# )
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import and_, func, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-# # Pydantic model
-# class StaffUnavailabilitiesCreateModel(BaseModel):
-#     id: UUID
-#     staff_id: str
-#     location_id: str
-#     start_datetime: datetime
-#     end_datetime: datetime
-#     reason: str
+from app.database.session import get_db
+from app.db.models import StaffUnavailability
 
-# class StaffUnavailabilitiesUpdateModel(BaseModel):
-#     staff_id: str
-#     location_id: str
-#     start_datetime: datetime
-#     end_datetime: datetime
-#     reason: str
+from app.utils.ResponseHandler import UnicodeJSONResponse
+from app.utils.api_response import ApiResponse
+from app.utils.openapi_responses import common_errors, success_200_example, success_example
+from app.utils.payload_cleaner import clean_create, clean_update
 
-# # ✅ CREATE
-# @router.post("/create", response_class=UnicodeJSONResponse)
-# def create_staff_unavailability_by_id(staff_unavailabilities: StaffUnavailabilitiesCreateModel):
-#     try:
-#         data = jsonable_encoder(staff_unavailabilities)
-
-#         # Clean "" to None
-#         cleaned_data = {
-#             k: (None if v == "" else v)
-#             for k, v in data.items()
-#         }
-
-#         print("Insert data:", cleaned_data)
-
-#         res = supabase.table("staff_unavailabilities").insert(cleaned_data).execute()
-
-#         # ✅ Updated error check
-#         if not res.data:
-#             raise HTTPException(status_code=400, detail="Insert failed or no data returned.")
-
-#         return ResponseHandler.success(
-#             message=ResponseCode.SUCCESS["REGISTERED"][1],
-#             data={"staff_unavailabilities": res.data[0]}
-#         )
-
-#     except Exception as e:
-#         print("Exception:", str(e))
-#         raise HTTPException(status_code=500, detail=str(e))
-
-# # ✅ READ ALL
-# @router.get("/search", response_class=UnicodeJSONResponse)
-# def read_staff_unavailability_by_all():
-#     res = supabase.table("staff_unavailabilities").select("*").order("id", desc=False).execute()
-#     if not res.data:
-#         return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={})
-    
-#     return ResponseHandler.success(
-#         message=ResponseCode.SUCCESS["RETRIEVED"][1],
-#         data={"total": len(res.data), "staff_unavailabilities": res.data}
-#     )
-
-# # ✅ READ BY ID
-# @router.get("/search-by-id", response_class=UnicodeJSONResponse)
-# def read_staff_unavailability_by_id(staff_unavailability_id: UUID):
-#     res = supabase.table("staff_unavailabilities").select("*").eq("id", str(staff_unavailability_id)).execute()
-#     if not res.data:
-#         return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"staff_unavailability_id": str(staff_unavailability_id)})
-    
-#     return ResponseHandler.success(
-#         message=ResponseCode.SUCCESS["RETRIEVED"][1],
-#         data={"staff_unavailabilities": res.data[0]}
-#     )
-
-# # ✅ UPDATE
-# @router.put("/update-by-id", response_class=UnicodeJSONResponse)
-# def update_staff_unavailability_by_id(staff_unavailability_id: UUID, staff_unavailabilities: StaffUnavailabilitiesUpdateModel):
-#     updated = {
-#         "staff_id": staff_unavailabilities.staff_id,
-#         "location_id": staff_unavailabilities.location_id,
-#         "weekday": staff_unavailabilities.weekday,
-#         "start_time": staff_unavailabilities.start_time,
-#         "end_time": staff_unavailabilities.end_time,
-#         "created_at": staff_unavailabilities.created_at,
-#     }
-
-#     res = supabase.table("staff_unavailabilities").update(updated).eq("id", str(staff_unavailability_id)).execute()
-#     if not res.data:
-#         return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"staff_unavailability_id": str(staff_unavailability_id)})
-    
-#     return ResponseHandler.success(
-#         message=ResponseCode.SUCCESS["UPDATED"][1],
-#         data={"staff_unavailabilities": res.data[0]}
-#     )
+from app.api.v1.models.staff_model import StaffUnavailabilityCreateModel, StaffUnavailabilityUpdateModel
+from app.api.v1.models.staff_response_model import StaffUnavailabilityResponse
 
 
-# # ✅ DELETE
-# @router.delete("/delete-by-id", response_class=UnicodeJSONResponse)
-# def delete_staff_unavailability_by_id(staff_unavailability_id: UUID):
-#     try:
-#         print(f"🗑️ Deleting staff unavailability id: {staff_unavailability_id}")
-#         res = supabase.table("staff_unavailabilities").delete().eq("id", str(staff_unavailability_id)).execute()
+router = APIRouter(
+    # ✅ ให้เหมือน patients: ใส่ /api/v1 ที่ main.py ตอน include_router
+    prefix="/staff_unavailabilities",
+    tags=["Staff_Settings"],
+)
 
-#         if not res.data:
-#             return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"staff_unavailability_id": str(staff_unavailability_id)})
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc)
 
-#         return ResponseHandler.success(
-#             message=f"staff unavailability with staff unavailability id: {staff_unavailability_id} deleted.",
-#             data={"staff_unavailability_id": str(staff_unavailability_id)}
-#         )
-#     except Exception as e:
-#         print("❌ Exception during delete:", e)
-#         raise HTTPException(status_code=500, detail=str(e))
+
+def _only_model_columns(model_cls, data: dict) -> dict:
+    return {k: v for k, v in data.items() if hasattr(model_cls, k)}
+
+
+EX_SEARCH_200 = success_example(
+    message="Retrieved successfully.",
+    data={
+        "filters": {"staff_id": None, "location_id": None, "is_active": True, "date_from": None, "date_to": None},
+        "paging": {"total": 0, "limit": 50, "offset": 0},
+        "staff_unavailabilities": [],
+    },
+)
+EX_ONE_200 = success_example(message="Retrieved successfully.", data={"staff_unavailabilities": {"id": "uuid"}})
+EX_CREATE_200 = success_example(message="Registered successfully.", data={"staff_unavailabilities": {"id": "uuid"}})
+EX_UPDATE_200 = success_example(message="Updated successfully.", data={"staff_unavailabilities": {"id": "uuid"}})
+EX_DELETE_200 = success_example(message="Deleted successfully.", data={"staff_unavailability_id": "uuid"})
+
+
+@router.get(
+    "/search",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+    response_model_exclude_none=True,
+    responses={
+        **success_200_example(description="RETRIEVED", example=EX_SEARCH_200),
+        **common_errors(
+            error_model=dict,
+            invalid={
+                "staff_id": "uuid",
+                "location_id": "uuid",
+                "date_from": "YYYY-MM-DD",
+                "date_to": "YYYY-MM-DD",
+                "limit": "1..200",
+                "offset": ">=0",
+            },
+            include_500=True,
+        ),
+    },
+)
+async def search_staff_unavailabilities(
+    session: AsyncSession = Depends(get_db),
+    staff_id: Optional[UUID] = Query(default=None),
+    location_id: Optional[UUID] = Query(default=None),
+    is_active: bool = Query(default=True, description="default=true"),
+    date_from: Optional[date] = Query(default=None),
+    date_to: Optional[date] = Query(default=None),
+    limit: int = Query(default=50, ge=1, le=200),
+    offset: int = Query(default=0, ge=0),
+):
+    filters = {
+        "staff_id": str(staff_id) if staff_id else None,
+        "location_id": str(location_id) if location_id else None,
+        "is_active": is_active,
+        "date_from": str(date_from) if date_from else None,
+        "date_to": str(date_to) if date_to else None,
+    }
+
+    try:
+        where = []
+        if staff_id is not None:
+            where.append(StaffUnavailability.staff_id == staff_id)
+        if location_id is not None and hasattr(StaffUnavailability, "location_id"):
+            where.append(StaffUnavailability.location_id == location_id)
+        if hasattr(StaffUnavailability, "is_active"):
+            where.append(StaffUnavailability.is_active == is_active)
+
+        # Assume unavailability_date column exists (adjust if your schema differs)
+        if date_from and date_to:
+            where.append(and_(StaffUnavailability.unavailability_date >= date_from, StaffUnavailability.unavailability_date <= date_to))
+        elif date_from:
+            where.append(StaffUnavailability.unavailability_date >= date_from)
+        elif date_to:
+            where.append(StaffUnavailability.unavailability_date <= date_to)
+
+        count_stmt = select(func.count()).select_from(StaffUnavailability)
+        for c in where:
+            count_stmt = count_stmt.where(c)
+        total = (await session.execute(count_stmt)).scalar_one()
+
+        stmt = select(StaffUnavailability)
+        for c in where:
+            stmt = stmt.where(c)
+
+        stmt = stmt.order_by(StaffUnavailability.unavailability_date.asc(), StaffUnavailability.staff_id.asc()).limit(limit).offset(offset)
+        items = (await session.execute(stmt)).scalars().all()
+
+        return ApiResponse.ok(
+            success_key="RETRIEVED",
+            default_message="Retrieved successfully.",
+            data={
+                "filters": filters,
+                "paging": {"total": int(total), "limit": limit, "offset": offset},
+                "staff_unavailabilities": [
+                    StaffUnavailabilityResponse.model_validate(x).model_dump(exclude_none=True) for x in items
+                ],
+            },
+        )
+
+    except HTTPException as e:
+        return ApiResponse.from_http_exception(e, details={"filters": filters})
+    except Exception as e:
+        return ApiResponse.err(
+            data_key="SERVER_ERROR",
+            default_code="SRV_500",
+            default_message="Internal server error.",
+            details={"detail": str(e), "filters": filters},
+            status_code=500,
+        )
+
+
+@router.get(
+    "/{staff_unavailability_id:uuid}",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+    response_model_exclude_none=True,
+    responses={
+        **success_200_example(description="RETRIEVED", example=EX_ONE_200),
+        **common_errors(error_model=dict, not_found={"staff_unavailability_id": "uuid"}, include_500=True),
+    },
+)
+async def read_staff_unavailability_by_id(staff_unavailability_id: UUID, session: AsyncSession = Depends(get_db)):
+    try:
+        obj = await session.get(StaffUnavailability, staff_unavailability_id)
+        if not obj:
+            return ApiResponse.err(
+                data_key="NOT_FOUND",
+                default_code="DATA_001",
+                default_message="Data not found.",
+                details={"staff_unavailability_id": str(staff_unavailability_id)},
+                status_code=404,
+            )
+
+        return ApiResponse.ok(
+            success_key="RETRIEVED",
+            default_message="Retrieved successfully.",
+            data={"staff_unavailabilities": StaffUnavailabilityResponse.model_validate(obj).model_dump(exclude_none=True)},
+        )
+
+    except HTTPException as e:
+        return ApiResponse.from_http_exception(e, details={"staff_unavailability_id": str(staff_unavailability_id)})
+    except Exception as e:
+        return ApiResponse.err(
+            data_key="SERVER_ERROR",
+            default_code="SRV_500",
+            default_message="Internal server error.",
+            details={"detail": str(e), "staff_unavailability_id": str(staff_unavailability_id)},
+            status_code=500,
+        )
+
+
+@router.post(
+    "",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+    response_model_exclude_none=True,
+    responses={
+        **success_200_example(description="REGISTERED", example=EX_CREATE_200),
+        **common_errors(error_model=dict, invalid={"payload": "invalid"}, include_500=True),
+    },
+)
+async def create_staff_unavailability(payload: StaffUnavailabilityCreateModel, session: AsyncSession = Depends(get_db)):
+    try:
+        data = _only_model_columns(StaffUnavailability, clean_create(payload))
+        obj = StaffUnavailability(**data)
+
+        if hasattr(obj, "created_at") and getattr(obj, "created_at", None) is None:
+            obj.created_at = _utc_now()
+        if hasattr(obj, "updated_at") and getattr(obj, "updated_at", None) is None:
+            obj.updated_at = _utc_now()
+        if hasattr(obj, "is_active") and getattr(obj, "is_active", None) is None:
+            obj.is_active = True
+
+        session.add(obj)
+        await session.commit()
+        await session.refresh(obj)
+
+        return ApiResponse.ok(
+            success_key="REGISTERED",
+            default_message="Registered successfully.",
+            data={"staff_unavailabilities": StaffUnavailabilityResponse.model_validate(obj).model_dump(exclude_none=True)},
+        )
+
+    except HTTPException as e:
+        return ApiResponse.from_http_exception(e, details={"payload": "invalid"})
+    except Exception as e:
+        return ApiResponse.err(
+            data_key="SERVER_ERROR",
+            default_code="SRV_500",
+            default_message="Internal server error.",
+            details={"detail": str(e)},
+            status_code=500,
+        )
+
+
+@router.put(
+    "/{staff_unavailability_id:uuid}",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+    response_model_exclude_none=True,
+    responses={
+        **success_200_example(description="UPDATED", example=EX_UPDATE_200),
+        **common_errors(
+            error_model=dict,
+            not_found={"staff_unavailability_id": "uuid"},
+            invalid={"payload": "invalid"},
+            include_500=True,
+        ),
+    },
+)
+async def update_staff_unavailability_by_id(
+    staff_unavailability_id: UUID, payload: StaffUnavailabilityUpdateModel, session: AsyncSession = Depends(get_db)
+):
+    try:
+        updates = payload.model_dump(exclude_unset=True)
+        if not updates:
+            return ApiResponse.err(
+                data_key="INVALID",
+                default_code="DATA_003",
+                default_message="Invalid request.",
+                details={"staff_unavailability_id": str(staff_unavailability_id), "detail": "No fields to update"},
+                status_code=422,
+            )
+
+        obj = await session.get(StaffUnavailability, staff_unavailability_id)
+        if not obj:
+            return ApiResponse.err(
+                data_key="NOT_FOUND",
+                default_code="DATA_001",
+                default_message="Data not found.",
+                details={"staff_unavailability_id": str(staff_unavailability_id)},
+                status_code=404,
+            )
+
+        data = _only_model_columns(StaffUnavailability, clean_update(payload))
+        for k, v in data.items():
+            setattr(obj, k, v)
+
+        if hasattr(obj, "updated_at"):
+            obj.updated_at = _utc_now()
+
+        await session.commit()
+        await session.refresh(obj)
+
+        return ApiResponse.ok(
+            success_key="UPDATED",
+            default_message="Updated successfully.",
+            data={"staff_unavailabilities": StaffUnavailabilityResponse.model_validate(obj).model_dump(exclude_none=True)},
+        )
+
+    except HTTPException as e:
+        return ApiResponse.from_http_exception(e, details={"staff_unavailability_id": str(staff_unavailability_id)})
+    except Exception as e:
+        return ApiResponse.err(
+            data_key="SERVER_ERROR",
+            default_code="SRV_500",
+            default_message="Internal server error.",
+            details={"detail": str(e), "staff_unavailability_id": str(staff_unavailability_id)},
+            status_code=500,
+        )
+
+
+@router.delete(
+    "/{staff_unavailability_id:uuid}",
+    response_class=UnicodeJSONResponse,
+    response_model=dict,
+    responses={
+        **success_200_example(description="DELETED", example=EX_DELETE_200),
+        **common_errors(error_model=dict, not_found={"staff_unavailability_id": "uuid"}, include_500=True),
+    },
+)
+async def delete_staff_unavailability_by_id(staff_unavailability_id: UUID, session: AsyncSession = Depends(get_db)):
+    try:
+        obj = await session.get(StaffUnavailability, staff_unavailability_id)
+        if not obj:
+            return ApiResponse.err(
+                data_key="NOT_FOUND",
+                default_code="DATA_001",
+                default_message="Data not found.",
+                details={"staff_unavailability_id": str(staff_unavailability_id)},
+                status_code=404,
+            )
+
+        await session.delete(obj)
+        await session.commit()
+
+        return ApiResponse.ok(
+            success_key="DELETED",
+            default_message="Deleted successfully.",
+            data={"staff_unavailability_id": str(staff_unavailability_id)},
+        )
+
+    except HTTPException as e:
+        return ApiResponse.from_http_exception(e, details={"staff_unavailability_id": str(staff_unavailability_id)})
+    except Exception as e:
+        return ApiResponse.err(
+            data_key="SERVER_ERROR",
+            default_code="SRV_500",
+            default_message="Internal server error.",
+            details={"detail": str(e), "staff_unavailability_id": str(staff_unavailability_id)},
+            status_code=500,
+        )

@@ -15,13 +15,20 @@ from .core_settings import (
 from .staff_settings import (
     Staff, StaffDepartment, StaffLocation, StaffService,
     StaffTemplate, StaffWorkPattern, StaffLeave,
+    #StaffAvailabilities, StaffUnavailabilities,
 )
+
 
 # ----- Patient Settings (patient, patient_addr, alerts, allergies, etc.) ----- #
 from .patient_settings import (
     Patient, PatientAddress, PatientImage, PatientPhoto,
     Alert, Allergy, MarketingStaff, PatientType, Profession, SaleStaff, Source,
 )
+
+from .booking_settings import (
+    Booking, BookingViewConfig, BookingStatusHistory, BookingStaff
+)
+
 
 __all__ = [
     "Base",
@@ -36,9 +43,13 @@ __all__ = [
     # Staff settings
     "Staff", "StaffDepartment", "StaffLocation", "StaffService",
     "StaffTemplate", "StaffWorkPattern", "StaffLeave",
+    #"StaffAvailabilities", "StaffUnavailabilities",
 
     # Patient settings
     "Patient",
     "PatientAddress", "PatientImage", "PatientPhoto",
     "Alert", "Allergy", "MarketingStaff", "PatientType", "Profession", "SaleStaff", "Source",
+    
+    # Booking settings
+    "Booking", "BookingViewConfig", "BookingStatusHistory", "BookingStaff",
 ]

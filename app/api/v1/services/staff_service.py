@@ -1,65 +1,85 @@
-# app/api/v1/settings/setting_service.py
-#from fastapi.encoders import jsonable_encoder
+# app/api/v1/services/staff_service.py
+
+from __future__ import annotations
+
+from typing import Any, Dict
 from uuid import UUID
+
 from app.services.supabase_client import supabase
+
 from app.core.config import get_settings
 settings = get_settings()  # ✅ โหลดค่าจาก .env ผ่าน config
 
 
 # ==============================
-#Staff
+# Staff
 # ==============================
-def create_staff(data: dict):
+def create_staff(data: Dict[str, Any]):
     return supabase.table("staff").insert(data).execute()
+
 
 def get_all_staff():
     return supabase.table("staff").select("*").order("staff_name", desc=False).execute()
 
+
 def get_staff_by_id(staff_id: UUID):
     return supabase.table("staff").select("*").eq("id", str(staff_id)).execute()
 
-def update_staff_by_id(staff_id: UUID, updated_data: dict):
+
+def update_staff_by_id(staff_id: UUID, updated_data: Dict[str, Any]):
     return supabase.table("staff").update(updated_data).eq("id", str(staff_id)).execute()
+
 
 def delete_staff_by_id(staff_id: UUID):
     return supabase.table("staff").delete().eq("id", str(staff_id)).execute()
 
+
 # ==============================
-#Staff Services
+# Staff Services
 # ==============================
-def create_staff_service(data: dict):
+def create_staff_service(data: Dict[str, Any]):
     return supabase.table("staff_services").insert(data).execute()
+
 
 def get_all_staff_services():
     return supabase.table("staff_services").select("*").order("id", desc=False).execute()
 
+
 def get_staff_service_by_id(staff_service_id: UUID):
     return supabase.table("staff_services").select("*").eq("id", str(staff_service_id)).execute()
 
-def update_staff_service_by_id(staff_service_id: UUID, updated_data: dict):
+
+def update_staff_service_by_id(staff_service_id: UUID, updated_data: Dict[str, Any]):
     return supabase.table("staff_services").update(updated_data).eq("id", str(staff_service_id)).execute()
+
 
 def delete_staff_service_by_id(staff_service_id: UUID):
     return supabase.table("staff_services").delete().eq("id", str(staff_service_id)).execute()
 
 
+
 # ==============================
-#Staff Locations
+# Staff Locations
 # ==============================
-def create_staff_location(data: dict):
+def create_staff_location(data: Dict[str, Any]):
     return supabase.table("staff_locations").insert(data).execute()
+
 
 def get_all_staff_locations():
     return supabase.table("staff_locations").select("*").order("id", desc=False).execute()
 
+
 def get_staff_location_by_id(staff_location_id: UUID):
     return supabase.table("staff_locations").select("*").eq("id", str(staff_location_id)).execute()
 
-def update_staff_location_by_id(staff_location_id: UUID, updated_data: dict):
+
+def update_staff_location_by_id(staff_location_id: UUID, updated_data: Dict[str, Any]):
     return supabase.table("staff_locations").update(updated_data).eq("id", str(staff_location_id)).execute()
+
 
 def delete_staff_location_by_id(staff_location_id: UUID):
     return supabase.table("staff_locations").delete().eq("id", str(staff_location_id)).execute()
+
 
 
 # ==============================
