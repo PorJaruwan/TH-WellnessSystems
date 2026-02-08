@@ -101,7 +101,8 @@ async def search_patient_addresses(
 
 
 @router.get(
-    "/{patient_id:uuid}/addresses/{address_type}",
+    "/addresses",
+    #"/{patient_id:uuid}/addresses/{address_type}",
     response_class=UnicodeJSONResponse,
     response_model=PatientAddressSingleEnvelope,
     response_model_exclude_none=True,
@@ -145,7 +146,7 @@ async def create_patient_address_endpoint(
 
 
 @router.put(
-    "/{patient_id:uuid}/addresses/{address_type}",
+    "/addresses",
     response_class=UnicodeJSONResponse,
     response_model=PatientAddressSingleEnvelope,
     response_model_exclude_none=True,
@@ -184,7 +185,7 @@ async def update_patient_address_endpoint(
 
 
 @router.delete(
-    "/{patient_id:uuid}/addresses/{address_type}",
+    "/addresses",
     response_class=UnicodeJSONResponse,
     response_model=PatientAddressDeleteEnvelope,
     response_model_exclude_none=True,

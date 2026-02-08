@@ -123,7 +123,7 @@ async def post_patient(
 
 
 @router.get(
-    "/patient_id",
+    "",
     response_class=UnicodeJSONResponse,
     response_model=PatientByIdEnvelope,
     response_model_exclude_none=True,
@@ -148,7 +148,7 @@ async def get_patient_by_id(
 
 
 @router.patch(
-    "/{patient_id:uuid}",
+    "",
     response_class=UnicodeJSONResponse,
     response_model=PatientUpdateEnvelope,
     response_model_exclude_none=True,
@@ -176,7 +176,7 @@ async def patch_patient_by_id(
 
 
 @router.delete(
-    "/{patient_id:uuid}",
+    "",
     response_class=UnicodeJSONResponse,
     response_model=PatientDeleteEnvelope,
     response_model_exclude_none=True,
