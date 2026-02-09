@@ -17,7 +17,9 @@ class PatientSearchItemDTO(BaseModel):
     id: UUID
     patient_code: str
     full_name_lo: str
+    full_name_en: Optional[str] = None
     telephone: Optional[str] = None
+    email: Optional[str] = None
     status: str
     is_active: bool = True
 

@@ -139,7 +139,7 @@ async def get_patient_by_id(
 
         return ResponseHandler.success(
             message=ResponseCode.SUCCESS["RETRIEVED"][1],
-            data={"patient": p},
+            data={"items": p},
         )
     except HTTPException:
         raise
