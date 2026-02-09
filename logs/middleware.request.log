@@ -3008,3 +3008,9 @@
 {"asctime": "2026-02-08 19:23:04,758", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/patients/search in 15.31s"}
 {"asctime": "2026-02-08 19:23:29,943", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/patients"}
 {"asctime": "2026-02-08 19:23:33,929", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/patients in 3.99s"}
+{"asctime": "2026-02-09 17:33:04,599", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2026-02-09 17:33:04,605", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.01s"}
+{"asctime": "2026-02-09 17:33:04,684", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2026-02-09 17:33:04,805", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.12s"}
+{"asctime": "2026-02-09 17:33:34,046", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/patients"}
+{"asctime": "2026-02-09 17:33:38,839", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/patients in 4.79s"}
