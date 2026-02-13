@@ -24,7 +24,8 @@ app = FastAPI()
 # ✅ CORS (FlutterFlow)
 origins = [
     "https://we-l-l-plus-admin-35c1o0.flutterflow.app",
-    "https://preview.flutterflow.io",
+    "https://preview.flutterflow.io",  
+    "https://well-plus-trial.flutterflow.app/",  
     # Add custom domains if any:
     # "https://yourdomain.com",
 ]
