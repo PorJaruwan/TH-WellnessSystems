@@ -142,7 +142,7 @@ async def create_booking_service(body: BookingCreate) -> BookingCreateResponse:
     now = datetime.utcnow().isoformat()
 
     payload = {
-        "resource_track_id": str(body.resource_track_id),
+        "resource_track_id": (str(body.resource_track_id) if body.resource_track_id else None),
         "company_code": body.company_code,
         "location_id": str(body.location_id),
         "building_id": str(body.building_id),

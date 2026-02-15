@@ -68,7 +68,11 @@ class BookingCreate(APIBaseModel):
     """
     POST /api/v1/bookings
     """
-    # resource_track_id: UUID
+    resource_track_id: Optional[UUID] = Field(
+        default=None,
+        description="Client-side resource tracking id (from FlutterFlow)",
+    )
+
     company_code: str = Field(..., max_length=50)
 
     location_id: UUID
@@ -97,12 +101,47 @@ class BookingCreate(APIBaseModel):
         return end_t
 
 
+
+
+# class BookingCreate(APIBaseModel):
+#     """
+#     POST /api/v1/bookings
+#     """
+#     # resource_track_id: UUID
+#     company_code: str = Field(..., max_length=50)
+
+#     location_id: UUID
+#     building_id: UUID
+#     room_id: UUID
+
+#     patient_id: UUID
+#     primary_person_id: UUID
+#     service_id: UUID
+
+#     booking_date: date
+#     start_time: time
+#     end_time: time
+
+#     status: BookingStatusEnum = BookingStatusEnum.booked
+#     source_of_ad: Optional[SourceOfAdEnum] = None
+#     note: Optional[str] = None
+#     cancel_reason: Optional[str] = None
+
+#     @field_validator("end_time")
+#     @classmethod
+#     def validate_end_after_start(cls, end_t: time, info):
+#         start_t = info.data.get("start_time")
+#         if isinstance(start_t, time) and end_t <= start_t:
+#             raise ValueError("end_time must be after start_time")
+#         return end_t
+
+
 class BookingUpdate(APIBaseModel):
     """
     PATCH /api/v1/bookings/{booking_id}
     (Partial update: set only provided fields)
     """
-    # resource_track_id: Optional[UUID] = None
+    #resource_track_id: Optional[UUID] = None
     company_code: Optional[str] = Field(None, max_length=50)
 
     location_id: Optional[UUID] = None
@@ -147,7 +186,7 @@ class BookingRead(ORMBaseModel):
     """
     id: UUID
 
-    resource_track_id: UUID
+    resource_track_id: Optional[UUID] = None
     company_code: str
 
     location_id: UUID
