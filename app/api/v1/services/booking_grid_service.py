@@ -211,6 +211,11 @@ async def get_booking_grid_service(
                         patient_name=b.get("patient_name"),
                         doctor_name=b.get("doctor_name"),
                         service_name=b.get("service_name"),
+                        # ✅ NEW
+                        patient_id=b.get("patient_id"),
+                        doctor_id=b.get("doctor_id"),
+                        service_id=b.get("service_id"),
+                        note=b.get("note"),
                     ).model_dump(exclude_none=True)
                 else:
                     row_dict[key] = BookingGridCell(
@@ -250,6 +255,11 @@ async def get_booking_grid_service(
                             patient_name=b.get("patient_name"),
                             doctor_name=b.get("doctor_name"),
                             service_name=b.get("service_name"),
+                            # ✅ NEW
+                            patient_id=b.get("patient_id"),
+                            doctor_id=b.get("doctor_id"),
+                            service_id=b.get("service_id"),
+                            note=b.get("note"),
                         )
                     )
                 else:
@@ -293,6 +303,11 @@ async def get_booking_grid_service(
                             patient_name=b.get("patient_name"),
                             doctor_name=b.get("doctor_name"),
                             service_name=b.get("service_name"),
+                            # ✅ NEW
+                            patient_id=b.get("patient_id"),
+                            doctor_id=b.get("doctor_id"),
+                            service_id=b.get("service_id"),
+                            note=b.get("note"),
                         )
                     )
                 else:

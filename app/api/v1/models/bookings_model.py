@@ -68,7 +68,7 @@ class BookingCreate(APIBaseModel):
     """
     POST /api/v1/bookings
     """
-    resource_track_id: UUID
+    # resource_track_id: UUID
     company_code: str = Field(..., max_length=50)
 
     location_id: UUID
@@ -102,7 +102,7 @@ class BookingUpdate(APIBaseModel):
     PATCH /api/v1/bookings/{booking_id}
     (Partial update: set only provided fields)
     """
-    resource_track_id: Optional[UUID] = None
+    # resource_track_id: Optional[UUID] = None
     company_code: Optional[str] = Field(None, max_length=50)
 
     location_id: Optional[UUID] = None

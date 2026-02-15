@@ -136,9 +136,29 @@ def repo_get_booking_grid_rows(
     booking_date_iso: str,
     room_ids: list[UUID] | None = None,
 ) -> list[dict[str, Any]]:
+    # ✅ include new fields in response:
+    #   patient_id, doctor_id (alias of primary_person_id), service_id, note
     q = (
         supabase.table("booking_grid_view")
-        .select("booking_id,room_id,start_time,end_time,status,patient_name,doctor_name,service_name")
+        .select(
+            ",".join(
+                [
+                    "booking_id",
+                    "room_id",
+                    "start_time",
+                    "end_time",
+                    "status",
+                    "patient_name",
+                    "doctor_name",
+                    "service_name",
+                    # --- NEW ---
+                    "patient_id",
+                    "doctor_id",
+                    "service_id",
+                    "note",
+                ]
+            )
+        )
         .eq("company_code", company_code)
         .eq("location_id", str(location_id))
         .eq("building_id", str(building_id))
@@ -152,3 +172,29 @@ def repo_get_booking_grid_rows(
     res = q.execute()
     _handle_supabase_error(res, "repo_get_booking_grid_rows")
     return res.data or []
+
+
+# def repo_get_booking_grid_rows(
+#     *,
+#     company_code: str,
+#     location_id: UUID,
+#     building_id: UUID,
+#     booking_date_iso: str,
+#     room_ids: list[UUID] | None = None,
+# ) -> list[dict[str, Any]]:
+#     q = (
+#         supabase.table("booking_grid_view")
+#         .select("booking_id,room_id,start_time,end_time,status,patient_name,doctor_name,service_name")
+#         .eq("company_code", company_code)
+#         .eq("location_id", str(location_id))
+#         .eq("building_id", str(building_id))
+#         .eq("booking_date", booking_date_iso)
+#     )
+
+#     # ✅ FIX: supabase-py in_ ต้องส่ง list ไม่ต้องส่ง "(...)" string
+#     if room_ids:
+#         q = q.in_("room_id", [str(x) for x in room_ids])
+
+#     res = q.execute()
+#     _handle_supabase_error(res, "repo_get_booking_grid_rows")
+#     return res.data or []

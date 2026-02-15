@@ -1,4 +1,5 @@
 # app/db/models/booking_settings.py
+
 from __future__ import annotations
 
 import uuid

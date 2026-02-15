@@ -41,6 +41,13 @@ class BookingGridSlot(ORMBaseModel):
     patient_name: Optional[str] = None
     doctor_name: Optional[str] = None
     service_name: Optional[str] = None
+
+    # ✅ NEW
+    patient_id: Optional[UUID] = None
+    doctor_id: Optional[UUID] = None
+    service_id: Optional[UUID] = None
+    note: Optional[str] = None
+
     status_label: Optional[str] = None
 
 
@@ -81,6 +88,11 @@ class BookingGridFlatItem(ORMBaseModel):
     patient_name: Optional[str] = None
     doctor_name: Optional[str] = None
     service_name: Optional[str] = None
+    # ✅ NEW
+    patient_id: Optional[UUID] = None
+    doctor_id: Optional[UUID] = None
+    service_id: Optional[UUID] = None
+    note: Optional[str] = None
 
 
 class BookingGridFlatPayload(ORMBaseModel):
@@ -112,6 +124,11 @@ class BookingGridCell(ORMBaseModel):
     patient_name: Optional[str] = None
     doctor_name: Optional[str] = None
     service_name: Optional[str] = None
+     # ✅ NEW
+    patient_id: Optional[UUID] = None
+    doctor_id: Optional[UUID] = None
+    service_id: Optional[UUID] = None
+    note: Optional[str] = None
 
 
 class BookingGridColumnsRow(ORMBaseModel):

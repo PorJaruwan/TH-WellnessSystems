@@ -13,27 +13,44 @@ settings = get_settings()
 DATABASE_URL = settings.DATABASE_URL
 
 # ✅ ปิด prepared statement แบบชัวร์ (กันลืมที่ env)
+# ✅ ensure asyncpg statement cache is disabled (safe for Supabase; also ok for direct)
 if "statement_cache_size=" not in DATABASE_URL:
     sep = "&" if "?" in DATABASE_URL else "?"
     DATABASE_URL = f"{DATABASE_URL}{sep}statement_cache_size=0"
 
+# ✅ Supabase uses SSL; keep it permissive for dev (as you had)
 ssl_ctx = ssl.create_default_context()
 ssl_ctx.check_hostname = False
 ssl_ctx.verify_mode = ssl.CERT_NONE
 
-
-# app/database/database.py
-
+# ✅ Direct DB (db.<ref>.supabase.co:5432) -> use pooled connections + recycle
 engine = create_async_engine(
     DATABASE_URL,
-    poolclass=NullPool,          # ✅ ใช้ NullPool เมื่อผ่าน PgBouncer/Supabase pooler
+    pool_size=5,
+    max_overflow=10,
+    pool_timeout=30,     # ✅ กันค้างรอ connection
+    pool_recycle=1800,   # 30 นาที
     pool_pre_ping=True,
     connect_args={
-        "ssl": ssl_ctx,
-        "statement_cache_size": 0,          # ✅ ปิด statement cache ของ asyncpg
-        "prepared_statement_cache_size": 0, # ✅ (ถ้า dialect รองรับ) ปิดเพิ่มอีกชั้น
+        "ssl": ssl_ctx,              # ✅ สำคัญ: ส่ง SSL context เข้าไปจริงๆ
+        "statement_cache_size": 0,   # ✅ ปิด asyncpg statement cache
     },
 )
+
+
+
+# ✅ Pooler DB 
+# # engine necnection for: pooler
+# engine = create_async_engine(
+#     DATABASE_URL,
+#     poolclass=NullPool,          # ✅ ใช้ NullPool เมื่อผ่าน PgBouncer/Supabase pooler
+#     pool_pre_ping=True,
+#     connect_args={
+#         "ssl": ssl_ctx,
+#         "statement_cache_size": 0,          # ✅ ปิด statement cache ของ asyncpg
+#         "prepared_statement_cache_size": 0, # ✅ (ถ้า dialect รองรับ) ปิดเพิ่มอีกชั้น
+#     },
+# )
 
 
 # engine = create_async_engine(
@@ -66,8 +83,14 @@ AsyncSessionLocal = async_sessionmaker(
     class_=AsyncSession,
 )
 
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
+async def get_db():
     async with AsyncSessionLocal() as session:
-        yield session
+        try:
+            yield session
+        finally:
+            await session.close()
 
 
+# async def get_db() -> AsyncGenerator[AsyncSession, None]:
+#     async with AsyncSessionLocal() as session:
+#         yield session

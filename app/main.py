@@ -13,23 +13,38 @@ from app.core.logging_config import get_service_logger
 from app.core.exception_handlers import register_exception_handlers
 
 
+from contextlib import asynccontextmanager
+
+# ✅ import engine to dispose on shutdown/reload
+from app.database.database import engine   # 👈 import engine ตัวเดียว (สำคัญมาก)
+
+
 # Load env vars
 load_dotenv()
 
-logger = get_service_logger("main")
-
-# ✅ Create FastAPI app (ONLY ONCE)
-app = FastAPI()
 
 # ✅ CORS (FlutterFlow)
 origins = [
     "https://we-l-l-plus-admin-35c1o0.flutterflow.app",
-    "https://preview.flutterflow.io",  
-    "https://well-plus-trial.flutterflow.app", 
-    
+    "https://preview.flutterflow.io",
     # Add custom domains if any:
     # "https://yourdomain.com",
 ]
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # ===== Startup =====
+    yield
+    # ===== Shutdown =====
+    if engine:
+        await engine.dispose()
+        print("🧹 SQLAlchemy engine disposed")
+
+# ✅ Create FastAPI app (ONLY ONCE)
+app = FastAPI(lifespan=lifespan)
+# app = FastAPI()
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,12 +54,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # ✅ Request logging middleware
 app.add_middleware(RequestLoggingMiddleware)
 
 # ✅ Global exception handlers (standard envelope)
 register_exception_handlers(app)
 
+
+logger = get_service_logger("main")
 
 @app.get("/", tags=["Health"])
 async def health_check():
@@ -111,6 +129,10 @@ from app.api.v1.bookings import (
 #     check_document_number,
 #     #document_controls, document_sequences, document_content_template,
 # )
+
+from app.api.v1.modules.ai.routers import (
+    ai_consult_router, chat_router,
+)
 
 
 ### ===== ✅ รวม router =====###
@@ -183,6 +205,13 @@ app.include_router(booking_grid.router)
 #app.include_router(doctor_availability.router)
 app.include_router(doctor_eligible.router)
 
+#  --AI Consult
+app.include_router(ai_consult_router.router, prefix=API_PREFIX)
+app.include_router(chat_router.router, prefix=API_PREFIX)
+
+
+
+
 #  --Controls
 #app.include_router(check_document_number.router)
 
@@ -191,9 +220,6 @@ app.include_router(doctor_eligible.router)
 # app.include_router(booking_service_logging.router)
 # app.include_router(payment_service.router)
 # app.include_router(patient_service.router)
-
-
-
 
 
 ###source-old
