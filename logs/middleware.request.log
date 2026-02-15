@@ -3032,3 +3032,17 @@
 {"asctime": "2026-02-15 12:51:02,255", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/ai/consult/topics"}
 {"asctime": "2026-02-15 12:51:16,159", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/ai/consult/topics"}
 {"asctime": "2026-02-15 12:51:21,163", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/ai/consult/topics"}
+{"asctime": "2026-02-15 12:58:06,637", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /docs"}
+{"asctime": "2026-02-15 12:58:06,640", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /docs in 0.00s"}
+{"asctime": "2026-02-15 12:58:06,717", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /openapi.json"}
+{"asctime": "2026-02-15 12:58:06,848", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /openapi.json in 0.13s"}
+{"asctime": "2026-02-15 12:58:22,287", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/ai/consult/topics"}
+{"asctime": "2026-02-15 12:58:23,414", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/ai/consult/topics in 1.13s"}
+{"asctime": "2026-02-15 12:59:29,735", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/ai/consult/topics/general/cards"}
+{"asctime": "2026-02-15 12:59:30,032", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/ai/consult/topics/general/cards in 0.30s"}
+{"asctime": "2026-02-15 13:02:19,507", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/ai/chat/sessions/425250f4-dd9f-478d-992d-16959685bd27/messages"}
+{"asctime": "2026-02-15 13:03:02,180", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/ai/chat/sessions/425250f4-dd9f-478d-992d-16959685bd27/messages"}
+{"asctime": "2026-02-15 13:03:13,751", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/ai/chat/sessions/425250f4-dd9f-478d-992d-16959685bd27/messages"}
+{"asctime": "2026-02-15 13:03:14,294", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/ai/chat/sessions/425250f4-dd9f-478d-992d-16959685bd27/messages in 0.54s"}
+{"asctime": "2026-02-15 13:03:40,799", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/ai/chat/sessions/425250f4-dd9f-478d-992d-16959685bd27/messages"}
+{"asctime": "2026-02-15 13:03:41,093", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/ai/chat/sessions/425250f4-dd9f-478d-992d-16959685bd27/messages in 0.29s"}

@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     # --- Supabase ---
     SUPABASE_URL: str
     SUPABASE_JWT_SECRET: str
+    SUPABASE_JWT_AUD: str = "authenticated"
     SUPABASE_SERVICE_ROLE_KEY: str | None = None
     SUPABASE_ANON_KEY: str | None = None
     SUPABASE_KEY: str
@@ -23,6 +24,14 @@ class Settings(BaseSettings):
     DATABASE_URL: str | None = None
     LOG_LEVEL: str = "INFO"
     JWT_SECRET_KEY: str | None = None
+
+
+    # --- Auth (DEV/JWT switch) ---
+    AUTH_MODE: str = "DEV"  # DEV | JWT
+
+    # --- WellPlus DEV defaults (optional) ---
+    WELLPLUS_COMPANY_CODE: str = "WELLPLUS_DEMO"
+    WELLPLUS_DEV_PATIENT_ID: str | None = None
 
 
     # --- Database SSL ---
