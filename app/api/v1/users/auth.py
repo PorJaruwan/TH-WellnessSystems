@@ -5,7 +5,8 @@ from __future__ import annotations
 from typing import Optional, Dict, Any
 from uuid import UUID
 
-from fastapi import HTTPException, Header, Depends, status
+from fastapi import HTTPException, Header, Query, Depends, status
+
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -125,31 +126,54 @@ async def current_company_code(
     db: AsyncSession = Depends(get_db),
     decoded_token: dict = Depends(verify_token),
     settings: Settings = Depends(get_settings),
+    # 👇 รับจาก query param ก่อน
+    company_code: str | None = Query(default=None, alias="company_code"),
+    # 👇 ยังรองรับ header ได้
     x_company_code: str | None = Header(default=None, alias="X-Company-Code"),
 ) -> str | None:
-    """
-    DEV:
-      - header (ถ้ามี) -> ใช้
-      - ไม่มีก็ fallback .env WELLPLUS_COMPANY_CODE
-
-    HEADER (PROD interim):
-      - ต้องมี header X-Company-Code เท่านั้น (ไม่ fallback .env)
-      - ถ้าไม่มี -> None (router จะตอบ 401 ตามที่คุณทำไว้)
-
-    JWT (PROD):
-      - derive จาก user_profiles.company_code
-    """
     mode = settings.AUTH_MODE.upper()
 
     if mode == "DEV":
-        return (x_company_code or settings.WELLPLUS_COMPANY_CODE).strip()
+        return (company_code or x_company_code or settings.WELLPLUS_COMPANY_CODE).strip()
 
     if mode == "HEADER":
-        return x_company_code.strip() if x_company_code else None
+        value = company_code or x_company_code
+        return value.strip() if value else None
 
     # JWT
     profile = await _get_profile_or_401(db, decoded_token, settings)
     return profile.get("company_code")
+
+
+# async def current_company_code(
+#     db: AsyncSession = Depends(get_db),
+#     decoded_token: dict = Depends(verify_token),
+#     settings: Settings = Depends(get_settings),
+#     x_company_code: str | None = Header(default=None, alias="X-Company-Code"),
+# ) -> str | None:
+#     """
+#     DEV:
+#       - header (ถ้ามี) -> ใช้
+#       - ไม่มีก็ fallback .env WELLPLUS_COMPANY_CODE
+
+#     HEADER (PROD interim):
+#       - ต้องมี header X-Company-Code เท่านั้น (ไม่ fallback .env)
+#       - ถ้าไม่มี -> None (router จะตอบ 401 ตามที่คุณทำไว้)
+
+#     JWT (PROD):
+#       - derive จาก user_profiles.company_code
+#     """
+#     mode = settings.AUTH_MODE.upper()
+
+#     if mode == "DEV":
+#         return (x_company_code or settings.WELLPLUS_COMPANY_CODE).strip()
+
+#     if mode == "HEADER":
+#         return x_company_code.strip() if x_company_code else None
+
+#     # JWT
+#     profile = await _get_profile_or_401(db, decoded_token, settings)
+#     return profile.get("company_code")
 
 
 # =========================================================
@@ -159,34 +183,62 @@ async def current_patient_id(
     db: AsyncSession = Depends(get_db),
     decoded_token: dict = Depends(verify_token),
     settings: Settings = Depends(get_settings),
+    # 👇 รับจาก query param ก่อน
+    patient_id: str | None = Query(default=None, alias="patient_id"),
+    # 👇 ยังรองรับ header ได้
     x_patient_id: str | None = Header(default=None, alias="X-Patient-Id"),
 ) -> str | None:
-    """
-    DEV:
-      - header (ถ้ามี) -> ใช้
-      - ไม่มีก็ fallback .env WELLPLUS_DEV_PATIENT_ID
-
-    HEADER (PROD interim):
-      - ต้องมี header X-Patient-Id เท่านั้น (ไม่ fallback .env)
-      - ถ้าไม่มี -> None (router จะตอบ 403 สำหรับ patient-only)
-
-    JWT (PROD):
-      - derive จาก user_profiles.patient_id
-    """
     mode = settings.AUTH_MODE.upper()
 
     if mode == "DEV":
+        if patient_id:
+            return patient_id.strip()
         if x_patient_id:
             return x_patient_id.strip()
         return settings.WELLPLUS_DEV_PATIENT_ID
 
     if mode == "HEADER":
-        return x_patient_id.strip() if x_patient_id else None
+        value = patient_id or x_patient_id
+        return value.strip() if value else None
 
     # JWT
     profile = await _get_profile_or_401(db, decoded_token, settings)
     pid = profile.get("patient_id")
     return str(pid) if pid else None
+
+
+# async def current_patient_id(
+#     db: AsyncSession = Depends(get_db),
+#     decoded_token: dict = Depends(verify_token),
+#     settings: Settings = Depends(get_settings),
+#     x_patient_id: str | None = Header(default=None, alias="X-Patient-Id"),
+# ) -> str | None:
+#     """
+#     DEV:
+#       - header (ถ้ามี) -> ใช้
+#       - ไม่มีก็ fallback .env WELLPLUS_DEV_PATIENT_ID
+
+#     HEADER (PROD interim):
+#       - ต้องมี header X-Patient-Id เท่านั้น (ไม่ fallback .env)
+#       - ถ้าไม่มี -> None (router จะตอบ 403 สำหรับ patient-only)
+
+#     JWT (PROD):
+#       - derive จาก user_profiles.patient_id
+#     """
+#     mode = settings.AUTH_MODE.upper()
+
+#     if mode == "DEV":
+#         if x_patient_id:
+#             return x_patient_id.strip()
+#         return settings.WELLPLUS_DEV_PATIENT_ID
+
+#     if mode == "HEADER":
+#         return x_patient_id.strip() if x_patient_id else None
+
+#     # JWT
+#     profile = await _get_profile_or_401(db, decoded_token, settings)
+#     pid = profile.get("patient_id")
+#     return str(pid) if pid else None
 
 
 
