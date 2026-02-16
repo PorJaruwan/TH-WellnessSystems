@@ -1,5 +1,6 @@
 
-# app/database/database.py (Version: ...)
+# app/database/database.py
+
 from typing import AsyncGenerator
 import ssl
 

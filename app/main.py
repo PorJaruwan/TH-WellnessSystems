@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1.routers import api_router
+
 from app.middlewares.request_logger import RequestLoggingMiddleware
 from app.core.logging_config import get_service_logger
 from app.core.exception_handlers import register_exception_handlers
@@ -27,6 +29,7 @@ load_dotenv()
 origins = [
     "https://we-l-l-plus-admin-35c1o0.flutterflow.app",
     "https://preview.flutterflow.io",
+    "https://well-plus-trial.flutterflow.app",
     # Add custom domains if any:
     # "https://yourdomain.com",
 ]
@@ -130,9 +133,13 @@ from app.api.v1.bookings import (
 #     #document_controls, document_sequences, document_content_template,
 # )
 
-from app.api.v1.modules.ai.routers import (
-    ai_consult_router, chat_router,
-)
+
+# from app.api.v1.modules.ai.routers import (
+#     ai_consult_router, chat_router,
+# )
+
+from app.api.v1.modules.ai.consult.routers import ai_consult_router
+from app.api.v1.modules.chat.routers import chat_router
 
 
 ### ===== ✅ รวม router =====###
@@ -205,11 +212,10 @@ app.include_router(booking_grid.router)
 #app.include_router(doctor_availability.router)
 app.include_router(doctor_eligible.router)
 
-#  --AI Consult
+
+#  --AI Consult & Chat
 app.include_router(ai_consult_router.router, prefix=API_PREFIX)
 app.include_router(chat_router.router, prefix=API_PREFIX)
-
-
 
 
 #  --Controls
