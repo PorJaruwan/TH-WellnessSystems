@@ -20,11 +20,15 @@ class AITopicItem(ORMBaseModel):
 class AITopicsList(ORMBaseModel):
     items: List[AITopicItem] = Field(default_factory=list)
 
+ 
 
 class AITopicCards(ORMBaseModel):
-    causes: List[str] = Field(default_factory=list)
+    # ✅ order for UI: 1) check 2) self_care 3) red_flag 4) cause
+    check: List[str] = Field(default_factory=list)
     self_care: List[str] = Field(default_factory=list)
-    red_flags: List[str] = Field(default_factory=list)
+    red_flag: List[str] = Field(default_factory=list)
+    cause: List[str] = Field(default_factory=list)
+
 
 
 class AITopicCardsPayload(ORMBaseModel):
@@ -65,9 +69,8 @@ class CreateAIConsultSessionPayload(ORMBaseModel):
 
 class AIQuickActionRequest(ORMBaseModel):
     """Request payload for chip actions: Causes / Self-care / When to see a doctor."""
-
-    action: Literal["causes", "self_care", "red_flags"] = Field(
-        ..., description="causes | self_care | red_flags"
+    action: Literal["cause", "self_care", "red_flag"] = Field(
+        ..., description="cause | self_care | red_flag"
     )
     lang: Optional[str] = Field(default=None, description="TH|EN or th-TH/en-US")
 

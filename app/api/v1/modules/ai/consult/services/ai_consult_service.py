@@ -59,18 +59,21 @@ def _pick_desc(t: AITopic, lang: str) -> str | None:
     return t.description_th or t.description_en
 
 
+
 def _parse_default_cards(default_cards: object) -> AITopicCards:
     """
     รองรับ 2 format:
-      A) {causes:[...], self_care:[...], red_flags:[...]}
-      B) [{type:"causes", items:[...]}, ...]
-    """
+      A) {check:[...], cause:[...], self_care:[...], red_flag:[...]}
+      B) [{type:"check", items:[...]}, ...]
+    """    
     cards = AITopicCards()
 
     if isinstance(default_cards, dict):
-        cards.causes = [str(x) for x in (default_cards.get("causes") or [])]
+        # ✅ accept both new key red_flag and legacy red_flag
+        cards.check = [str(x) for x in (default_cards.get("check") or [])]
         cards.self_care = [str(x) for x in (default_cards.get("self_care") or [])]
-        cards.red_flags = [str(x) for x in (default_cards.get("red_flags") or [])]
+        cards.red_flag = [str(x) for x in (default_cards.get("red_flag") or default_cards.get("red_flags") or [])]
+        cards.cause = [str(x) for x in (default_cards.get("cause") or [])]
         return cards
 
     if isinstance(default_cards, list):
@@ -81,15 +84,16 @@ def _parse_default_cards(default_cards: object) -> AITopicCards:
             items = block.get("items") or []
             if not isinstance(items, list):
                 continue
-
-            if t in ("cause", "causes"):
-                cards.causes = [str(x) for x in items]
+            if t in ("check", "assessment", "questions"):
+                cards.check = [str(x) for x in items]
             elif t in ("self_care", "selfcare", "care"):
                 cards.self_care = [str(x) for x in items]
-            elif t in ("red_flags", "redflag", "redflags", "when_to_see_doctor"):
-                cards.red_flags = [str(x) for x in items]
-
+            elif t in ("red_flag", "red_flags", "redflag", "redflags", "when_to_see_doctor"):
+                cards.red_flag = [str(x) for x in items]
+            elif t in ("cause", "causes"):
+                cards.cause = [str(x) for x in items]
     return cards
+
 
 
 async def list_ai_topics(
@@ -247,14 +251,14 @@ async def create_or_get_ai_consult_session(
 def _action_title(action: str, lang: str) -> str:
     if lang == "EN":
         return {
-            "causes": "Possible causes",
+            "cause": "Possible cause",
             "self_care": "Self-care",
-            "red_flags": "When to see a doctor",
+            "red_flag": "When to see a doctor",
         }.get(action, "Quick info")
     return {
-        "causes": "อาจเกิดจาก",
+        "cause": "อาจเกิดจาก",
         "self_care": "ดูแลเบื้องต้น",
-        "red_flags": "ควรพบแพทย์เมื่อ",
+        "red_flag": "ควรพบแพทย์เมื่อ",
     }.get(action, "ข้อมูลเพิ่มเติม")
 
 
@@ -267,14 +271,14 @@ def _bullets(items: list[str]) -> str:
 def _default_chips(lang: str) -> list[dict[str, Any]]:
     if lang == "EN":
         return [
-            {"type": "chip", "label": "Causes", "action": {"type": "quick", "value": "causes"}},
+            {"type": "chip", "label": "Causes", "action": {"type": "quick", "value": "cause"}},
             {"type": "chip", "label": "Self-care", "action": {"type": "quick", "value": "self_care"}},
-            {"type": "chip", "label": "When to see a doctor", "action": {"type": "quick", "value": "red_flags"}},
+            {"type": "chip", "label": "When to see a doctor", "action": {"type": "quick", "value": "red_flag"}},
         ]
     return [
-        {"type": "chip", "label": "Causes", "action": {"type": "quick", "value": "causes"}},
+        {"type": "chip", "label": "Causes", "action": {"type": "quick", "value": "cause"}},
         {"type": "chip", "label": "Self-care", "action": {"type": "quick", "value": "self_care"}},
-        {"type": "chip", "label": "When to see a doctor", "action": {"type": "quick", "value": "red_flags"}},
+        {"type": "chip", "label": "When to see a doctor", "action": {"type": "quick", "value": "red_flag"}},
     ]
 
 
@@ -322,12 +326,14 @@ async def run_quick_action(
     _topic, cards, disclaimer = res
 
     items: list[str]
-    if action == "causes":
-        items = cards.causes
+    if action == "cause":
+        items = cards.cause
     elif action == "self_care":
         items = cards.self_care
+    elif action == "red_flag":
+        items = cards.red_flag
     else:
-        items = cards.red_flags
+        items = []
 
     title = _action_title(action, lang2)
     body = _bullets(items)
@@ -344,7 +350,7 @@ async def run_quick_action(
     ui_cards: list[dict[str, Any]] = _default_chips(lang2)
 
     # If user asks "When to see a doctor", surface escalation CTA.
-    if action == "red_flags" and items:
+    if action == "red_flag" and items:
         if lang2 == "EN":
             triage = {"level": "recommended", "reason": "Some symptoms may require medical evaluation."}
         else:
