@@ -54,6 +54,11 @@ class ApiResponse:
             status_code=status_code,
         )
 
+        # ✅ If ResponseHandler already returned a Response, return directly
+        if isinstance(payload, UnicodeJSONResponse):
+            return payload
+        
+        # ✅ Otherwise assume Pydantic model
         return UnicodeJSONResponse(
             status_code=status_code,
             content=payload.model_dump(),

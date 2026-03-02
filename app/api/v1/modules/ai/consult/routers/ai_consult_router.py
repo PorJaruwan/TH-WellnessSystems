@@ -7,43 +7,55 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import get_db
+from app.api.v1.modules.ai.consult.dependencies import get_ai_consult_sessions_service
+from app.api.v1.utils.list_payload_builder import build_list_payload
 from app.utils.ResponseHandler import UnicodeJSONResponse
 from app.utils.api_response import ApiResponse
 
-from app.api.v1.modules.ai.consult.schemas.envelopes.ai_consult_envelopes import (
+from app.api.v1.modules.ai.consult.models._envelopes.ai_consult_envelopes import (
     AITopicsEnvelope,
     AITopicCardsEnvelope,
     AIConsultSessionEnvelope,
     AIConsultEscalateEnvelope,
+    AIConsultSessionsListEnvelope,
+    AIConsultSessionDetailEnvelope,
 )
-from app.api.v1.modules.ai.consult.schemas.ai_consult_model import (
+
+from app.api.v1.modules.ai.consult.models.dtos import (
     AITopicsList,
     AITopicCardsPayload,
-    CreateAIConsultSessionRequest,
     CreateAIConsultSessionPayload,
-    AIQuickActionRequest,
-    AIConsultEscalateRequest,
     AIConsultEscalatePayload,
 )
+
+from app.api.v1.modules.ai.consult.models.schemas import (
+    CreateAIConsultSessionRequest,
+    AIQuickActionRequest,
+    AIConsultEscalateRequest,
+)
+
 from app.api.v1.modules.ai.consult.services.ai_consult_service import (
     list_ai_topics,
     get_ai_topic_cards,
     create_or_get_ai_consult_session,
     run_quick_action,
     create_escalation_handoff,
-    list_my_ai_sessions,
 )
 
-from app.api.v1.modules.chat.schemas.envelopes.chat_envelopes import ChatSendMessageEnvelope
-from app.api.v1.modules.chat.schemas.chat_model import ChatSendMessagePayload
-
-from app.api.v1.users.auth import current_company_code, current_patient_id
-
-
-router = APIRouter(
-    prefix="/ai/consult",
-    tags=["AI Consult"],
+from app.api.v1.modules.ai.consult.services.ai_consult_sessions_service import (
+    AIConsultSessionsService,
 )
+
+from app.api.v1.modules.chat.models._envelopes.chat_envelopes import ChatSendMessageEnvelope
+from app.api.v1.modules.chat.models.dtos import ChatSendMessagePayload
+
+from app.api.v1.authen.auth import current_company_code, current_patient_id
+
+router = APIRouter()
+# router = APIRouter(
+#     prefix="/ai/consult",
+#     tags=["AI Consult"],
+# )
 
 
 def _normalize_lang(lang: str | None) -> str:
@@ -207,6 +219,89 @@ async def create_session(
         success_key="CREATE_SUCCESS",
         default_message=msg,
         data=payload,
+    )
+
+
+# 10) GET /api/v1/ai/consult/sessions/my?status=active
+# 10) GET /api/v1/ai/consult/sessions/my?status=active
+@router.get(
+    "/sessions/my",
+    response_class=UnicodeJSONResponse,
+    response_model=AIConsultSessionsListEnvelope,
+    response_model_exclude_none=True,
+)
+async def get_my_sessions(
+    service: AIConsultSessionsService = Depends(get_ai_consult_sessions_service),
+    company_code: str = Depends(current_company_code),
+    patient_id: str | None = Depends(current_patient_id),
+    status: str = Query(default="active", description="active|closed|all"),
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+):
+    if not company_code:
+        return _unauthorized_company_code()
+    if not patient_id:
+        return _forbidden_patient_id()
+
+    payload, total = await service.list_my_sessions(
+        company_code=company_code,
+        patient_id=patient_id,
+        status=status,
+        limit=limit,
+        offset=offset,
+    )
+
+    data = build_list_payload(
+        items=payload.items,
+        total=total,
+        limit=limit,
+        offset=offset,
+        filters={"status": status},
+    ).model_dump(exclude_none=True)
+
+    return ApiResponse.ok(
+        success_key="GET_SUCCESS",
+        default_message="Retrieved successfully.",
+        data=data,
+    )
+
+# 11) GET /api/v1/ai/consult/sessions/{session_id}
+@router.get(
+    "/sessions/{session_id}",
+    response_class=UnicodeJSONResponse,
+    response_model=AIConsultSessionDetailEnvelope,
+    response_model_exclude_none=True,
+)
+async def get_session_detail(
+    session_id: UUID = Path(...),
+    db: AsyncSession = Depends(get_db),
+    company_code: str = Depends(current_company_code),
+    patient_id: str | None = Depends(current_patient_id),
+):
+    if not company_code:
+        return _unauthorized_company_code()
+    if not patient_id:
+        return _forbidden_patient_id()
+
+    detail = await AIConsultSessionsService.get_session_detail(
+        db,
+        company_code=company_code,
+        patient_id=patient_id,
+        session_id=session_id,
+    )
+    if not detail:
+        return ApiResponse.err(
+            data_key="NOT_FOUND",
+            default_code="DATA_001",
+            default_message="Session not found.",
+            details={"session_id": str(session_id)},
+            status_code=404,
+        )
+
+    return ApiResponse.ok(
+        success_key="GET_SUCCESS",
+        default_message="Session loaded successfully.",
+        data=detail.model_dump(),
     )
 
 

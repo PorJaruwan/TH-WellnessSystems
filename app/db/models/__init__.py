@@ -15,7 +15,6 @@ from .core_settings import (
 from .staff_settings import (
     Staff, StaffDepartment, StaffLocation, StaffService,
     StaffTemplate, StaffWorkPattern, StaffLeave,
-    #StaffAvailabilities, StaffUnavailabilities,
 )
 
 
@@ -43,7 +42,6 @@ __all__ = [
     # Staff settings
     "Staff", "StaffDepartment", "StaffLocation", "StaffService",
     "StaffTemplate", "StaffWorkPattern", "StaffLeave",
-    #"StaffAvailabilities", "StaffUnavailabilities",
 
     # Patient settings
     "Patient",

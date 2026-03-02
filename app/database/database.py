@@ -30,11 +30,14 @@ engine = create_async_engine(
     pool_size=5,
     max_overflow=10,
     pool_timeout=30,     # ✅ กันค้างรอ connection
-    pool_recycle=1800,   # 30 นาที
+    pool_recycle=600,   # 30 นาที
     pool_pre_ping=True,
+    # pool_use_lifo=True,
     connect_args={
         "ssl": ssl_ctx,              # ✅ สำคัญ: ส่ง SSL context เข้าไปจริงๆ
         "statement_cache_size": 0,   # ✅ ปิด asyncpg statement cache
+        "timeout": 60,               # connect timeout
+        "command_timeout": 90,       # query/command timeout
     },
 )
 

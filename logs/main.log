@@ -3,3 +3,6 @@
 {"asctime": "2025-11-07 15:11:55,180", "levelname": "INFO", "name": "main", "message": "\ud83d\udccc Accessed home endpoint"}
 {"asctime": "2025-11-12 14:57:53,673", "levelname": "INFO", "name": "main", "message": "\ud83d\udccc Accessed home endpoint"}
 {"asctime": "2025-12-08 22:12:36,140", "levelname": "INFO", "name": "main", "message": "\ud83d\udccc Accessed home endpoint"}
+{"asctime": "2026-03-01 16:10:25,564", "levelname": "INFO", "name": "main", "message": "\u2705 API startup"}
+{"asctime": "2026-03-01 16:10:25,567", "levelname": "INFO", "name": "main", "message": "ENV=dev"}
+{"asctime": "2026-03-01 16:10:25,568", "levelname": "INFO", "name": "main", "message": "API_PREFIX=/api/v1"}

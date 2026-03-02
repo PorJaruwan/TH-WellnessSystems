@@ -3,6 +3,7 @@ from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import EmailStr, SecretStr
 
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -19,12 +20,10 @@ class Settings(BaseSettings):
     SUPABASE_ANON_KEY: str | None = None
     SUPABASE_KEY: str
 
-
     # --- Database / App ---
     DATABASE_URL: str | None = None
     LOG_LEVEL: str = "INFO"
     JWT_SECRET_KEY: str | None = None
-
 
     # --- Auth (DEV/JWT switch) ---
     AUTH_MODE: str = "DEV"  # DEV | JWT
@@ -33,10 +32,13 @@ class Settings(BaseSettings):
     WELLPLUS_COMPANY_CODE: str = "WELLPLUS_DEMO"
     WELLPLUS_DEV_PATIENT_ID: str | None = None
 
-
     # --- Database SSL ---
     SSL_MODE: str = "require"  # require | verify | disable
 
+    # --- OpenAI (Embeddings) ---
+    OPENAI_API_KEY: str | None = None
+    OPENAI_EMBED_MODEL: str = "text-embedding-3-small"
+    OPENAI_EMBED_DIM: int = 1536
 
     # # --- Firebase ---kanchitk-2025-08-12
     # FIREBASE_CREDENTIALS_PATH: str | None = None
@@ -44,6 +46,8 @@ class Settings(BaseSettings):
     # FIREBASE_PASSWORD: SecretStr | None = None
     # FIREBASE_WEB_API_KEY: str | None = None
 
-@lru_cache()   # ✅ ต้องมีวงเล็บ
+
+@lru_cache()  # ✅ ต้องมีวงเล็บ
 def get_settings() -> Settings:
     return Settings()
+

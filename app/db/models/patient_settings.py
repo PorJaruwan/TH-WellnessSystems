@@ -298,6 +298,7 @@ class Alert(Base):
         server_default=text("gen_random_uuid()"),
     )
     alert_type: Mapped[str] = mapped_column(String(25), nullable=False)
+    alert_name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=False)
 
     is_active: Mapped[bool] = mapped_column(

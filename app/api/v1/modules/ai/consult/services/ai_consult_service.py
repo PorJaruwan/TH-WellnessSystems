@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 from app.db.models.ai_topics import AITopic
 from app.api.v1.modules.chat.models.chat_models import ChatSession  # ✅ ใช้ตัวนี้ (ตรงกับไฟล์ chat_models.py)
 
-from app.api.v1.modules.ai.consult.schemas.ai_consult_model import (
+from app.api.v1.modules.ai.consult.models.dtos import (
     AITopicItem,
     AITopicCards,
 )

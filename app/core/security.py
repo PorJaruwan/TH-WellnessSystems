@@ -1,6 +1,8 @@
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
-# import requests
 from app.core.config import get_settings
+
 
 settings = get_settings()
 # SUPABASE_URL = settings.SUPABASE_URL
@@ -33,6 +35,37 @@ def decode_supabase_jwt(token: str) -> dict:
         raise e
 
 
+
+security = HTTPBearer()
+
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+):
+    settings = get_settings()
+
+    token = credentials.credentials
+
+    try:
+        payload = jwt.decode(
+            token,
+            settings.JWT_SECRET_KEY,
+            algorithms=["HS256"],
+        )
+
+        return {
+            "user_id": payload.get("sub"),
+            "company_code": payload.get("company_code"),
+            "patient_id": payload.get("patient_id"),
+            "role": payload.get("role"),
+        }
+
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication token",
+        )
+
+######################################
 # def decode_supabase_jwt(token: str):
 #     """
 #     ตรวจสอบและถอดรหัส Supabase JWT ด้วย public keys

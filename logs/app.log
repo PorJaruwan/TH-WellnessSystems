@@ -3191,3 +3191,36 @@
 {"asctime": "2026-02-17 20:30:27,547", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/ai/consult/topics in 1.12s"}
 {"asctime": "2026-02-17 20:31:12,920", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce5 Request: GET /api/v1/ai/consult/topics/skin/cards"}
 {"asctime": "2026-02-17 20:31:13,210", "levelname": "INFO", "name": "middleware.request", "message": "\ud83d\udce4 Response: status_code=200 for GET /api/v1/ai/consult/topics/skin/cards in 0.29s"}
+{"asctime": "2026-03-01 16:10:25,564", "levelname": "INFO", "name": "main", "message": "\u2705 API startup"}
+{"asctime": "2026-03-01 16:10:25,567", "levelname": "INFO", "name": "main", "message": "ENV=dev"}
+{"asctime": "2026-03-01 16:10:25,568", "levelname": "INFO", "name": "main", "message": "API_PREFIX=/api/v1"}
+{"asctime": "2026-03-01 16:11:06,572", "levelname": "INFO", "name": "middleware.request_context", "message": "[f7666679-6b40-4f04-85a9-a9ab7f2fce1b] \ud83d\udce5 GET /docs"}
+{"asctime": "2026-03-01 16:11:06,573", "levelname": "INFO", "name": "middleware.request_context", "message": "[f7666679-6b40-4f04-85a9-a9ab7f2fce1b] \ud83d\udce4 200 GET /docs in 1ms"}
+{"asctime": "2026-03-01 16:11:06,610", "levelname": "INFO", "name": "middleware.request_context", "message": "[dfaecb49-375f-4b67-b4e2-53492532f476] \ud83d\udce5 GET /openapi.json"}
+{"asctime": "2026-03-01 16:11:06,761", "levelname": "INFO", "name": "middleware.request_context", "message": "[dfaecb49-375f-4b67-b4e2-53492532f476] \ud83d\udce4 200 GET /openapi.json in 151ms"}
+{"asctime": "2026-03-01 16:11:38,450", "levelname": "INFO", "name": "middleware.request_context", "message": "[3adfb114-0b06-4e71-a18f-5cbca8124694] \ud83d\udce5 GET /api/v1/ai/consult/topics"}
+{"asctime": "2026-03-01 16:11:39,772", "levelname": "INFO", "name": "middleware.request_context", "message": "[3adfb114-0b06-4e71-a18f-5cbca8124694] \ud83d\udce4 200 GET /api/v1/ai/consult/topics in 1322ms"}
+{"asctime": "2026-03-01 16:12:06,470", "levelname": "INFO", "name": "middleware.request_context", "message": "[b12db492-ea3c-44ce-8659-3102a11dd539] \ud83d\udce5 GET /api/v1/masters/companies/search"}
+{"asctime": "2026-03-01 16:12:06,851", "levelname": "INFO", "name": "middleware.request_context", "message": "[b12db492-ea3c-44ce-8659-3102a11dd539] \ud83d\udce4 200 GET /api/v1/masters/companies/search in 380ms"}
+{"asctime": "2026-03-01 16:12:40,132", "levelname": "INFO", "name": "middleware.request_context", "message": "[1bf8412f-acbf-48fe-9bce-b867ed6d1d6c] \ud83d\udce5 GET /api/v1/patients/search"}
+{"asctime": "2026-03-01 16:12:40,536", "levelname": "INFO", "name": "middleware.request_context", "message": "[1bf8412f-acbf-48fe-9bce-b867ed6d1d6c] \ud83d\udce4 200 GET /api/v1/patients/search in 403ms"}
+{"asctime": "2026-03-01 16:16:39,933", "levelname": "INFO", "name": "middleware.request_context", "message": "[cb822fbb-e0c4-4137-9dc9-4c666ef090c7] \ud83d\udce5 GET /api/v1/masters/companies/search"}
+{"asctime": "2026-03-01 16:16:40,225", "levelname": "INFO", "name": "middleware.request_context", "message": "[cb822fbb-e0c4-4137-9dc9-4c666ef090c7] \ud83d\udce4 200 GET /api/v1/masters/companies/search in 292ms"}
+{"asctime": "2026-03-01 16:17:53,641", "levelname": "INFO", "name": "middleware.request_context", "message": "[52ebb5a4-597b-485e-98e1-34e64e91cbdd] \ud83d\udce5 GET /"}
+{"asctime": "2026-03-01 16:17:53,642", "levelname": "INFO", "name": "middleware.request_context", "message": "[52ebb5a4-597b-485e-98e1-34e64e91cbdd] \ud83d\udce4 200 GET / in 1ms"}
+{"asctime": "2026-03-01 16:31:13,085", "levelname": "INFO", "name": "middleware.request_context", "message": "[add852f9-fca0-4fc0-a5bc-5f324ad4e773] \ud83d\udce5 GET /api/v1/masters/companies/search"}
+{"asctime": "2026-03-01 16:31:14,621", "levelname": "INFO", "name": "middleware.request_context", "message": "[add852f9-fca0-4fc0-a5bc-5f324ad4e773] \ud83d\udce4 200 GET /api/v1/masters/companies/search in 1535ms"}
+{"asctime": "2026-03-01 16:32:07,485", "levelname": "INFO", "name": "middleware.request_context", "message": "[3109f049-cb94-4cde-9692-a6093011f753] \ud83d\udce5 GET /api/v1/bookings/search"}
+{"asctime": "2026-03-01 16:32:09,192", "levelname": "INFO", "name": "middleware.request_context", "message": "[3109f049-cb94-4cde-9692-a6093011f753] \ud83d\udce4 200 GET /api/v1/bookings/search in 1706ms"}
+{"asctime": "2026-03-01 16:32:59,710", "levelname": "INFO", "name": "middleware.request_context", "message": "[2e33b1e7-2d5a-4731-a9b6-03aeb1547b61] \ud83d\udce5 GET /api/v1/patients/search"}
+{"asctime": "2026-03-01 16:33:00,062", "levelname": "INFO", "name": "middleware.request_context", "message": "[2e33b1e7-2d5a-4731-a9b6-03aeb1547b61] \ud83d\udce4 200 GET /api/v1/patients/search in 351ms"}
+{"asctime": "2026-03-01 16:37:34,186", "levelname": "INFO", "name": "middleware.request_context", "message": "[88af38b2-f9f6-4199-a7f1-b22be57c909e] \ud83d\udce5 GET /api/v1/patients/search"}
+{"asctime": "2026-03-01 16:37:34,467", "levelname": "INFO", "name": "middleware.request_context", "message": "[88af38b2-f9f6-4199-a7f1-b22be57c909e] \ud83d\udce4 200 GET /api/v1/patients/search in 281ms"}
+{"asctime": "2026-03-01 16:38:56,603", "levelname": "INFO", "name": "middleware.request_context", "message": "[101090bf-f0a9-4471-95f6-86b6024a24de] \ud83d\udce5 GET /api/v1/patients/52fba638-fe51-4951-9005-c87f721e987c"}
+{"asctime": "2026-03-01 16:38:57,409", "levelname": "INFO", "name": "middleware.request_context", "message": "[101090bf-f0a9-4471-95f6-86b6024a24de] \ud83d\udce4 200 GET /api/v1/patients/52fba638-fe51-4951-9005-c87f721e987c in 806ms"}
+{"asctime": "2026-03-01 16:40:28,563", "levelname": "INFO", "name": "middleware.request_context", "message": "[9a5ee19d-fa07-4dcf-8c93-ea64f7c0beb3] \ud83d\udce5 GET /api/v1/patients/profiles/52fba638-fe51-4951-9005-c87f721e987c/contact"}
+{"asctime": "2026-03-01 16:40:28,846", "levelname": "INFO", "name": "middleware.request_context", "message": "[9a5ee19d-fa07-4dcf-8c93-ea64f7c0beb3] \ud83d\udce4 200 GET /api/v1/patients/profiles/52fba638-fe51-4951-9005-c87f721e987c/contact in 282ms"}
+{"asctime": "2026-03-01 16:41:19,159", "levelname": "INFO", "name": "middleware.request_context", "message": "[9bc4fe6e-da6d-4c86-8603-bb217791748a] \ud83d\udce5 GET /api/v1/patients/profiles/52fba638-fe51-4951-9005-c87f721e987c/profile"}
+{"asctime": "2026-03-01 16:41:20,059", "levelname": "INFO", "name": "middleware.request_context", "message": "[9bc4fe6e-da6d-4c86-8603-bb217791748a] \ud83d\udce4 200 GET /api/v1/patients/profiles/52fba638-fe51-4951-9005-c87f721e987c/profile in 899ms"}
+{"asctime": "2026-03-01 16:42:34,720", "levelname": "INFO", "name": "middleware.request_context", "message": "[4e88a6e7-14e1-4aa4-8259-4287cc27a2e9] \ud83d\udce5 GET /api/v1/patients/profiles/52fba638-fe51-4951-9005-c87f721e987c/marketing"}
+{"asctime": "2026-03-01 16:42:35,016", "levelname": "INFO", "name": "middleware.request_context", "message": "[4e88a6e7-14e1-4aa4-8259-4287cc27a2e9] \ud83d\udce4 200 GET /api/v1/patients/profiles/52fba638-fe51-4951-9005-c87f721e987c/marketing in 296ms"}
