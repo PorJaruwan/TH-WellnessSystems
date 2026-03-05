@@ -23,8 +23,9 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=ChatRetrievalListEnvelope,
     response_model_exclude_none=True,
+    operation_id="search_session_retrievals",
 )
-async def list_session_retrievals(
+async def search_session_retrievals(
     session_id: UUID,
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),

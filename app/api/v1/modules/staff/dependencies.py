@@ -50,6 +50,15 @@ from app.api.v1.modules.staff.services.staff_leave_search_service import StaffLe
 from app.api.v1.modules.staff.services.staff_leave_read_service import StaffLeaveReadService
 from app.api.v1.modules.staff.services.staff_leave_crud_service import StaffLeaveCrudService
 
+from app.api.v1.modules.staff.repositories.staff_locations_search_repository import StaffLocationsSearchRepository
+from app.api.v1.modules.staff.repositories.staff_locations_read_repository import StaffLocationsReadRepository
+from app.api.v1.modules.staff.repositories.staff_locations_crud_repository import StaffLocationsCrudRepository
+
+from app.api.v1.modules.staff.services.staff_locations_search_service import StaffLocationsSearchService
+from app.api.v1.modules.staff.services.staff_locations_read_service import StaffLocationsReadService
+from app.api.v1.modules.staff.services.staff_locations_crud_service import StaffLocationsCrudService
+
+
 
 def get_staff_departments_search_service(db: AsyncSession = Depends(get_db)) -> StaffDepartmentsSearchService:
     return StaffDepartmentsSearchService(StaffDepartmentsSearchRepository(db))
@@ -85,3 +94,19 @@ def get_staff_leave_read_service(db: AsyncSession = Depends(get_db)) -> StaffLea
 
 def get_staff_leave_crud_service(db: AsyncSession = Depends(get_db)) -> StaffLeaveCrudService:
     return StaffLeaveCrudService(StaffLeaveCrudRepository(db))
+
+
+# =========================================================
+# Staff Locations dependencies
+# =========================================================
+def get_staff_locations_search_service(db: AsyncSession = Depends(get_db)) -> StaffLocationsSearchService:
+    return StaffLocationsSearchService(StaffLocationsSearchRepository(db))
+
+
+def get_staff_locations_read_service(db: AsyncSession = Depends(get_db)) -> StaffLocationsReadService:
+    return StaffLocationsReadService(StaffLocationsReadRepository(db))
+
+
+def get_staff_locations_crud_service(db: AsyncSession = Depends(get_db)) -> StaffLocationsCrudService:
+    return StaffLocationsCrudService(StaffLocationsCrudRepository(db))
+

@@ -21,8 +21,9 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=ChatEscalationsEnvelope,
     response_model_exclude_none=True,
+    operation_id="search_my_escalations",
 )
-async def list_my_escalations(
+async def search_my_escalations(
     status: str | None = Query(default=None),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),

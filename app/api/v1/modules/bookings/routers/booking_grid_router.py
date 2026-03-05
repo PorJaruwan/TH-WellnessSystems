@@ -61,6 +61,7 @@ router = APIRouter(
             invalid={"filters": {}, "detail": "INVALID:..."},
         ),
     },
+    operation_id="get_booking_grid",
 )
 async def get_booking_grid(
     db: AsyncSession = Depends(get_db),

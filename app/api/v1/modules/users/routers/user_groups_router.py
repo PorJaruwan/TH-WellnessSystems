@@ -14,7 +14,7 @@ from app.api.v1.modules.users.models._envelopes import UserGroupsCreateEnvelope,
 
 router = APIRouter()
 
-@router.post("", response_class=UnicodeJSONResponse, response_model=UserGroupsCreateEnvelope)
+@router.post("", response_class=UnicodeJSONResponse, response_model=UserGroupsCreateEnvelope, operation_id="create_user_groups")
 def create_user_groups(
     request: Request,
     body: UserGroupCreate,
@@ -32,7 +32,7 @@ def create_user_groups(
         data={"item": dto},
     )
 
-@router.put("/{id}", response_class=UnicodeJSONResponse, response_model=UserGroupsUpdateEnvelope)
+@router.put("/{id}", response_class=UnicodeJSONResponse, response_model=UserGroupsUpdateEnvelope, operation_id="update_user_groups")
 def update_user_groups(
     request: Request,
     id: UUID,
@@ -51,7 +51,7 @@ def update_user_groups(
         data={"item": dto},
     )
 
-@router.delete("/{id}", response_class=UnicodeJSONResponse, response_model=UserGroupsDeleteEnvelope)
+@router.delete("/{id}", response_class=UnicodeJSONResponse, response_model=UserGroupsDeleteEnvelope, operation_id="delete_user_groups")
 def delete_user_groups(
     request: Request,
     id: UUID,

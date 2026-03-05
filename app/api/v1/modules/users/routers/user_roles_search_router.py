@@ -13,7 +13,7 @@ from app.api.v1.modules.users.models._envelopes import UserRolesSearchEnvelope
 
 router = APIRouter()
 
-@router.get("/search", response_class=UnicodeJSONResponse, response_model=UserRolesSearchEnvelope)
+@router.get("/search", response_class=UnicodeJSONResponse, response_model=UserRolesSearchEnvelope, operation_id="search_user_roles")
 def search_user_roles(
     request: Request,
     

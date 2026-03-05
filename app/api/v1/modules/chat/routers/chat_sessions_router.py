@@ -31,6 +31,7 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=ChatCreateSessionEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_session",
 )
 async def create_session(
     body: ChatCreateSessionRequest,
@@ -66,6 +67,7 @@ async def create_session(
     response_class=UnicodeJSONResponse,
     response_model=ChatSendMessageEnvelope,
     response_model_exclude_none=True,
+    operation_id="post_message",
 )
 async def post_message(
     body: ChatSendMessageRequest,
@@ -109,6 +111,7 @@ async def post_message(
     response_class=UnicodeJSONResponse,
     response_model=ChatSessionHeaderEnvelope,
     response_model_exclude_none=True,
+    operation_id="close_session",
 )
 async def close_session(
     session_id: UUID = Path(...),
@@ -149,6 +152,7 @@ async def close_session(
     response_class=UnicodeJSONResponse,
     response_model=ChatSessionHeaderEnvelope,
     response_model_exclude_none=True,
+    operation_id="reopen_session",
 )
 async def reopen_session(
     session_id: UUID = Path(...),

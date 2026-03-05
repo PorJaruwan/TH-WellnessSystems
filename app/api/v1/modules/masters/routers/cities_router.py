@@ -26,6 +26,7 @@ def get_crud_service(session: AsyncSession = Depends(get_db)) -> CityCrudService
     response_class=UnicodeJSONResponse,
     response_model=CityCreateEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_cities",
 )
 async def create_cities(
     request: Request,
@@ -47,6 +48,7 @@ async def create_cities(
     response_class=UnicodeJSONResponse,
     response_model=CityUpdateEnvelope,
     response_model_exclude_none=True,
+    operation_id="update_cities",
 )
 async def update_cities(
     request: Request,
@@ -75,6 +77,7 @@ async def update_cities(
     response_class=UnicodeJSONResponse,
     response_model=CityDeleteEnvelope,
     response_model_exclude_none=True,
+    operation_id="delete_cities",
 )
 async def delete_cities(
     request: Request,

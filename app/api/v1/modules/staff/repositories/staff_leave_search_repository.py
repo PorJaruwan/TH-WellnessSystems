@@ -7,7 +7,11 @@ from uuid import UUID
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import StaffLeave
+import app.db.models as db_models
+
+StaffLeave = db_models.StaffLeave
+Staff = db_models.Staff
+Location = getattr(db_models, "Location", getattr(db_models, "Locations", None))
 
 
 class StaffLeaveSearchRepository:
@@ -26,6 +30,9 @@ class StaffLeaveSearchRepository:
         limit: int = 50,
         offset: int = 0,
     ) -> tuple[list[dict], int]:
+        if Location is None:
+            raise RuntimeError("Location model not found in app.db.models (expected Location or Locations)")
+
         where = []
         if company_code:
             where.append(StaffLeave.company_code == company_code)
@@ -51,11 +58,13 @@ class StaffLeaveSearchRepository:
             count_stmt = count_stmt.where(c)
         total = int((await self.db.execute(count_stmt)).scalar_one() or 0)
 
-        stmt = select(
+        cols = [
             StaffLeave.id.label("id"),
             StaffLeave.company_code.label("company_code"),
             StaffLeave.location_id.label("location_id"),
             StaffLeave.staff_id.label("staff_id"),
+            Staff.staff_name.label("staff_name"),
+            Location.location_name.label("location_name"),
             StaffLeave.leave_type.label("leave_type"),
             StaffLeave.date_from.label("date_from"),
             StaffLeave.date_to.label("date_to"),
@@ -67,8 +76,15 @@ class StaffLeaveSearchRepository:
             getattr(StaffLeave, "is_active").label("is_active") if hasattr(StaffLeave, "is_active") else None,
             getattr(StaffLeave, "created_at").label("created_at") if hasattr(StaffLeave, "created_at") else None,
             getattr(StaffLeave, "updated_at").label("updated_at") if hasattr(StaffLeave, "updated_at") else None,
+        ]
+        cols = [c for c in cols if c is not None]
+
+        stmt = (
+            select(*cols)
+            .select_from(StaffLeave)
+            .join(Staff, Staff.id == StaffLeave.staff_id)
+            .join(Location, Location.id == StaffLeave.location_id)
         )
-        stmt = select(*[c for c in stmt.selected_columns if c is not None])
 
         for c in where:
             stmt = stmt.where(c)

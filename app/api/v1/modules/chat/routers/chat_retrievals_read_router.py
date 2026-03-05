@@ -22,8 +22,9 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=ChatRetrievalDetailEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_retrieval_detail",
 )
-async def get_retrieval_detail(
+async def read_retrieval_detail(
     retrieval_id: UUID = Path(...),
     retrievals_service: ChatRetrievalsService = Depends(get_chat_retrievals_service),
     company_code: str = Depends(current_company_code),

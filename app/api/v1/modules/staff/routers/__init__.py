@@ -23,7 +23,10 @@ from .staff_leave_router import router as staff_leave_router
 from .staff_leave_search_router import router as staff_leave_search_router
 from .staff_leave_read_router import router as staff_leave_read_router
 
-
+# Sub-entities: locations
+from .staff_locations_router import router as staff_locations_router
+from .staff_locations_search_router import router as staff_locations_search_router
+from .staff_locations_read_router import router as staff_locations_read_router
 # =========================================================
 # ✅ WellPlus Standard Facade Router (prefix defined ONCE)
 # =========================================================
@@ -48,5 +51,10 @@ router.include_router(staff_services_router, prefix="/services")
 router.include_router(staff_leave_search_router, prefix="/leave")
 router.include_router(staff_leave_read_router, prefix="/leave")
 router.include_router(staff_leave_router, prefix="/leave")
+
+# Locations: /staff/locations/...
+router.include_router(staff_locations_search_router, prefix="/locations")
+router.include_router(staff_locations_read_router, prefix="/locations")
+router.include_router(staff_locations_router, prefix="/locations")
 
 __all__ = ["router"]

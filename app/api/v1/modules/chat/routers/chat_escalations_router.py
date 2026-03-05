@@ -22,6 +22,7 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=ChatEscalationEnvelope,
     response_model_exclude_none=True,
+    operation_id="update_escalation",
 )
 async def update_escalation(
     escalation_id: UUID = Path(...),

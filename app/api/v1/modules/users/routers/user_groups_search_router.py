@@ -13,7 +13,7 @@ from app.api.v1.modules.users.models._envelopes import UserGroupsSearchEnvelope
 
 router = APIRouter()
 
-@router.get("/search", response_class=UnicodeJSONResponse, response_model=UserGroupsSearchEnvelope)
+@router.get("/search", response_class=UnicodeJSONResponse, response_model=UserGroupsSearchEnvelope, operation_id="search_user_groups")
 def search_user_groups(
     request: Request,
     

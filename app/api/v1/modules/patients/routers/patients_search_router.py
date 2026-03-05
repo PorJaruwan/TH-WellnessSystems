@@ -24,19 +24,20 @@ from app.api.v1.modules.patients.models._envelopes.patients_v2_envelopes import 
 from app.api.v1.modules.patients.services.patients_search_service import PatientsSearchService
 
 router = APIRouter()
-# router = APIRouter(prefix="/patients", tags=["Patients"])
+
 
 DEFAULT_SORT_BY = "created_at"
 DEFAULT_SORT_ORDER = "desc"
 
-
 @router.get(
-    "/search",
+    "/search", 
     response_class=UnicodeJSONResponse,
     response_model=PatientsSearchListEnvelopeV2,
     response_model_exclude_none=True,
+    summary="Search Patients",
+    operation_id="search_patients",
 )
-async def patients_search_endpoint(
+async def search_patients(
     request: Request,
     svc: PatientsSearchService = Depends(get_patients_search_service),
     q: str = Query(default="", description="keyword: ชื่อ/นามสกุล/รหัส/โทร/id_card"),

@@ -14,7 +14,7 @@ from app.api.v1.modules.users.models._envelopes import GroupsCreateEnvelope, Gro
 
 router = APIRouter()
 
-@router.post("", response_class=UnicodeJSONResponse, response_model=GroupsCreateEnvelope)
+@router.post("", response_class=UnicodeJSONResponse, response_model=GroupsCreateEnvelope, operation_id="create_groups")
 def create_groups(
     request: Request,
     body: GroupCreate,
@@ -32,7 +32,7 @@ def create_groups(
         data={"item": dto},
     )
 
-@router.put("/{id}", response_class=UnicodeJSONResponse, response_model=GroupsUpdateEnvelope)
+@router.put("/{id}", response_class=UnicodeJSONResponse, response_model=GroupsUpdateEnvelope, operation_id="update_groups")
 def update_groups(
     request: Request,
     id: UUID,
@@ -51,7 +51,7 @@ def update_groups(
         data={"item": dto},
     )
 
-@router.delete("/{id}", response_class=UnicodeJSONResponse, response_model=GroupsDeleteEnvelope)
+@router.delete("/{id}", response_class=UnicodeJSONResponse, response_model=GroupsDeleteEnvelope, operation_id="delete_groups")
 def delete_groups(
     request: Request,
     id: UUID,

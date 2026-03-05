@@ -14,7 +14,7 @@ from app.api.v1.modules.users.models._envelopes import PermissionsCreateEnvelope
 
 router = APIRouter()
 
-@router.post("", response_class=UnicodeJSONResponse, response_model=PermissionsCreateEnvelope)
+@router.post("", response_class=UnicodeJSONResponse, response_model=PermissionsCreateEnvelope, operation_id="create_permissions")
 def create_permissions(
     request: Request,
     body: PermissionCreate,
@@ -32,7 +32,7 @@ def create_permissions(
         data={"item": dto},
     )
 
-@router.put("/{id}", response_class=UnicodeJSONResponse, response_model=PermissionsUpdateEnvelope)
+@router.put("/{id}", response_class=UnicodeJSONResponse, response_model=PermissionsUpdateEnvelope, operation_id="update_permissions")
 def update_permissions(
     request: Request,
     id: UUID,
@@ -51,7 +51,7 @@ def update_permissions(
         data={"item": dto},
     )
 
-@router.delete("/{id}", response_class=UnicodeJSONResponse, response_model=PermissionsDeleteEnvelope)
+@router.delete("/{id}", response_class=UnicodeJSONResponse, response_model=PermissionsDeleteEnvelope, operation_id="delete_permissions")
 def delete_permissions(
     request: Request,
     id: UUID,

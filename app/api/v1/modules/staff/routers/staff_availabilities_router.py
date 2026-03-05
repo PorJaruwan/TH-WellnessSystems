@@ -72,6 +72,7 @@ EX_DELETE_200 = success_example(message="Deleted successfully.", data={"item": "
             include_500=True,
         ),
     },
+    operation_id="search_staff_availabilities",
 )
 async def search_staff_availabilities(
     session: AsyncSession = Depends(get_db),
@@ -153,8 +154,9 @@ async def search_staff_availabilities(
         **success_200_example(description="RETRIEVED", example=EX_ONE_200),
         **common_errors(error_model=dict, not_found={"staff_availability_id": "uuid"}, include_500=True),
     },
+    operation_id="read_staff_availability",
 )
-async def read_staff_availability_by_id(staff_availability_id: UUID, session: AsyncSession = Depends(get_db)):
+async def read_staff_availability(staff_availability_id: UUID, session: AsyncSession = Depends(get_db)):
     try:
         obj = await session.get(StaffAvailability, staff_availability_id)
         if not obj:
@@ -193,6 +195,7 @@ async def read_staff_availability_by_id(staff_availability_id: UUID, session: As
         **success_200_example(description="REGISTERED", example=EX_CREATE_200),
         **common_errors(error_model=dict, invalid={"payload": "invalid"}, include_500=True),
     },
+    operation_id="create_staff_availability",
 )
 async def create_staff_availability(payload: StaffAvailabilityCreateModel, session: AsyncSession = Depends(get_db)):
     try:
@@ -242,8 +245,9 @@ async def create_staff_availability(payload: StaffAvailabilityCreateModel, sessi
             include_500=True,
         ),
     },
+    operation_id="update_staff_availability",
 )
-async def update_staff_availability_by_id(
+async def update_staff_availability(
     staff_availability_id: UUID, payload: StaffAvailabilityUpdateModel, session: AsyncSession = Depends(get_db)
 ):
     try:
@@ -303,8 +307,9 @@ async def update_staff_availability_by_id(
         **success_200_example(description="DELETED", example=EX_DELETE_200),
         **common_errors(error_model=dict, not_found={"staff_availability_id": "uuid"}, include_500=True),
     },
+    operation_id="delete_staff_availability",
 )
-async def delete_staff_availability_by_id(staff_availability_id: UUID, session: AsyncSession = Depends(get_db)):
+async def delete_staff_availability(staff_availability_id: UUID, session: AsyncSession = Depends(get_db)):
     try:
         obj = await session.get(StaffAvailability, staff_availability_id)
         if not obj:

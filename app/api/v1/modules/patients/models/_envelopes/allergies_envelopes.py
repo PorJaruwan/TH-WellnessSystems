@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import List
 
 from app.api.v1.models._envelopes.base_envelopes import SuccessEnvelope, Paging, Sort
-from app.api.v1.modules.patients.models.patient_masterdata_model import AllergyDTO
+from app.api.v1.modules.patients.models.dtos import AllergyDTO
 
 
 class AllergySingleData(BaseModel):
@@ -27,7 +27,8 @@ class AllergyListEnvelope(SuccessEnvelope):
 
 
 class AllergyDeleteData(BaseModel):
-    allergy_id: str
+    deleted: bool
+    id: str
 
 
 class AllergyDeleteEnvelope(SuccessEnvelope):

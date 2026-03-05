@@ -24,6 +24,7 @@ def get_read_service(session: AsyncSession = Depends(get_db)) -> CityReadService
     response_class=UnicodeJSONResponse,
     response_model=CityGetEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_cities_by_id",
 )
 async def read_cities_by_id(
     request: Request,

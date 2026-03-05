@@ -44,15 +44,20 @@ def get_search_service(session: AsyncSession = Depends(get_db)) -> LanguageSearc
     response_class=UnicodeJSONResponse,
     response_model=LanguagesSearchEnvelope,
     response_model_exclude_none=True,
+    operation_id="search_languages",
 )
 async def search_languages(
     request: Request,
     q: str = Query("", description="Search keyword"),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
+    sort_by: str | None = Query(None, description="Sort by column name"),
+    sort_dir: str = Query("desc", pattern="^(asc|desc)$", description="Sort direction: asc|desc"),
     svc: LanguageSearchService = Depends(get_search_service),
 ):
-    rows, total = await svc.search(q=q, limit=limit, offset=offset)
+    rows, total = await svc.search(q=q, limit=limit, offset=offset, sort_by=sort_by,
+            sort_dir=sort_dir,
+)
     items = [LanguageDTO.model_validate(_normalize_row(r), from_attributes=True).model_dump(exclude_none=True) for r in rows]
     payload = build_list_payload(
         items=items,

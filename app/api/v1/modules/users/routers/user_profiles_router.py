@@ -14,7 +14,7 @@ from app.api.v1.modules.users.models._envelopes import UserProfilesCreateEnvelop
 
 router = APIRouter()
 
-@router.post("", response_class=UnicodeJSONResponse, response_model=UserProfilesCreateEnvelope)
+@router.post("", response_class=UnicodeJSONResponse, response_model=UserProfilesCreateEnvelope, operation_id="create_user_profiles")
 def create_user_profiles(
     request: Request,
     body: UserProfileCreate,
@@ -32,7 +32,7 @@ def create_user_profiles(
         data={"item": dto},
     )
 
-@router.put("/{id}", response_class=UnicodeJSONResponse, response_model=UserProfilesUpdateEnvelope)
+@router.put("/{id}", response_class=UnicodeJSONResponse, response_model=UserProfilesUpdateEnvelope, operation_id="update_user_profiles")
 def update_user_profiles(
     request: Request,
     id: UUID,
@@ -51,7 +51,7 @@ def update_user_profiles(
         data={"item": dto},
     )
 
-@router.delete("/{id}", response_class=UnicodeJSONResponse, response_model=UserProfilesDeleteEnvelope)
+@router.delete("/{id}", response_class=UnicodeJSONResponse, response_model=UserProfilesDeleteEnvelope, operation_id="delete_user_profiles")
 def delete_user_profiles(
     request: Request,
     id: UUID,

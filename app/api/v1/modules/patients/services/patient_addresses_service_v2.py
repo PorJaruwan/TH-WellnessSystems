@@ -1,3 +1,4 @@
+# app/api/v1/modules/patients/services/patient_addresses_service_v2.py
 
 from __future__ import annotations
 
@@ -28,6 +29,8 @@ class PatientAddressesService:
         *,
         q: str = "",
         patient_id: Optional[UUID] = None,
+        address_type: Optional[str] = None,
+        is_primary: Optional[bool] = None,
         limit: int = 50,
         offset: int = 0,
         sort_by: str = DEFAULT_SORT_BY,
@@ -36,6 +39,8 @@ class PatientAddressesService:
         items, total = await self.repo.list(
             q=q,
             patient_id=patient_id,
+            address_type=address_type,
+            is_primary=is_primary,
             limit=limit,
             offset=offset,
             sort_by=sort_by,
@@ -45,7 +50,12 @@ class PatientAddressesService:
         typed_items = [PatientAddressRead.model_validate(x) for x in items]
 
         payload = ListPayload[PatientAddressRead](
-            filters={"q": q or None, "patient_id": patient_id},
+            filters={
+                "q": q or None,
+                "patient_id": str(patient_id) if patient_id else None,
+                "address_type": address_type or None,
+                "is_primary": is_primary,
+            },
             sort=Sort(by=sort_by, order=sort_order),
             paging=Paging(
                 total=total,
@@ -62,6 +72,10 @@ class PatientAddressesService:
 
     async def get(self, address_id: UUID) -> Optional[PatientAddressRead]:
         obj = await self.repo.get_by_id(address_id)
+        return PatientAddressRead.model_validate(obj) if obj else None
+
+    async def get_by_key(self, *, patient_id: UUID, address_type: str) -> Optional[PatientAddressRead]:
+        obj = await self.repo.get_by_key(patient_id=patient_id, address_type=address_type)
         return PatientAddressRead.model_validate(obj) if obj else None
 
     async def create(self, body: PatientAddressCreate) -> PatientAddressRead:
@@ -83,8 +97,27 @@ class PatientAddressesService:
         updated = await self.repo.update(obj)
         return PatientAddressRead.model_validate(updated)
 
+    async def update_by_key(self, *, patient_id: UUID, address_type: str, body: PatientAddressUpdate) -> Optional[PatientAddressRead]:
+        obj = await self.repo.get_by_key(patient_id=patient_id, address_type=address_type)
+        if not obj:
+            return None
+
+        data = body.model_dump(exclude_unset=True, exclude_none=True)
+        for k, v in data.items():
+            setattr(obj, k, v)
+
+        updated = await self.repo.update(obj)
+        return PatientAddressRead.model_validate(updated)
+
     async def delete(self, address_id: UUID) -> bool:
         obj = await self.repo.get_by_id(address_id)
+        if not obj:
+            return False
+        await self.repo.delete(obj)
+        return True
+
+    async def delete_by_key(self, *, patient_id: UUID, address_type: str) -> bool:
+        obj = await self.repo.get_by_key(patient_id=patient_id, address_type=address_type)
         if not obj:
             return False
         await self.repo.delete(obj)

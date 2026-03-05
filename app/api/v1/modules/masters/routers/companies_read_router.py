@@ -24,6 +24,7 @@ def get_read_service(session: AsyncSession = Depends(get_db)) -> CompanyReadServ
     response_class=UnicodeJSONResponse,
     response_model=CompanyGetEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_companies_by_id",
 )
 async def read_companies_by_id(
     request: Request,

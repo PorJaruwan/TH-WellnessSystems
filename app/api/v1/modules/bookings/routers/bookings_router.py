@@ -110,6 +110,7 @@ def _normalize_detail(row: dict) -> dict:
             invalid={"detail": "INVALID:payload..."},
         ),
     },
+    operation_id="create_booking",
 )
 async def create_booking(
     payload: BookingCreate,
@@ -180,6 +181,7 @@ async def create_booking(
             invalid={"detail": "INVALID:..."},
         ),
     },
+    operation_id="search_bookings",
 )
 async def search_bookings(
     session: AsyncSession = Depends(get_db),
@@ -256,8 +258,9 @@ async def search_bookings(
             invalid={"detail": "INVALID:..."},
         ),
     },
+    operation_id="read_booking",
 )
-async def get_booking(
+async def read_booking(
     booking_id: UUID,
     session: AsyncSession = Depends(get_db),
 ):
@@ -298,8 +301,9 @@ async def get_booking(
             invalid={"detail": "INVALID:payload..."},
         ),
     },
+    operation_id="patch_booking",
 )
-async def update_booking(
+async def patch_booking(
     booking_id: UUID,
     payload: BookingUpdate,
     session: AsyncSession = Depends(get_db),
@@ -349,6 +353,7 @@ async def update_booking(
             invalid={"detail": "INVALID:..."},
         ),
     },
+    operation_id="delete_booking",
 )
 async def delete_booking(
     booking_id: UUID,
@@ -388,8 +393,9 @@ async def delete_booking(
             invalid={"detail": "INVALID:payload..."},
         ),
     },
+    operation_id="patch_booking_note",
 )
-async def update_booking_note(
+async def patch_booking_note(
     booking_id: UUID,
     body: BookingUpdateNote,
     session: AsyncSession = Depends(get_db),
@@ -411,28 +417,6 @@ async def update_booking_note(
         return ApiResponse.from_http_exception(e, details={"booking_id": str(booking_id), "note": body.note})
 
 
-# ==========================================================
-# POST /api/v1/bookings/{booking_id}/status
-# ==========================================================
-# @router.post(
-#     "/{booking_id:uuid}/status",
-#     response_class=UnicodeJSONResponse,
-#     response_model=BookingStatusActionEnvelope,
-#     response_model_exclude_none=True,
-#     responses={
-#         **success_200_example(
-#             example=success_example(
-#                 message="Data updated successfully.",
-#                 data={"result": {"booking_id": "uuid", "new_status": "confirmed"}},
-#             )
-#         ),
-#         **common_errors(
-#             error_model=ErrorEnvelope,
-#             not_found={"booking_id": "uuid"},
-#             invalid={"detail": "INVALID:action..."},
-#         ),
-#     },
-# )
 @router.post(
     "/{booking_id:uuid}/status",
     response_class=UnicodeJSONResponse,
@@ -469,6 +453,7 @@ async def update_booking_note(
             },
         ),
     },
+    operation_id="booking_status_action",
 )
 
 async def booking_status_action(
@@ -532,8 +517,9 @@ async def booking_status_action(
             invalid={"detail": "INVALID:..."},
         ),
     },
+    operation_id="read_booking_history",
 )
-async def get_booking_history(
+async def read_booking_history(
     booking_id: UUID,
     session: AsyncSession = Depends(get_db),
 ):

@@ -13,7 +13,7 @@ from app.api.v1.modules.users.models._envelopes import UserProfilesSearchEnvelop
 
 router = APIRouter()
 
-@router.get("/search", response_class=UnicodeJSONResponse, response_model=UserProfilesSearchEnvelope)
+@router.get("/search", response_class=UnicodeJSONResponse, response_model=UserProfilesSearchEnvelope, operation_id="search_user_profiles")
 def search_user_profiles(
     request: Request,
     q: str = Query("", description="Full name contains"),

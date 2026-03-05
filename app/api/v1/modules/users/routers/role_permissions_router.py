@@ -14,7 +14,7 @@ from app.api.v1.modules.users.models._envelopes import RolePermissionsCreateEnve
 
 router = APIRouter()
 
-@router.post("", response_class=UnicodeJSONResponse, response_model=RolePermissionsCreateEnvelope)
+@router.post("", response_class=UnicodeJSONResponse, response_model=RolePermissionsCreateEnvelope, operation_id="create_role_permissions")
 def create_role_permissions(
     request: Request,
     body: RolePermissionCreate,
@@ -32,7 +32,7 @@ def create_role_permissions(
         data={"item": dto},
     )
 
-@router.put("/{id}", response_class=UnicodeJSONResponse, response_model=RolePermissionsUpdateEnvelope)
+@router.put("/{id}", response_class=UnicodeJSONResponse, response_model=RolePermissionsUpdateEnvelope, operation_id="update_role_permissions")
 def update_role_permissions(
     request: Request,
     id: UUID,
@@ -51,7 +51,7 @@ def update_role_permissions(
         data={"item": dto},
     )
 
-@router.delete("/{id}", response_class=UnicodeJSONResponse, response_model=RolePermissionsDeleteEnvelope)
+@router.delete("/{id}", response_class=UnicodeJSONResponse, response_model=RolePermissionsDeleteEnvelope, operation_id="delete_role_permissions")
 def delete_role_permissions(
     request: Request,
     id: UUID,

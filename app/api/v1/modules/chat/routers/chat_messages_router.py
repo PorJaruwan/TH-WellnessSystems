@@ -28,6 +28,7 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=ChatSoftDeleteMessageEnvelope,
     response_model_exclude_none=True,
+    operation_id="soft_delete_message",
 )
 async def soft_delete_message(
     message_id: UUID = Path(...),
@@ -67,8 +68,9 @@ async def soft_delete_message(
     response_class=UnicodeJSONResponse,
     response_model=ChatCitationsEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_message_citations",
 )
-async def get_message_citations(
+async def read_message_citations(
     assistant_message_id: UUID = Path(...),
     db: AsyncSession = Depends(get_db),
     company_code: str | None = Depends(current_company_code),

@@ -14,7 +14,7 @@ from app.api.v1.modules.users.models._envelopes import GroupRolesSearchEnvelope
 router = APIRouter()
 
 
-@router.get("/search", response_class=UnicodeJSONResponse, response_model=GroupRolesSearchEnvelope)
+@router.get("/search", response_class=UnicodeJSONResponse, response_model=GroupRolesSearchEnvelope, operation_id="search_group_roles")
 def search_group_roles(
     request: Request,
     

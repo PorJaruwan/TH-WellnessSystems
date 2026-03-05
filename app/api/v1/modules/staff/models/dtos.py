@@ -48,7 +48,7 @@ class StaffDetailDTO(ORMDTO):
 # =========================================================
 # Staff Departments / Services / Leave DTOs
 # =========================================================
-from datetime import date, datetime
+from datetime import date, datetime, time
 from typing import Optional
 
 
@@ -56,6 +56,8 @@ class StaffDepartmentDTO(ORMDTO):
     id: UUID
     staff_id: UUID
     department_id: UUID
+    department_name: Optional[str] = None
+    staff_name: Optional[str] = None
     role_in_dept: Optional[str] = None
     is_primary: Optional[bool] = None
     is_active: Optional[bool] = None
@@ -67,6 +69,8 @@ class StaffServiceDTO(ORMDTO):
     id: UUID
     staff_id: UUID
     service_id: UUID
+    service_name: Optional[str] = None
+    staff_name: Optional[str] = None
     duration_minutes: Optional[int] = None
     is_active: Optional[bool] = None
     created_at: Optional[datetime] = None
@@ -78,6 +82,8 @@ class StaffLeaveDTO(ORMDTO):
     company_code: str
     location_id: UUID
     staff_id: UUID
+    location_name: Optional[str] = None
+    staff_name: Optional[str] = None
     leave_type: str
     date_from: date
     date_to: date
@@ -89,3 +95,22 @@ class StaffLeaveDTO(ORMDTO):
     is_active: Optional[bool] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+
+class StaffLocationDTO(ORMDTO):
+    id: UUID
+    staff_id: UUID
+    location_id: UUID
+    location_name: Optional[str] = None
+    staff_name: Optional[str] = None
+
+    work_days: Optional[str] = None
+    work_time_from: Optional[time] = None
+    work_time_to: Optional[time] = None
+
+    is_primary: Optional[bool] = None
+    is_active: Optional[bool] = None
+
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+

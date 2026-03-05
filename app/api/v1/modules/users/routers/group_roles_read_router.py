@@ -14,7 +14,7 @@ from app.api.v1.modules.users.models._envelopes import GroupRolesGetEnvelope
 router = APIRouter()
 # router = APIRouter(prefix="/group_roles", tags=["User_Settings"])
 
-@router.get("/{id}", response_class=UnicodeJSONResponse, response_model=GroupRolesGetEnvelope)
+@router.get("/{id}", response_class=UnicodeJSONResponse, response_model=GroupRolesGetEnvelope, operation_id="get_group_roles_by_id")
 def get_group_roles_by_id(
     request: Request,
     id: UUID,

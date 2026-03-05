@@ -106,6 +106,7 @@ class DoctorEligibleEnvelope(BaseModel):
             invalid={"detail": "check_timeslot/check_booking requires both date and time"},
         ),
     },
+    operation_id="check_doctors_eligible",
 )
 async def check_doctors_eligible(
     room_id: UUID = Query(..., description="Room UUID"),

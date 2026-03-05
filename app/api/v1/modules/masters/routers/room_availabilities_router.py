@@ -27,6 +27,7 @@ def get_crud_service(session: AsyncSession = Depends(get_db)) -> RoomAvailabilit
     response_class=UnicodeJSONResponse,
     response_model=RoomAvailabilityCreateEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_room_availabilities",
 )
 async def create_room_availabilities(
     request: Request,
@@ -48,6 +49,7 @@ async def create_room_availabilities(
     response_class=UnicodeJSONResponse,
     response_model=RoomAvailabilityUpdateEnvelope,
     response_model_exclude_none=True,
+    operation_id="update_room_availabilities",
 )
 async def update_room_availabilities(
     request: Request,
@@ -76,6 +78,7 @@ async def update_room_availabilities(
     response_class=UnicodeJSONResponse,
     response_model=RoomAvailabilityDeleteEnvelope,
     response_model_exclude_none=True,
+    operation_id="delete_room_availabilities",
 )
 async def delete_room_availabilities(
     request: Request,

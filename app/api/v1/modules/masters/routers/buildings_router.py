@@ -27,6 +27,7 @@ def get_crud_service(session: AsyncSession = Depends(get_db)) -> BuildingCrudSer
     response_class=UnicodeJSONResponse,
     response_model=BuildingCreateEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_buildings",
 )
 async def create_buildings(
     request: Request,
@@ -48,6 +49,7 @@ async def create_buildings(
     response_class=UnicodeJSONResponse,
     response_model=BuildingUpdateEnvelope,
     response_model_exclude_none=True,
+    operation_id="update_buildings",
 )
 async def update_buildings(
     request: Request,
@@ -76,6 +78,7 @@ async def update_buildings(
     response_class=UnicodeJSONResponse,
     response_model=BuildingDeleteEnvelope,
     response_model_exclude_none=True,
+    operation_id="delete_buildings",
 )
 async def delete_buildings(
     request: Request,

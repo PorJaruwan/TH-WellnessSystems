@@ -1,11 +1,10 @@
-# app/api/v1/models/_envelopes/patient_types_envelopes.py
-
 from __future__ import annotations
+
 from pydantic import BaseModel
 from typing import List
 
 from app.api.v1.models._envelopes.base_envelopes import SuccessEnvelope, Paging, Sort
-from app.api.v1.modules.patients.models.patient_masterdata_model import PatientTypeDTO
+from app.api.v1.modules.patients.models.dtos import PatientTypeDTO
 
 
 class PatientTypeSingleData(BaseModel):
@@ -18,7 +17,7 @@ class PatientTypeSingleEnvelope(SuccessEnvelope):
 
 class PatientTypeListData(BaseModel):
     filters: dict
-    sort: Sort            # ✅ ADD
+    sort: Sort
     paging: Paging
     items: List[PatientTypeDTO]
 
@@ -28,6 +27,7 @@ class PatientTypeListEnvelope(SuccessEnvelope):
 
 
 class PatientTypeDeleteData(BaseModel):
+    deleted: bool
     id: str
 
 

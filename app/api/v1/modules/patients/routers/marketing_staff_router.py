@@ -1,43 +1,37 @@
-# app/api/v1/patients/marketing_staff.py
+# # app/api/v1/patients/marketing_staff.py
 
 from __future__ import annotations
 
 from uuid import UUID
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import get_db
 from app.utils.ResponseHandler import ResponseHandler, ResponseCode, UnicodeJSONResponse
 
-from app.api.v1.modules.patients.models.patients_model import MarketingStaffCreate, MarketingStaffUpdate
+from app.api.v1.modules.patients.models.schemas import MarketingStaffCreate, MarketingStaffUpdate
+from app.api.v1.modules.patients.models.dtos import MarketingStaffDTO
 from app.api.v1.modules.patients.models._envelopes.marketing_staff_envelopes import (
     MarketingStaffSingleEnvelope,
     MarketingStaffListEnvelope,
     MarketingStaffDeleteEnvelope,
 )
-from app.api.v1.modules.patients.models.patient_masterdata_model import MarketingStaffDTO
+
 from app.api.v1.modules.patients.repositories.masterdata_repository import MasterDataRepository
 from app.api.v1.modules.patients.services.masterdata_service import MasterDataService
-
 from app.db.models.patient_settings import MarketingStaff
-
-
-def get_masterdata_service(db: AsyncSession = Depends(get_db)) -> MasterDataService:
-    """✅ Standard dependency: router -> service -> repo."""
-    return MasterDataService(MasterDataRepository(db))
 
 router = APIRouter()
 
-
 DEFAULT_SORT_BY = "marketing_name"
 ALLOWED_SORT_FIELDS = ["marketing_name", "campaign", "created_at", "updated_at", "is_active"]
+SEARCH_FIELDS = ["marketing_name", "campaign"]
 
 
-def _get_sort_value(x, field: str) -> str:
-    v = x.get(field) if isinstance(x, dict) else getattr(x, field, None)
-    return "" if v is None else str(v).lower()
+def get_masterdata_service(db: AsyncSession = Depends(get_db)) -> MasterDataService:
+    return MasterDataService(MasterDataRepository(db))
 
 
 @router.post(
@@ -45,11 +39,13 @@ def _get_sort_value(x, field: str) -> str:
     response_class=UnicodeJSONResponse,
     response_model=MarketingStaffSingleEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_marketing_staff",
 )
-async def create(request: Request, payload: MarketingStaffCreate, db: AsyncSession = Depends(get_db)):
+async def create_marketing_staff(request: Request, payload: MarketingStaffCreate, db: AsyncSession = Depends(get_db)):
     repo = MasterDataRepository(db)
     obj = await repo.create(MarketingStaff, payload.model_dump())
-    return ResponseHandler.success_from_request(request, 
+    return ResponseHandler.success_from_request(
+        request,
         message=ResponseCode.SUCCESS["REGISTERED"][1],
         data={"item": MarketingStaffDTO.model_validate(obj).model_dump(exclude_none=True)},
     )
@@ -60,43 +56,32 @@ async def create(request: Request, payload: MarketingStaffCreate, db: AsyncSessi
     response_class=UnicodeJSONResponse,
     response_model=MarketingStaffListEnvelope,
     response_model_exclude_none=True,
+    operation_id="search_marketing_staff",
 )
-async def search(
+async def search_marketing_staff(
     request: Request,
+    q: Optional[str] = Query(None),
+    is_active: Optional[bool] = Query(None),
+    sort_by: str = Query(DEFAULT_SORT_BY),
+    sort_order: str = Query("asc"),
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
     svc: MasterDataService = Depends(get_masterdata_service),
-    q: Optional[str] = Query(default=None, description="search in marketing_name/campaign"),
-    is_active: Optional[bool] = Query(default=None, description="filter is_active (None=all)"),
-    sort_by: str = Query(default=DEFAULT_SORT_BY, description="sort field"),
-    sort_order: str = Query(default="asc", pattern="^(asc|desc)$", description="asc|desc"),
-    limit: int = Query(default=200, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
 ):
-    filters_payload = {"q": q, "is_active": is_active}
-
-    payload, total, _effective_sort_by = await svc.search_list_payload(
+    payload, _, _ = await svc.search_list_payload(
         model=MarketingStaff,
         dto=MarketingStaffDTO,
         q=q,
         is_active=is_active,
-        search_fields=["marketing_name", "campaign"],
-        extra_eq_filters=None,
+        search_fields=SEARCH_FIELDS,
         sort_by=sort_by,
         sort_order=sort_order,
         allowed_sort_fields=ALLOWED_SORT_FIELDS,
         default_sort_by=DEFAULT_SORT_BY,
         limit=limit,
         offset=offset,
-        filters_payload=filters_payload,
+        filters_payload={"q": q, "is_active": is_active},
     )
-
-    if total == 0:
-        return ResponseHandler.error_from_request(
-            request,
-            *("DATA_204", "No data found."),
-            details={"filters": filters_payload},
-            status_code=404,
-        )
-
     return ResponseHandler.success_from_request(
         request,
         message=ResponseCode.SUCCESS["RETRIEVED"][1],
@@ -105,48 +90,66 @@ async def search(
 
 
 @router.get(
-    "/{item_id:uuid}",
+    "/{marketing_staff_id:uuid}",
     response_class=UnicodeJSONResponse,
     response_model=MarketingStaffSingleEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_marketing_staff",
 )
-async def get_by_id(request: Request, item_id: UUID, db: AsyncSession = Depends(get_db)):
+async def read_marketing_staff(request: Request, marketing_staff_id: UUID, db: AsyncSession = Depends(get_db)):
     repo = MasterDataRepository(db)
-    item = await repo.get_by_id(MarketingStaff, item_id)
+    item = await repo.get_by_id(MarketingStaff, marketing_staff_id)
     if item is None:
-        return ResponseHandler.error_from_request(request, *("DATA_404", "Resource not found."), details={"id": str(item_id)})
-    return ResponseHandler.success_from_request(request, 
+        return ResponseHandler.error_from_request(
+            request, *("DATA_404", "Resource not found."), details={"id": str(marketing_staff_id)}
+        )
+    return ResponseHandler.success_from_request(
+        request,
         message=ResponseCode.SUCCESS["RETRIEVED"][1],
         data={"item": MarketingStaffDTO.model_validate(item).model_dump(exclude_none=True)},
     )
 
 
 @router.put(
-    "/{item_id:uuid}",
+    "/{marketing_staff_id:uuid}",
     response_class=UnicodeJSONResponse,
     response_model=MarketingStaffSingleEnvelope,
     response_model_exclude_none=True,
+    operation_id="update_marketing_staff",
 )
-async def update(request: Request, item_id: UUID, payload: MarketingStaffUpdate, db: AsyncSession = Depends(get_db)):
+async def update_marketing_staff(
+    request: Request, marketing_staff_id: UUID, payload: MarketingStaffUpdate, db: AsyncSession = Depends(get_db)
+):
     repo = MasterDataRepository(db)
-    obj = await repo.update_by_id(MarketingStaff, item_id, payload.model_dump(exclude_unset=True))
+    obj = await repo.update_by_id(MarketingStaff, marketing_staff_id, payload.model_dump(exclude_unset=True))
     if obj is None:
-        return ResponseHandler.error_from_request(request, *("DATA_404", "Resource not found."), details={"id": str(item_id)})
-    return ResponseHandler.success_from_request(request, 
+        return ResponseHandler.error_from_request(
+            request, *("DATA_404", "Resource not found."), details={"id": str(marketing_staff_id)}
+        )
+    return ResponseHandler.success_from_request(
+        request,
         message=ResponseCode.SUCCESS["UPDATED"][1],
         data={"item": MarketingStaffDTO.model_validate(obj).model_dump(exclude_none=True)},
     )
 
 
 @router.delete(
-    "/{item_id:uuid}",
+    "/{marketing_staff_id:uuid}",
     response_class=UnicodeJSONResponse,
     response_model=MarketingStaffDeleteEnvelope,
     response_model_exclude_none=True,
+    operation_id="delete_marketing_staff",
 )
-async def delete(request: Request, item_id: UUID, db: AsyncSession = Depends(get_db)):
+async def delete_marketing_staff(request: Request, marketing_staff_id: UUID, db: AsyncSession = Depends(get_db)):
     repo = MasterDataRepository(db)
-    deleted = await repo.delete_by_id(MarketingStaff, item_id)
+    deleted = await repo.delete_by_id(MarketingStaff, marketing_staff_id)
     if not deleted:
-        return ResponseHandler.error_from_request(request, *("DATA_404", "Resource not found."), details={"id": str(item_id)})
-    return ResponseHandler.success_from_request(request, message=f"Deleted {item_id}.", data={"id": str(item_id)})
+        return ResponseHandler.error_from_request(
+            request, *("DATA_404", "Resource not found."), details={"id": str(marketing_staff_id)}
+        )
+    return ResponseHandler.success_from_request(
+        request,
+        message=f"MarketingStaff with id {marketing_staff_id} deleted.",
+        data={"deleted": True, "id": str(marketing_staff_id)},
+    )
+

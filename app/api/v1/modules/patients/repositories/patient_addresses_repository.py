@@ -1,7 +1,8 @@
+# app/api/v1/modules/patients/repositories/patient_addresses_repository.py
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 from uuid import UUID
 
 from sqlalchemy import select, func, or_, asc, desc
@@ -9,21 +10,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models.patient_settings import PatientAddress
 
-# ✅ FIX: ใช้ชื่อ field ที่มีจริงใน ORM (ดูจาก patient_settings.py)
-# อ้างอิง model: PatientAddress มี sub_district, city, state_province, postal_code, country_code
 
-_ALLOWED_SORT_FIELDS = {
+ALLOWED_SORT_FIELDS = {
     "created_at": PatientAddress.created_at,
     "updated_at": PatientAddress.updated_at,
     "address_type": PatientAddress.address_type,
     "patient_id": PatientAddress.patient_id,
-
-    # ✅ แก้จาก province/district เป็นชื่อจริง
     "sub_district": PatientAddress.sub_district,
     "city": PatientAddress.city,
     "state_province": PatientAddress.state_province,
     "postal_code": PatientAddress.postal_code,
     "country_code": PatientAddress.country_code,
+    "is_primary": PatientAddress.is_primary,
 }
 
 DEFAULT_SORT_BY = "created_at"
@@ -31,7 +29,7 @@ DEFAULT_SORT_ORDER = "desc"
 
 
 class PatientAddressesRepository:
-    """DB access for patient addresses (projection-free; table is small)."""
+    """DB access for patient addresses."""
 
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -41,6 +39,8 @@ class PatientAddressesRepository:
         *,
         q: str = "",
         patient_id: Optional[UUID] = None,
+        address_type: Optional[str] = None,
+        is_primary: Optional[bool] = None,
         limit: int = 50,
         offset: int = 0,
         sort_by: str = DEFAULT_SORT_BY,
@@ -49,6 +49,12 @@ class PatientAddressesRepository:
         filters = []
         if patient_id:
             filters.append(PatientAddress.patient_id == patient_id)
+
+        if address_type:
+            filters.append(PatientAddress.address_type == address_type)
+
+        if is_primary is not None:
+            filters.append(PatientAddress.is_primary == is_primary)
 
         if q:
             kw = f"%{q}%"
@@ -67,7 +73,7 @@ class PatientAddressesRepository:
         total_stmt = select(func.count()).select_from(PatientAddress).where(*filters)
         total = int((await self.db.execute(total_stmt)).scalar() or 0)
 
-        col = _ALLOWED_SORT_FIELDS.get(sort_by, _ALLOWED_SORT_FIELDS[DEFAULT_SORT_BY])
+        col = ALLOWED_SORT_FIELDS.get(sort_by, ALLOWED_SORT_FIELDS[DEFAULT_SORT_BY])
         col = asc(col) if sort_order == "asc" else desc(col)
 
         stmt = (
@@ -83,6 +89,14 @@ class PatientAddressesRepository:
 
     async def get_by_id(self, address_id: UUID) -> Optional[PatientAddress]:
         stmt = select(PatientAddress).where(PatientAddress.id == address_id)
+        res = await self.db.execute(stmt)
+        return res.scalar_one_or_none()
+
+    async def get_by_key(self, *, patient_id: UUID, address_type: str) -> Optional[PatientAddress]:
+        stmt = select(PatientAddress).where(
+            PatientAddress.patient_id == patient_id,
+            PatientAddress.address_type == address_type,
+        )
         res = await self.db.execute(stmt)
         return res.scalar_one_or_none()
 

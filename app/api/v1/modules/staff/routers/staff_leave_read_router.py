@@ -16,8 +16,9 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=StaffLeaveByIdEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="read_staff_leave",
 )
-async def read_staff_leave_by_id(
+async def read_staff_leave(
     request: Request,
     staff_leave_id: UUID,
     svc: StaffLeaveReadService = Depends(get_staff_leave_read_service),

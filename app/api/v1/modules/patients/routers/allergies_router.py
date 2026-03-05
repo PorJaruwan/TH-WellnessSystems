@@ -1,46 +1,37 @@
-# app/api/v1/patients/allergies.py
-
 from __future__ import annotations
 
-from typing import Optional
 from uuid import UUID
+from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import get_db
 from app.utils.ResponseHandler import ResponseHandler, ResponseCode, UnicodeJSONResponse
+from app.utils.payload_cleaner import clean_create, clean_update
 
-from app.api.v1.modules.patients.models.patients_model import AllergyCreate, AllergyUpdate
+from app.api.v1.modules.patients.models.schemas import AllergyCreate, AllergyUpdate
+from app.api.v1.modules.patients.models.dtos import AllergyDTO
 from app.api.v1.modules.patients.models._envelopes.allergies_envelopes import (
     AllergySingleEnvelope,
     AllergyListEnvelope,
     AllergyDeleteEnvelope,
 )
-from app.api.v1.modules.patients.models.patient_masterdata_model import AllergyDTO
+
 from app.api.v1.modules.patients.repositories.masterdata_repository import MasterDataRepository
 from app.api.v1.modules.patients.services.masterdata_service import MasterDataService
-
 from app.db.models.patient_settings import Allergy
 
-from app.utils.payload_cleaner import clean_create, clean_update
- 
-
-
-def get_masterdata_service(db: AsyncSession = Depends(get_db)) -> MasterDataService:
-    """✅ Standard dependency: router -> service -> repo."""
-    return MasterDataService(MasterDataRepository(db))
 
 router = APIRouter()
 
-
 DEFAULT_SORT_BY = "allergy_name"
 ALLOWED_SORT_FIELDS = ["allergy_name", "allergy_type", "description", "created_at", "updated_at", "is_active"]
+SEARCH_FIELDS = ["allergy_name", "allergy_type", "description"]
 
 
-def _get_sort_value(x, field: str) -> str:
-    v = x.get(field) if isinstance(x, dict) else getattr(x, field, None)
-    return "" if v is None else str(v).lower()
+def get_masterdata_service(db: AsyncSession = Depends(get_db)) -> MasterDataService:
+    return MasterDataService(MasterDataRepository(db))
 
 
 @router.post(
@@ -48,6 +39,7 @@ def _get_sort_value(x, field: str) -> str:
     response_class=UnicodeJSONResponse,
     response_model=AllergySingleEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_allergy",
 )
 async def create_allergy(request: Request, payload: AllergyCreate, db: AsyncSession = Depends(get_db)):
     repo = MasterDataRepository(db)
@@ -64,43 +56,32 @@ async def create_allergy(request: Request, payload: AllergyCreate, db: AsyncSess
     response_class=UnicodeJSONResponse,
     response_model=AllergyListEnvelope,
     response_model_exclude_none=True,
+    operation_id="search_allergies",
 )
 async def search_allergies(
     request: Request,
+    q: Optional[str] = Query(None),
+    is_active: Optional[bool] = Query(None),
+    sort_by: str = Query(DEFAULT_SORT_BY),
+    sort_order: str = Query("asc"),
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
     svc: MasterDataService = Depends(get_masterdata_service),
-    q: Optional[str] = Query(default=None, description="search in allergy_name/description"),
-    is_active: Optional[bool] = Query(default=None, description="filter is_active (None=all)"),
-    sort_by: str = Query(default=DEFAULT_SORT_BY, description="sort field"),
-    sort_order: str = Query(default="asc", pattern="^(asc|desc)$", description="asc|desc"),
-    limit: int = Query(default=200, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
 ):
-    filters_payload = {"q": q, "is_active": is_active}
-
-    payload, total, _effective_sort_by = await svc.search_list_payload(
+    payload, _, _ = await svc.search_list_payload(
         model=Allergy,
         dto=AllergyDTO,
         q=q,
         is_active=is_active,
-        search_fields=["allergy_name", "description"],
-        extra_eq_filters=None,
+        search_fields=SEARCH_FIELDS,
         sort_by=sort_by,
         sort_order=sort_order,
         allowed_sort_fields=ALLOWED_SORT_FIELDS,
         default_sort_by=DEFAULT_SORT_BY,
         limit=limit,
         offset=offset,
-        filters_payload=filters_payload,
+        filters_payload={"q": q, "is_active": is_active},
     )
-
-    if total == 0:
-        return ResponseHandler.error_from_request(
-            request,
-            *("DATA_204", "No data found."),
-            details={"filters": filters_payload},
-            status_code=404,
-        )
-
     return ResponseHandler.success_from_request(
         request,
         message=ResponseCode.SUCCESS["RETRIEVED"][1],
@@ -113,13 +94,17 @@ async def search_allergies(
     response_class=UnicodeJSONResponse,
     response_model=AllergySingleEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_allergy",
 )
 async def read_allergy(request: Request, allergy_id: UUID, db: AsyncSession = Depends(get_db)):
     repo = MasterDataRepository(db)
     item = await repo.get_by_id(Allergy, allergy_id)
     if item is None:
-        return ResponseHandler.error_from_request(request, *("DATA_404", "Resource not found."), details={"allergy_id": str(allergy_id)})
-    return ResponseHandler.success_from_request(request, 
+        return ResponseHandler.error_from_request(
+            request, *("DATA_404", "Resource not found."), details={"id": str(allergy_id)}
+        )
+    return ResponseHandler.success_from_request(
+        request,
         message=ResponseCode.SUCCESS["RETRIEVED"][1],
         data={"item": AllergyDTO.model_validate(item).model_dump(exclude_none=True)},
     )
@@ -130,12 +115,15 @@ async def read_allergy(request: Request, allergy_id: UUID, db: AsyncSession = De
     response_class=UnicodeJSONResponse,
     response_model=AllergySingleEnvelope,
     response_model_exclude_none=True,
+    operation_id="update_allergy",
 )
 async def update_allergy(request: Request, allergy_id: UUID, payload: AllergyUpdate, db: AsyncSession = Depends(get_db)):
     repo = MasterDataRepository(db)
     obj = await repo.update_by_id(Allergy, allergy_id, clean_update(payload))
     if obj is None:
-        return ResponseHandler.error_from_request(request, *("DATA_404", "Resource not found."), details={"allergy_id": str(allergy_id)})
+        return ResponseHandler.error_from_request(
+            request, *("DATA_404", "Resource not found."), details={"id": str(allergy_id)}
+        )
     return ResponseHandler.success_from_request(
         request,
         message=ResponseCode.SUCCESS["UPDATED"][1],
@@ -148,14 +136,17 @@ async def update_allergy(request: Request, allergy_id: UUID, payload: AllergyUpd
     response_class=UnicodeJSONResponse,
     response_model=AllergyDeleteEnvelope,
     response_model_exclude_none=True,
+    operation_id="delete_allergy",
 )
 async def delete_allergy(request: Request, allergy_id: UUID, db: AsyncSession = Depends(get_db)):
     repo = MasterDataRepository(db)
     deleted = await repo.delete_by_id(Allergy, allergy_id)
     if not deleted:
-        return ResponseHandler.error_from_request(request, *("DATA_404", "Resource not found."), details={"allergy_id": str(allergy_id)})
+        return ResponseHandler.error_from_request(
+            request, *("DATA_404", "Resource not found."), details={"id": str(allergy_id)}
+        )
     return ResponseHandler.success_from_request(
         request,
         message=f"Allergy with id {allergy_id} deleted.",
-        data={"allergy_id": str(allergy_id)},
+        data={"deleted": True, "id": str(allergy_id)},
     )

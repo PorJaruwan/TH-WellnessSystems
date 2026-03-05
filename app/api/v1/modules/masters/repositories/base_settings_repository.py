@@ -36,13 +36,14 @@ class BaseSettingsSearchRepository:
         self.session = session
         self.model = model
         self.search_fields = list(search_fields)
-
     async def search(
         self,
         q: str | None,
         limit: int,
         offset: int,
         base_filters: Iterable[Any] | None = None,
+        sort_by: str | None = None,
+        sort_dir: str = "asc",
     ):
         # ✅ Standard: select columns + mappings() for list/search
         table = self.model.__table__
@@ -58,6 +59,25 @@ class BaseSettingsSearchRepository:
             ors = _build_ilike_filters(self.model, q, self.search_fields)
             if ors:
                 stmt = stmt.where(or_(*ors))
+
+        # ordering (safe allow-list by real table columns)
+        if sort_by is None:
+            # sensible defaults for grid/list
+            for cand in ("updated_at", "created_at", "id"):
+                if cand in table.c:
+                    sort_by = cand
+                    break
+
+        if sort_by and sort_by in table.c:
+            col = table.c[sort_by]
+            if (sort_dir or "").lower() == "desc":
+                stmt = stmt.order_by(col.desc())
+            else:
+                stmt = stmt.order_by(col.asc())
+
+            # deterministic tie-breaker
+            if "id" in table.c and sort_by != "id":
+                stmt = stmt.order_by(table.c["id"].asc())
 
         # total
         total_stmt = select(func.count()).select_from(stmt.subquery())

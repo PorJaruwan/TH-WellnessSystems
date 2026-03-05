@@ -25,6 +25,7 @@ def get_read_service(session: AsyncSession = Depends(get_db)) -> LocationReadSer
     response_class=UnicodeJSONResponse,
     response_model=LocationGetEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_locations_by_id",
 )
 async def read_locations_by_id(
     request: Request,

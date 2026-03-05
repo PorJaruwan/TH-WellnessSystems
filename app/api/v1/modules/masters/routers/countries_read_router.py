@@ -24,6 +24,7 @@ def get_read_service(session: AsyncSession = Depends(get_db)) -> CountryReadServ
     response_class=UnicodeJSONResponse,
     response_model=CountryGetEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_countries_by_id",
 )
 async def read_countries_by_id(
     request: Request,

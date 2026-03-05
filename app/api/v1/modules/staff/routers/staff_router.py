@@ -22,6 +22,7 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=StaffCreateEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="create_staff",
 )
 async def create_staff(
     request: Request,
@@ -50,8 +51,9 @@ async def create_staff(
     response_class=UnicodeJSONResponse,
     response_model=StaffDeleteEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="delete_staff",
 )
-async def delete_staff_by_id(
+async def delete_staff(
     request: Request,
     staff_id: UUID,
     svc: StaffCrudService = Depends(get_staff_crud_service),

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from uuid import UUID
 from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -46,22 +47,36 @@ def get_search_service(session: AsyncSession = Depends(get_db)) -> RoomAvailabil
     response_class=UnicodeJSONResponse,
     response_model=RoomAvailabilitySearchEnvelope,
     response_model_exclude_none=True,
+    operation_id="search_room_availabilities",
 )
 async def search_room_availabilities(
     request: Request,
     q: str = Query("", description="Search keyword"),
+    room_id: UUID | None = Query(None, description="Filter by room_id"),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
+    sort_by: str | None = Query(None, description="Sort by column name"),
+    sort_dir: str = Query("desc", pattern="^(asc|desc)$", description="Sort direction: asc|desc"),
     svc: RoomAvailabilitySearchService = Depends(get_search_service),
 ):
-    rows, total = await svc.search(q=q, limit=limit, offset=offset)
+    rows, total = await svc.search(
+        q=q,
+        room_id=room_id,
+        limit=limit,
+        offset=offset,
+                sort_by=sort_by,
+            sort_dir=sort_dir,
+)
     items = [RoomAvailabilityResponse.model_validate(_normalize_row(r), from_attributes=True).model_dump(exclude_none=True) for r in rows]
     payload = build_list_payload(
         items=items,
         total=total,
         limit=limit,
         offset=offset,
-        filters={"q": q},
+        filters={
+            "q": q,
+            "room_id": str(room_id) if room_id else None,
+        },
     )
 
     return ResponseHandler.success_from_request(

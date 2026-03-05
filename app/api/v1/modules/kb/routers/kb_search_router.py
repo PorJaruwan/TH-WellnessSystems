@@ -15,8 +15,11 @@ from app.api.v1.modules.kb.models._envelopes.kb_envelopes import KBSearchEnvelop
 router = APIRouter()
 
 
-@router.post("/search", response_class=UnicodeJSONResponse, response_model=KBSearchEnvelope)
-async def kb_search(
+@router.post("/search", 
+    response_class=UnicodeJSONResponse, 
+    response_model=KBSearchEnvelope, 
+    operation_id="search_kb")
+async def search_kb(
     request: Request,
     req: KBSearchRequest,
     svc: KBSearchService = Depends(get_kb_search_service),

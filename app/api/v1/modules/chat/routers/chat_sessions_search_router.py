@@ -28,8 +28,9 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=ChatSessionSummaryListEnvelope,
     response_model_exclude_none=True,
+    operation_id="search_my_sessions",
 )
-async def list_my_sessions(
+async def search_my_sessions(
     status: str = Query(default="open", description="open|closed"),
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),

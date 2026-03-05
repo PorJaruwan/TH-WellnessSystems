@@ -25,6 +25,7 @@ def get_read_service(session: AsyncSession = Depends(get_db)) -> RoomAvailabilit
     response_class=UnicodeJSONResponse,
     response_model=RoomAvailabilityGetEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_room_availabilities_by_id",
 )
 async def read_room_availabilities_by_id(
     request: Request,

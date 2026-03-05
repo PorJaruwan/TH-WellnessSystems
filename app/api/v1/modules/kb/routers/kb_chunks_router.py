@@ -16,8 +16,11 @@ from app.api.v1.modules.kb.models._envelopes.kb_envelopes import KBChunksListEnv
 router = APIRouter()
 
 
-@router.get("/{document_id}/chunks/search", response_class=UnicodeJSONResponse, response_model=KBChunksListEnvelope)
-async def search_kb_document_chunks(
+@router.get("/{document_id}/chunks/search", 
+    response_class=UnicodeJSONResponse,
+    response_model=KBChunksListEnvelope, 
+    operation_id="read_kb_document_chunks")
+async def read_kb_document_chunks(
     request: Request,
     document_id: UUID,
     limit: int = Query(200, ge=1, le=500),

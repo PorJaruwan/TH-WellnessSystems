@@ -6,7 +6,11 @@ from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import StaffDepartment
+import app.db.models as db_models
+
+StaffDepartment = db_models.StaffDepartment
+Staff = db_models.Staff
+Department = getattr(db_models, "Department", getattr(db_models, "Departments", None))
 
 
 class StaffDepartmentsSearchRepository:
@@ -21,6 +25,9 @@ class StaffDepartmentsSearchRepository:
         limit: int = 50,
         offset: int = 0,
     ) -> tuple[list[dict], int]:
+        if Department is None:
+            raise RuntimeError("Department model not found in app.db.models (expected Department or Departments)")
+
         where = []
         if staff_id:
             where.append(StaffDepartment.staff_id == staff_id)
@@ -34,19 +41,26 @@ class StaffDepartmentsSearchRepository:
             count_stmt = count_stmt.where(c)
         total = int((await self.db.execute(count_stmt)).scalar_one() or 0)
 
-        stmt = select(
+        cols = [
             StaffDepartment.id.label("id"),
             StaffDepartment.staff_id.label("staff_id"),
             StaffDepartment.department_id.label("department_id"),
+            Staff.staff_name.label("staff_name"),
+            Department.department_name.label("department_name"),
             getattr(StaffDepartment, "role_in_dept").label("role_in_dept") if hasattr(StaffDepartment, "role_in_dept") else None,
             getattr(StaffDepartment, "is_primary").label("is_primary") if hasattr(StaffDepartment, "is_primary") else None,
             getattr(StaffDepartment, "is_active").label("is_active") if hasattr(StaffDepartment, "is_active") else None,
             getattr(StaffDepartment, "created_at").label("created_at") if hasattr(StaffDepartment, "created_at") else None,
             getattr(StaffDepartment, "updated_at").label("updated_at") if hasattr(StaffDepartment, "updated_at") else None,
-        )
+        ]
+        cols = [c for c in cols if c is not None]
 
-        # remove None columns
-        stmt = select(*[c for c in stmt.selected_columns if c is not None])
+        stmt = (
+            select(*cols)
+            .select_from(StaffDepartment)
+            .join(Staff, Staff.id == StaffDepartment.staff_id)
+            .join(Department, Department.id == StaffDepartment.department_id)
+        )
 
         for c in where:
             stmt = stmt.where(c)

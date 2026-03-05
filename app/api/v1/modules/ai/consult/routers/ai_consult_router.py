@@ -95,8 +95,9 @@ def _forbidden_patient_id():
     response_class=UnicodeJSONResponse,
     response_model=AITopicsEnvelope,
     response_model_exclude_none=True,
+    operation_id="search_topics",
 )
-async def get_topics(
+async def search_topics(
     db: AsyncSession = Depends(get_db),
     company_code: str = Depends(current_company_code),
     lang: str | None = Query(default=None, description="TH|EN or th-TH/en-US"),
@@ -121,8 +122,9 @@ async def get_topics(
     response_class=UnicodeJSONResponse,
     response_model=AITopicCardsEnvelope,
     response_model_exclude_none=True,
+    operation_id="search_topic_cards",
 )
-async def get_topic_cards(
+async def search_topic_cards(
     topic_code: str,
     db: AsyncSession = Depends(get_db),
     company_code: str = Depends(current_company_code),
@@ -159,6 +161,7 @@ async def get_topic_cards(
     response_class=UnicodeJSONResponse,
     response_model=AIConsultSessionEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_session",
 )
 async def create_session(
     body: CreateAIConsultSessionRequest,
@@ -222,15 +225,16 @@ async def create_session(
     )
 
 
-# 10) GET /api/v1/ai/consult/sessions/my?status=active
+
 # 10) GET /api/v1/ai/consult/sessions/my?status=active
 @router.get(
     "/sessions/my",
     response_class=UnicodeJSONResponse,
     response_model=AIConsultSessionsListEnvelope,
     response_model_exclude_none=True,
+    operation_id="search_my_sessions",
 )
-async def get_my_sessions(
+async def search_my_sessions(
     service: AIConsultSessionsService = Depends(get_ai_consult_sessions_service),
     company_code: str = Depends(current_company_code),
     patient_id: str | None = Depends(current_patient_id),
@@ -271,8 +275,9 @@ async def get_my_sessions(
     response_class=UnicodeJSONResponse,
     response_model=AIConsultSessionDetailEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_session_detail",
 )
-async def get_session_detail(
+async def read_session_detail(
     session_id: UUID = Path(...),
     db: AsyncSession = Depends(get_db),
     company_code: str = Depends(current_company_code),
@@ -311,6 +316,7 @@ async def get_session_detail(
     response_class=UnicodeJSONResponse,
     response_model=ChatSendMessageEnvelope,
     response_model_exclude_none=True,
+    operation_id="quick_action",
 )
 async def quick_action(
     body: AIQuickActionRequest,
@@ -374,6 +380,7 @@ async def quick_action(
     response_class=UnicodeJSONResponse,
     response_model=AIConsultEscalateEnvelope,
     response_model_exclude_none=True,
+    operation_id="escalate_to_booking",
 )
 async def escalate_to_booking(
     body: AIConsultEscalateRequest,

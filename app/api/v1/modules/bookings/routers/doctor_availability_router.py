@@ -21,7 +21,7 @@ router = APIRouter(
     tags=["Bookings"]
 )
 
-@router.get("/availability")
+@router.get("/availability", operation_id="check_availability")
 async def check_availability(
     service_id: UUID = Query(..., description="Service ID"),
     target_date: date = Query(..., description="Date to check"),

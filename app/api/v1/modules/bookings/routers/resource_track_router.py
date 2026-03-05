@@ -34,6 +34,7 @@ router = APIRouter(
     "/availability/resource-tracks",
     response_model=AvailabilityResponse,
     summary="Get resource availability by resource_track_id and date",
+    operation_id="get_resource_availability",
 )
 async def get_resource_availability(
     resource_track_id: UUID = Query(...),

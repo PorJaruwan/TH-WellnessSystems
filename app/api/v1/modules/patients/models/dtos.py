@@ -1,39 +1,39 @@
-"""patients.models.dtos
-Response Models (Outbound) only — WellPlus Module Standard v1.0
-
-✅ Canonical import path for routers/services should be `patients.models.dtos`
+# app/api/v1/modules/patients/models/dtos.py
 """
+Response Models (Outbound) only — WellPlus Module Standard v1.0
+Single source of truth for outbound DTO imports.
+"""
+
 from __future__ import annotations
 
-# Core Patient DTOs
+# -------------------------
+# Core Patients (Read/Output)
+# -------------------------
 from app.api.v1.modules.patients.models.patients_model import (  # noqa: F401
     PatientRead,
+    PatientAddressRead,
+    PatientImageRead,
 )
 
-# Projection DTOs for search/list
+# -------------------------
+# Patient Profiles (Read models from ORM Patient)
+# -------------------------
 from app.api.v1.modules.patients.models.patient_profiles_model import (  # noqa: F401
     PatientSearchItemDTO,
-)
-
-# Masterdata DTOs (alerts/allergies/sources/etc.)
-from app.api.v1.modules.patients.models.patient_masterdata_model import (  # noqa: F401
-    AlertDTO,
-    AllergyDTO,
-    SourceDTO,
-    MarketingStaffDTO,
-    SaleStaffDTO,
-    PatientTypeDTO,
-)
-
-# Patient profiles (response DTOs)
-from app.api.v1.modules.patients.models.patient_profiles_model import (  # noqa: F401
     PatientProfileDTO,
     PatientContactDTO,
     PatientMedicalFlagsDTO,
     PatientMarketingDTO,
 )
 
-# Patient images/photos DTOs
-from app.api.v1.modules.patients.models.patient_photos_models import (  # noqa: F401
-    PatientPhotoRead,
+# -------------------------
+# Masterdata DTOs (6 routers)
+# -------------------------
+from app.api.v1.modules.patients.models.patient_masterdata_model import (  # noqa: F401
+    AlertDTO,
+    AllergyDTO,
+    SourceDTO,
+    PatientTypeDTO,
+    SaleStaffDTO,
+    MarketingStaffDTO,
 )

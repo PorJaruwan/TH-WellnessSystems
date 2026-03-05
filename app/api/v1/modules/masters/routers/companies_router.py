@@ -26,6 +26,7 @@ def get_crud_service(session: AsyncSession = Depends(get_db)) -> CompanyCrudServ
     response_class=UnicodeJSONResponse,
     response_model=CompanyCreateEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_companies",
 )
 async def create_companies(
     request: Request,
@@ -47,6 +48,7 @@ async def create_companies(
     response_class=UnicodeJSONResponse,
     response_model=CompanyUpdateEnvelope,
     response_model_exclude_none=True,
+    operation_id="update_companies",
 )
 async def update_companies(
     request: Request,
@@ -75,6 +77,7 @@ async def update_companies(
     response_class=UnicodeJSONResponse,
     response_model=CompanyDeleteEnvelope,
     response_model_exclude_none=True,
+    operation_id="delete_companies",
 )
 async def delete_companies(
     request: Request,

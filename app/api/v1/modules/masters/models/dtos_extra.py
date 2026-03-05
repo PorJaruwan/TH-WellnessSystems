@@ -1,9 +1,6 @@
 # app/api/v1/modules/masters/models/dtos_extra.py
-
 # app.api.v1.modules.masters.models
 # app.api.v1.modules.masters.schemas
-#
-# app.api.v1.modules.masters.models._envelopes
 # app.api.v1.modules.masters.models._envelopes
 
 from __future__ import annotations

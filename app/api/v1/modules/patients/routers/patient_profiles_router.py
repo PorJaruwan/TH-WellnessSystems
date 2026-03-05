@@ -37,8 +37,9 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=PatientProfileGetEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_profile",
 )
-async def get_profile(
+async def read_profile(
     request: Request,
     patient_id: UUID = Path(..., description="patient id"),
     svc: PatientProfilesService = Depends(get_patient_profiles_service),
@@ -63,6 +64,7 @@ async def get_profile(
     response_class=UnicodeJSONResponse,
     response_model=PatientProfilePatchEnvelope,
     response_model_exclude_none=True,
+    operation_id="patch_profile",
 )
 async def patch_profile(
     request: Request,
@@ -93,8 +95,9 @@ async def patch_profile(
     response_class=UnicodeJSONResponse,
     response_model=PatientContactGetEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_contact",
 )
-async def get_contact(
+async def read_contact(
     request: Request,
     patient_id: UUID,
     svc: PatientProfilesService = Depends(get_patient_profiles_service),
@@ -119,6 +122,7 @@ async def get_contact(
     response_class=UnicodeJSONResponse,
     response_model=PatientContactPatchEnvelope,
     response_model_exclude_none=True,
+    operation_id="patch_contact",
 )
 async def patch_contact(
     request: Request,
@@ -149,8 +153,9 @@ async def patch_contact(
     response_class=UnicodeJSONResponse,
     response_model=PatientMedicalFlagsGetEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_medical_flags",
 )
-async def get_medical_flags(
+async def read_medical_flags(
     request: Request,
     patient_id: UUID,
     svc: PatientProfilesService = Depends(get_patient_profiles_service),
@@ -175,6 +180,7 @@ async def get_medical_flags(
     response_class=UnicodeJSONResponse,
     response_model=PatientMedicalFlagsPatchEnvelope,
     response_model_exclude_none=True,
+    operation_id="patch_medical_flags",
 )
 async def patch_medical_flags(
     request: Request,
@@ -205,8 +211,9 @@ async def patch_medical_flags(
     response_class=UnicodeJSONResponse,
     response_model=PatientMarketingGetEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_marketing",
 )
-async def get_marketing(
+async def read_marketing(
     request: Request,
     patient_id: UUID,
     svc: PatientProfilesService = Depends(get_patient_profiles_service),
@@ -231,6 +238,7 @@ async def get_marketing(
     response_class=UnicodeJSONResponse,
     response_model=PatientMarketingPatchEnvelope,
     response_model_exclude_none=True,
+    operation_id="patch_marketing",
 )
 async def patch_marketing(
     request: Request,

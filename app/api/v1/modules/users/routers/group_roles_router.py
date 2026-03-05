@@ -15,7 +15,7 @@ from app.api.v1.modules.users.models._envelopes import GroupRolesCreateEnvelope,
 router = APIRouter()
 # router = APIRouter(prefix="/group_roles", tags=["User_Settings"])
 
-@router.post("", response_class=UnicodeJSONResponse, response_model=GroupRolesCreateEnvelope)
+@router.post("", response_class=UnicodeJSONResponse, response_model=GroupRolesCreateEnvelope, operation_id="create_group_roles")
 def create_group_roles(
     request: Request,
     body: GroupRoleCreate,
@@ -33,7 +33,7 @@ def create_group_roles(
         data={"item": dto},
     )
 
-@router.put("/{id}", response_class=UnicodeJSONResponse, response_model=GroupRolesUpdateEnvelope)
+@router.put("/{id}", response_class=UnicodeJSONResponse, response_model=GroupRolesUpdateEnvelope, operation_id="update_group_roles")
 def update_group_roles(
     request: Request,
     id: UUID,
@@ -52,7 +52,7 @@ def update_group_roles(
         data={"item": dto},
     )
 
-@router.delete("/{id}", response_class=UnicodeJSONResponse, response_model=GroupRolesDeleteEnvelope)
+@router.delete("/{id}", response_class=UnicodeJSONResponse, response_model=GroupRolesDeleteEnvelope, operation_id="delete_group_roles")
 def delete_group_roles(
     request: Request,
     id: UUID,

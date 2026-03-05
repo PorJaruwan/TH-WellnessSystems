@@ -22,6 +22,7 @@ router = APIRouter(
     response_model=ScheduleResponse,
     summary="Check doctor availability schedule",
     response_description="List of available and unavailable time slots with appointment details"
+    operation_id="get_doctor_schedule",
 )
 async def get_doctor_schedule(request: ScheduleRequest):
     """

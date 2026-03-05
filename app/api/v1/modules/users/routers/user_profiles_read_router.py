@@ -13,7 +13,7 @@ from app.api.v1.modules.users.models._envelopes import UserProfilesGetEnvelope
 
 router = APIRouter()
 
-@router.get("/{id}", response_class=UnicodeJSONResponse, response_model=UserProfilesGetEnvelope)
+@router.get("/{id}", response_class=UnicodeJSONResponse, response_model=UserProfilesGetEnvelope, operation_id="get_user_profiles_by_id")
 def get_user_profiles_by_id(
     request: Request,
     id: UUID,

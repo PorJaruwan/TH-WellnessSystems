@@ -26,6 +26,7 @@ def get_crud_service(session: AsyncSession = Depends(get_db)) -> DistrictCrudSer
     response_class=UnicodeJSONResponse,
     response_model=DistrictCreateEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_districts",
 )
 async def create_districts(
     request: Request,
@@ -47,6 +48,7 @@ async def create_districts(
     response_class=UnicodeJSONResponse,
     response_model=DistrictUpdateEnvelope,
     response_model_exclude_none=True,
+    operation_id="update_districts",
 )
 async def update_districts(
     request: Request,
@@ -75,6 +77,7 @@ async def update_districts(
     response_class=UnicodeJSONResponse,
     response_model=DistrictDeleteEnvelope,
     response_model_exclude_none=True,
+    operation_id="delete_districts",
 )
 async def delete_districts(
     request: Request,

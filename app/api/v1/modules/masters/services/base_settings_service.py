@@ -15,8 +15,23 @@ class BaseSettingsSearchService:
     def __init__(self, repo: BaseSettingsSearchRepository):
         self.repo = repo
 
-    async def search(self, q: str | None, limit: int, offset: int, base_filters: Iterable[Any] | None = None):
-        return await self.repo.search(q=q or "", limit=limit, offset=offset, base_filters=base_filters)
+    async def search(
+        self,
+        q: str | None,
+        limit: int,
+        offset: int,
+        base_filters: Iterable[Any] | None = None,
+        sort_by: str | None = None,
+        sort_dir: str = "asc",
+    ):
+        return await self.repo.search(
+            q=q or "",
+            limit=limit,
+            offset=offset,
+            base_filters=base_filters,
+            sort_by=sort_by,
+            sort_dir=sort_dir,
+        )
 
 
 class BaseSettingsReadService:

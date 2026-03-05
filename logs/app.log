@@ -3224,3 +3224,23 @@
 {"asctime": "2026-03-01 16:41:20,059", "levelname": "INFO", "name": "middleware.request_context", "message": "[9bc4fe6e-da6d-4c86-8603-bb217791748a] \ud83d\udce4 200 GET /api/v1/patients/profiles/52fba638-fe51-4951-9005-c87f721e987c/profile in 899ms"}
 {"asctime": "2026-03-01 16:42:34,720", "levelname": "INFO", "name": "middleware.request_context", "message": "[4e88a6e7-14e1-4aa4-8259-4287cc27a2e9] \ud83d\udce5 GET /api/v1/patients/profiles/52fba638-fe51-4951-9005-c87f721e987c/marketing"}
 {"asctime": "2026-03-01 16:42:35,016", "levelname": "INFO", "name": "middleware.request_context", "message": "[4e88a6e7-14e1-4aa4-8259-4287cc27a2e9] \ud83d\udce4 200 GET /api/v1/patients/profiles/52fba638-fe51-4951-9005-c87f721e987c/marketing in 296ms"}
+{"asctime": "2026-03-05 21:43:06,323", "levelname": "INFO", "name": "main", "message": "\u2705 API startup"}
+{"asctime": "2026-03-05 21:43:06,324", "levelname": "INFO", "name": "main", "message": "ENV=dev"}
+{"asctime": "2026-03-05 21:43:06,324", "levelname": "INFO", "name": "main", "message": "API_PREFIX=/api/v1"}
+{"asctime": "2026-03-05 21:44:29,160", "levelname": "INFO", "name": "middleware.request_context", "message": "[d4f26044-681e-46ad-afa2-52dcedc173ec] \ud83d\udce5 GET /docs"}
+{"asctime": "2026-03-05 21:44:29,162", "levelname": "INFO", "name": "middleware.request_context", "message": "[d4f26044-681e-46ad-afa2-52dcedc173ec] \ud83d\udce4 200 GET /docs in 1ms"}
+{"asctime": "2026-03-05 21:44:30,244", "levelname": "INFO", "name": "middleware.request_context", "message": "[e70c4c3b-e2c6-4067-98b9-deec3115b49e] \ud83d\udce5 GET /openapi.json"}
+{"asctime": "2026-03-05 21:44:30,386", "levelname": "INFO", "name": "middleware.request_context", "message": "[e70c4c3b-e2c6-4067-98b9-deec3115b49e] \ud83d\udce4 200 GET /openapi.json in 142ms"}
+{"asctime": "2026-03-05 21:45:25,028", "levelname": "INFO", "name": "middleware.request_context", "message": "[3ef58554-5324-41da-ba56-14ce44935ce0] \ud83d\udce5 GET /api/v1/masters/buildings/search"}
+{"asctime": "2026-03-05 21:45:26,693", "levelname": "INFO", "name": "middleware.request_context", "message": "[3ef58554-5324-41da-ba56-14ce44935ce0] \ud83d\udce4 200 GET /api/v1/masters/buildings/search in 1665ms"}
+{"asctime": "2026-03-05 21:46:24,617", "levelname": "INFO", "name": "middleware.request_context", "message": "[b62a25bc-e886-452b-bbe9-cdc68b5c4174] \ud83d\udce5 GET /api/v1/masters/buildings/search"}
+{"asctime": "2026-03-05 21:46:25,012", "levelname": "INFO", "name": "middleware.request_context", "message": "[b62a25bc-e886-452b-bbe9-cdc68b5c4174] \ud83d\udce4 200 GET /api/v1/masters/buildings/search in 394ms"}
+{"asctime": "2026-03-05 21:46:41,626", "levelname": "INFO", "name": "middleware.request_context", "message": "[58e09bc7-876b-4422-97b4-9b45d24d2631] \ud83d\udce5 GET /api/v1/masters/buildings/search"}
+{"asctime": "2026-03-05 21:46:42,023", "levelname": "INFO", "name": "middleware.request_context", "message": "[58e09bc7-876b-4422-97b4-9b45d24d2631] \ud83d\udce4 200 GET /api/v1/masters/buildings/search in 397ms"}
+{"asctime": "2026-03-05 21:47:37,389", "levelname": "INFO", "name": "middleware.request_context", "message": "[23d057c7-27b3-4c04-8803-c633becb27f2] \ud83d\udce5 GET /api/v1/masters/buildings/grid"}
+{"asctime": "2026-03-05 21:47:37,783", "levelname": "INFO", "name": "middleware.request_context", "message": "[23d057c7-27b3-4c04-8803-c633becb27f2] \ud83d\udce4 200 GET /api/v1/masters/buildings/grid in 394ms"}
+{"asctime": "2026-03-05 21:48:57,393", "levelname": "INFO", "name": "middleware.request_context", "message": "[f45b912a-20a3-4366-aecf-08d00ee8722c] \ud83d\udce5 GET /api/v1/masters/room_services/search"}
+{"asctime": "2026-03-05 21:48:57,721", "levelname": "INFO", "name": "middleware.request_context", "message": "[f45b912a-20a3-4366-aecf-08d00ee8722c] \ud83d\udce4 200 GET /api/v1/masters/room_services/search in 328ms"}
+{"asctime": "2026-03-05 21:51:25,326", "levelname": "INFO", "name": "middleware.request_context", "message": "[e7306a1f-8f17-40ce-8688-23091614f1a1] \ud83d\udce5 GET /api/v1/patients/search"}
+{"asctime": "2026-03-05 21:51:25,766", "levelname": "INFO", "name": "middleware.request_context", "message": "[e7306a1f-8f17-40ce-8688-23091614f1a1] \ud83d\udce4 200 GET /api/v1/patients/search in 439ms"}
+{"asctime": "2026-03-05 21:53:57,027", "levelname": "INFO", "name": "main", "message": "\ud83e\uddf9 SQLAlchemy engine disposed"}

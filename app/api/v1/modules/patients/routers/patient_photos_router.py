@@ -36,12 +36,14 @@ def get_photos_service(db: AsyncSession = Depends(get_db)) -> PatientPhotosServi
 
 
 @router.get(
-    "/search",
+    "/photos/search",
     response_class=UnicodeJSONResponse,
     response_model=PatientPhotoListEnvelope,
     response_model_exclude_none=True,
+    summary="Search Patient Photos",
+    operation_id="search_patient_photos",
 )
-async def list_photos(
+async def search_patient_photos(
     request: Request,
     svc: PatientPhotosService = Depends(get_photos_service),
     q: Optional[str] = Query(default=None),
@@ -83,12 +85,13 @@ async def list_photos(
 
 
 @router.get(
-    "/{photo_id:uuid}",
+    "/photos/{photo_id:uuid}",
     response_class=UnicodeJSONResponse,
     response_model=PatientPhotoSingleEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_photo",
 )
-async def get_photo_by_id(
+async def read_photo(
     request: Request,
     photo_id: UUID,
     svc: PatientPhotosService = Depends(get_photos_service),
@@ -109,12 +112,13 @@ async def get_photo_by_id(
 
 
 @router.get(
-    "/{patient_id:uuid}",
+    "/{patient_id:uuid}/photos",
     response_class=UnicodeJSONResponse,
     response_model=PatientPhotoSingleEnvelope,
     response_model_exclude_none=True,
+    operation_id="search_photo_by_patient",
 )
-async def get_photo_by_patient(
+async def search_photo_by_patient(
     request: Request,
     patient_id: UUID,
     svc: PatientPhotosService = Depends(get_photos_service),
@@ -135,10 +139,11 @@ async def get_photo_by_patient(
 
 
 @router.post(
-    "/upload",
+    "/photos/upload",
     response_class=UnicodeJSONResponse,
     response_model=PatientPhotoUploadEnvelope,
     response_model_exclude_none=True,
+    operation_id="upload_photo",
 )
 async def upload_photo(
     request: Request,
@@ -168,10 +173,11 @@ async def upload_photo(
 
 
 @router.delete(
-    "/{photo_id:uuid}",
+    "/photos/{photo_id:uuid}",
     response_class=UnicodeJSONResponse,
     response_model=PatientPhotoDeleteEnvelope,
     response_model_exclude_none=True,
+    operation_id="delete_photo",
 )
 async def delete_photo(
     request: Request,

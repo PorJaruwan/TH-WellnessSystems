@@ -13,7 +13,7 @@ from app.api.v1.modules.users.models._envelopes import PermissionsGetEnvelope
 
 router = APIRouter()
 
-@router.get("/{id}", response_class=UnicodeJSONResponse, response_model=PermissionsGetEnvelope)
+@router.get("/{id}", response_class=UnicodeJSONResponse, response_model=PermissionsGetEnvelope, operation_id="get_permissions_by_id")
 def get_permissions_by_id(
     request: Request,
     id: UUID,

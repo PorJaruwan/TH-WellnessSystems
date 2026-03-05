@@ -27,6 +27,7 @@ def get_crud_service(session: AsyncSession = Depends(get_db)) -> DepartmentCrudS
     response_class=UnicodeJSONResponse,
     response_model=DepartmentCreateEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_departments",
 )
 async def create_departments(
     request: Request,
@@ -48,6 +49,7 @@ async def create_departments(
     response_class=UnicodeJSONResponse,
     response_model=DepartmentUpdateEnvelope,
     response_model_exclude_none=True,
+    operation_id="update_departments",
 )
 async def update_departments(
     request: Request,
@@ -76,6 +78,7 @@ async def update_departments(
     response_class=UnicodeJSONResponse,
     response_model=DepartmentDeleteEnvelope,
     response_model_exclude_none=True,
+    operation_id="delete_departments",
 )
 async def delete_departments(
     request: Request,

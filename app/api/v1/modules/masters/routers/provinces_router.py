@@ -26,6 +26,7 @@ def get_crud_service(session: AsyncSession = Depends(get_db)) -> ProvinceCrudSer
     response_class=UnicodeJSONResponse,
     response_model=ProvinceCreateEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_provinces",
 )
 async def create_provinces(
     request: Request,
@@ -47,6 +48,7 @@ async def create_provinces(
     response_class=UnicodeJSONResponse,
     response_model=ProvinceUpdateEnvelope,
     response_model_exclude_none=True,
+    operation_id="update_provinces",
 )
 async def update_provinces(
     request: Request,
@@ -75,6 +77,7 @@ async def update_provinces(
     response_class=UnicodeJSONResponse,
     response_model=ProvinceDeleteEnvelope,
     response_model_exclude_none=True,
+    operation_id="delete_provinces",
 )
 async def delete_provinces(
     request: Request,

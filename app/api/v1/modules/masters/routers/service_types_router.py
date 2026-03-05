@@ -27,6 +27,7 @@ def get_crud_service(session: AsyncSession = Depends(get_db)) -> ServiceTypeCrud
     response_class=UnicodeJSONResponse,
     response_model=ServiceTypeCreateEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_service_types",
 )
 async def create_service_types(
     request: Request,
@@ -48,6 +49,7 @@ async def create_service_types(
     response_class=UnicodeJSONResponse,
     response_model=ServiceTypeUpdateEnvelope,
     response_model_exclude_none=True,
+    operation_id="update_service_types",
 )
 async def update_service_types(
     request: Request,
@@ -76,6 +78,7 @@ async def update_service_types(
     response_class=UnicodeJSONResponse,
     response_model=ServiceTypeDeleteEnvelope,
     response_model_exclude_none=True,
+    operation_id="delete_service_types",
 )
 async def delete_service_types(
     request: Request,

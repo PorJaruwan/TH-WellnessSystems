@@ -19,6 +19,7 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=StaffSearchEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="search_staff",
 )
 async def search_staff(
     request: Request,

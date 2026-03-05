@@ -18,8 +18,9 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=StaffByIdEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="read_staff",
 )
-async def read_staff_by_id(
+async def read_staff(
     request: Request,
     staff_id: UUID,
     svc: StaffReadService = Depends(get_staff_read_service),

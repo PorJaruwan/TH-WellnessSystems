@@ -26,6 +26,7 @@ def get_crud_service(session: AsyncSession = Depends(get_db)) -> CountryCrudServ
     response_class=UnicodeJSONResponse,
     response_model=CountryCreateEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_countries",
 )
 async def create_countries(
     request: Request,
@@ -47,6 +48,7 @@ async def create_countries(
     response_class=UnicodeJSONResponse,
     response_model=CountryUpdateEnvelope,
     response_model_exclude_none=True,
+    operation_id="update_countries",
 )
 async def update_countries(
     request: Request,
@@ -75,6 +77,7 @@ async def update_countries(
     response_class=UnicodeJSONResponse,
     response_model=CountryDeleteEnvelope,
     response_model_exclude_none=True,
+    operation_id="delete_countries",
 )
 async def delete_countries(
     request: Request,

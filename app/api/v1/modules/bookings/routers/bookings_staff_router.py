@@ -30,8 +30,8 @@ router = APIRouter(
 # Collection (Optional: for admin/debug)
 # GET /api/v1/bookings/staff
 # -------------------------------------------------------
-@router.get("/staff/search", response_class=UnicodeJSONResponse, summary="List booking staff (all)")
-def list_booking_staff():
+@router.get("/staff/search", response_class=UnicodeJSONResponse, summary="Search booking staff", operation_id="search_booking_staff")
+def search_booking_staff():
     res = get_all_booking_staff()
     if not res.data:
         return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={})
@@ -48,7 +48,8 @@ def list_booking_staff():
 @router.post(
     "/{booking_id}/staff",
     response_class=UnicodeJSONResponse,
-    summary="Add staff to a booking",
+    summary="Create staff to a booking",
+    operation_id="create_booking_staff_for_booking",
 )
 def create_booking_staff_for_booking(booking_id: UUID, booking_staff: BookingStaffCreateModel):
     try:
@@ -77,7 +78,8 @@ def create_booking_staff_for_booking(booking_id: UUID, booking_staff: BookingSta
 @router.get(
     "/{booking_id}/staff",
     response_class=UnicodeJSONResponse,
-    summary="Get booking staff by booking_id (optional filter by role)",
+    summary="Read booking staff by booking id (optional filter by role)",
+    operation_id="read_booking_staff_by_booking_id",
 )
 def read_booking_staff_by_booking_id(booking_id: UUID, role: str | None = None):
     try:
@@ -106,7 +108,8 @@ def read_booking_staff_by_booking_id(booking_id: UUID, role: str | None = None):
 @router.get(
     "/staff/{booking_staff_id}",
     response_class=UnicodeJSONResponse,
-    summary="Get booking_staff by id",
+    summary="Read booking staff by id",
+    operation_id="read_booking_staff",
 )
 def read_booking_staff(booking_staff_id: UUID):
     res = get_booking_staff_by_id(booking_staff_id)
@@ -124,7 +127,8 @@ def read_booking_staff(booking_staff_id: UUID):
 @router.put(
     "/staff/{booking_staff_id}",
     response_class=UnicodeJSONResponse,
-    summary="Update booking_staff by id",
+    summary="Update booking staff by id",
+    operation_id="update_booking_staff",
 )
 def update_booking_staff(booking_staff_id: UUID, booking_staff: BookingStaffUpdateModel):
     try:
@@ -155,7 +159,8 @@ def update_booking_staff(booking_staff_id: UUID, booking_staff: BookingStaffUpda
 @router.delete(
     "/staff/{booking_staff_id}",
     response_class=UnicodeJSONResponse,
-    summary="Delete booking_staff by id",
+    summary="Delete booking staff by id",
+    operation_id="delete_booking_staff",
 )
 def delete_booking_staff(booking_staff_id: UUID):
     try:

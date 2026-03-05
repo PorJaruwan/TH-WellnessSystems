@@ -46,22 +46,28 @@ def get_search_service(session: AsyncSession = Depends(get_db)) -> ServiceTypeSe
     response_class=UnicodeJSONResponse,
     response_model=ServiceTypeSearchEnvelope,
     response_model_exclude_none=True,
+    operation_id="search_service_types",
 )
 async def search_service_types(
     request: Request,
     q: str = Query("", description="Search keyword"),
+    is_active: bool = Query(True, description="Filter by is_active"),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
+    sort_by: str | None = Query(None, description="Sort by column name"),
+    sort_dir: str = Query("desc", pattern="^(asc|desc)$", description="Sort direction: asc|desc"),
     svc: ServiceTypeSearchService = Depends(get_search_service),
 ):
-    rows, total = await svc.search(q=q, limit=limit, offset=offset)
+    rows, total = await svc.search(q=q, is_active=is_active, limit=limit, offset=offset, sort_by=sort_by,
+            sort_dir=sort_dir,
+)
     items = [ServiceTypeResponse.model_validate(_normalize_row(r), from_attributes=True).model_dump(exclude_none=True) for r in rows]
     payload = build_list_payload(
         items=items,
         total=total,
         limit=limit,
         offset=offset,
-        filters={"q": q},
+        filters={"q": q, "is_active": is_active},
     )
 
     return ResponseHandler.success_from_request(

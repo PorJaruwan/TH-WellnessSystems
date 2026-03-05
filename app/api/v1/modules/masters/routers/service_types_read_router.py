@@ -25,6 +25,7 @@ def get_read_service(session: AsyncSession = Depends(get_db)) -> ServiceTypeRead
     response_class=UnicodeJSONResponse,
     response_model=ServiceTypeGetEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_service_types_by_id",
 )
 async def read_service_types_by_id(
     request: Request,

@@ -22,6 +22,7 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=StaffServicesCreateEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="create_staff_service",
 )
 async def create_staff_service(
     request: Request,
@@ -50,8 +51,9 @@ async def create_staff_service(
     response_class=UnicodeJSONResponse,
     response_model=StaffServicesUpdateEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="update_staff_service",
 )
-async def update_staff_service_by_id(
+async def update_staff_service(
     request: Request,
     staff_service_id: UUID,
     payload: StaffServicesUpdateModel,
@@ -92,8 +94,9 @@ async def update_staff_service_by_id(
     response_class=UnicodeJSONResponse,
     response_model=StaffServicesDeleteEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="delete_staff_service",
 )
-async def delete_staff_service_by_id(
+async def delete_staff_service(
     request: Request,
     staff_service_id: UUID,
     svc: StaffServicesCrudService = Depends(get_staff_services_crud_service),

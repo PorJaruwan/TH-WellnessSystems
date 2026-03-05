@@ -13,7 +13,7 @@ from app.api.v1.modules.users.models._envelopes import UserGroupsGetEnvelope
 
 router = APIRouter()
 
-@router.get("/{id}", response_class=UnicodeJSONResponse, response_model=UserGroupsGetEnvelope)
+@router.get("/{id}", response_class=UnicodeJSONResponse, response_model=UserGroupsGetEnvelope, operation_id="get_user_groups_by_id")
 def get_user_groups_by_id(
     request: Request,
     id: UUID,

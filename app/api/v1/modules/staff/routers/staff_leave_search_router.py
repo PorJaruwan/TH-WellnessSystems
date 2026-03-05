@@ -20,6 +20,7 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=StaffLeaveSearchEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="search_staff_leave",
 )
 async def search_staff_leave(
     request: Request,

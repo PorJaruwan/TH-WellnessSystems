@@ -27,6 +27,7 @@ def get_crud_service(session: AsyncSession = Depends(get_db)) -> LocationCrudSer
     response_class=UnicodeJSONResponse,
     response_model=LocationCreateEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_locations",
 )
 async def create_locations(
     request: Request,
@@ -48,6 +49,7 @@ async def create_locations(
     response_class=UnicodeJSONResponse,
     response_model=LocationUpdateEnvelope,
     response_model_exclude_none=True,
+    operation_id="update_locations",
 )
 async def update_locations(
     request: Request,
@@ -76,6 +78,7 @@ async def update_locations(
     response_class=UnicodeJSONResponse,
     response_model=LocationDeleteEnvelope,
     response_model_exclude_none=True,
+    operation_id="delete_locations",
 )
 async def delete_locations(
     request: Request,

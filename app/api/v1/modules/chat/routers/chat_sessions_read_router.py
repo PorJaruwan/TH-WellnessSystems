@@ -33,8 +33,9 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=ChatSessionHeaderEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_session",
 )
-async def get_session(
+async def read_session(
     session_id: UUID = Path(...),
     db: AsyncSession = Depends(get_db),
     company_code: str = Depends(current_company_code),
@@ -71,8 +72,9 @@ async def get_session(
     response_class=UnicodeJSONResponse,
     response_model=ChatMessagesEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_messages",
 )
-async def get_messages(
+async def read_messages(
     session_id: UUID,
     db: AsyncSession = Depends(get_db),
     company_code: str = Depends(current_company_code),

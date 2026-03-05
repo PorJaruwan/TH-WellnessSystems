@@ -22,7 +22,6 @@ from app.api.v1.modules.patients.services.patients_read_service import PatientsR
 from app.api.v1.modules.patients.models._envelopes.patients_profile_envelopes import PatientByIdEnvelope
 
 router = APIRouter()
-# router = APIRouter(prefix="/patients", tags=["Patients"])
 
 
 @router.get(
@@ -30,8 +29,9 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=PatientByIdEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_patient",
 )
-async def read_patient_by_id(
+async def read_patient(
     request: Request,
     patient_id: UUID,
     svc: PatientsReadService = Depends(get_patients_read_service),

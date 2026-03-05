@@ -30,6 +30,7 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=ChatRetrievalEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_chat_retrieval",
 )
 async def create_chat_retrieval(
     req: ChatRetrievalCreateRequest,
@@ -53,8 +54,9 @@ async def create_chat_retrieval(
     response_class=UnicodeJSONResponse,
     response_model=ChatRetrievalItemsEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_chat_retrieval_items",
 )
-async def add_chat_retrieval_items(
+async def create_chat_retrieval_items(
     retrieval_id: UUID,
     items: List[ChatRetrievalItemCreateRequest],
     retrievals_service: ChatRetrievalsService = Depends(get_chat_retrievals_service),

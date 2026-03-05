@@ -22,6 +22,7 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=StaffLeaveCreateEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="create_staff_leave",
 )
 async def create_staff_leave(
     request: Request,
@@ -50,8 +51,9 @@ async def create_staff_leave(
     response_class=UnicodeJSONResponse,
     response_model=StaffLeaveUpdateEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="update_staff_leave",
 )
-async def update_staff_leave_by_id(
+async def update_staff_leave(
     request: Request,
     staff_leave_id: UUID,
     payload: StaffLeaveUpdateModel,
@@ -92,8 +94,9 @@ async def update_staff_leave_by_id(
     response_class=UnicodeJSONResponse,
     response_model=StaffLeaveDeleteEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="delete_staff_leave",
 )
-async def delete_staff_leave_by_id(
+async def delete_staff_leave(
     request: Request,
     staff_leave_id: UUID,
     svc: StaffLeaveCrudService = Depends(get_staff_leave_crud_service),

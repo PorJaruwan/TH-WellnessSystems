@@ -13,7 +13,7 @@ from app.api.v1.modules.users.models._envelopes import PermissionsSearchEnvelope
 
 router = APIRouter()
 
-@router.get("/search", response_class=UnicodeJSONResponse, response_model=PermissionsSearchEnvelope)
+@router.get("/search", response_class=UnicodeJSONResponse, response_model=PermissionsSearchEnvelope, operation_id="search_permissions")
 def search_permissions(
     request: Request,
     q: str = Query("", description="Permission code contains"),

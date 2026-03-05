@@ -1,236 +1,105 @@
-# app/api/v1/staff/staff_locations.py
-
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, Request
 
-from app.database.session import get_db
-from app.db.models import StaffLocation
 from app.utils.ResponseHandler import ResponseHandler, ResponseCode, UnicodeJSONResponse
-from app.api.v1.utils.list_payload_builder import build_list_payload
-from app.utils.payload_cleaner import clean_create, clean_update
-
-from app.api.v1.modules.staff.models.staff_response_model import (
-    StaffLocationResponse,
-    StaffLocationSearchEnvelope,
-    StaffLocationByIdEnvelope,
-    StaffLocationCreateEnvelope,
-    StaffLocationUpdateEnvelope,
-    StaffLocationDeleteEnvelope,
-)
-
-try:
-    from app.api.v1.modules.staff.models.staff_model import StaffLocationsCreateModel, StaffLocationsUpdateModel
-except Exception:
-    from pydantic import BaseModel
-
-    class StaffLocationsCreateModel(BaseModel):
-        pass
-
-    class StaffLocationsUpdateModel(BaseModel):
-        pass
-
-
-
-router = APIRouter(
-    # ✅ ให้เหมือน patients: ใส่ /api/v1 ที่ main.py ตอน include_router
-    prefix="/staff_locations",
-    tags=["Staff_Settings"],
+from app.api.v1.modules.staff.dependencies import get_staff_locations_crud_service
+from app.api.v1.modules.staff.models.schemas import StaffLocationsCreateModel, StaffLocationsUpdateModel
+from app.api.v1.modules.staff.services.staff_locations_crud_service import StaffLocationsCrudService
+from app.api.v1.modules.staff.models._envelopes.staff_locations_envelopes import (
+    StaffLocationsCreateEnvelopeV2,
+    StaffLocationsUpdateEnvelopeV2,
+    StaffLocationsDeleteEnvelopeV2,
 )
 
 
-def _utc_now() -> datetime:
-    return datetime.now(timezone.utc)
-
-
-def _only_model_columns(model_cls, data: dict) -> dict:
-    return {k: v for k, v in data.items() if hasattr(model_cls, k)}
-
-
-@router.get(
-    "/search",
-    response_class=UnicodeJSONResponse,
-    response_model=StaffLocationSearchEnvelope,
-    response_model_exclude_none=True,
-)
-async def search_staff_locations(
-    session: AsyncSession = Depends(get_db),
-    staff_id: Optional[UUID] = Query(default=None),
-    location_id: Optional[UUID] = Query(default=None),
-    is_active: bool = Query(default=True, description="default=true"),
-    limit: int = Query(default=50, ge=1, le=200),
-    offset: int = Query(default=0, ge=0),
-):
-    """
-    Standard (same as patients.py)
-    - total/count/limit/offset/filters
-    - policy: if total==0 -> DATA.EMPTY (404 in envelope)
-    """
-    filters = {
-        "staff_id": str(staff_id) if staff_id else None,
-        "location_id": str(location_id) if location_id else None,
-        "is_active": is_active,
-    }
-
-    try:
-        where = []
-        if staff_id is not None:
-            where.append(StaffLocation.staff_id == staff_id)
-        if location_id is not None:
-            where.append(StaffLocation.location_id == location_id)
-        if hasattr(StaffLocation, "is_active"):
-            where.append(StaffLocation.is_active == is_active)
-
-        count_stmt = select(func.count()).select_from(StaffLocation)
-        for c in where:
-            count_stmt = count_stmt.where(c)
-        total = int((await session.execute(count_stmt)).scalar_one())
-
-        stmt = select(StaffLocation)
-        for c in where:
-            stmt = stmt.where(c)
-
-        stmt = stmt.order_by(StaffLocation.id.asc()).limit(limit).offset(offset)
-        items = (await session.execute(stmt)).scalars().all()
-
-        if total == 0:
-            return ResponseHandler.error(
-                *ResponseCode.DATA["EMPTY"],
-                details={"filters": filters},
-                status_code=404,
-            )
-
-        # ✅ Standard ListPayload(items)
-        items_out = [StaffLocationResponse.model_validate(x, from_attributes=True).model_dump(exclude_none=True) for x in items]
-        payload = build_list_payload(items=items_out, total=total, limit=limit, offset=offset, filters=filters)
-        return ResponseHandler.success(
-            message=ResponseCode.SUCCESS["RETRIEVED"][1],
-            data=payload.model_dump(exclude_none=True),
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.get(
-    "/{staff_location_id:uuid}",
-    response_class=UnicodeJSONResponse,
-    response_model=StaffLocationByIdEnvelope,
-    response_model_exclude_none=True,
-)
-async def read_staff_location_by_id(staff_location_id: UUID, session: AsyncSession = Depends(get_db)):
-    try:
-        obj = await session.get(StaffLocation, staff_location_id)
-        if not obj:
-            raise HTTPException(status_code=404, detail="staff_location not found")
-
-        return ResponseHandler.success(
-            message=ResponseCode.SUCCESS["RETRIEVED"][1],
-            data={"item": StaffLocationResponse.model_validate(obj)},
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+router = APIRouter()
 
 
 @router.post(
     "/",
     response_class=UnicodeJSONResponse,
-    response_model=StaffLocationCreateEnvelope,
+    response_model=StaffLocationsCreateEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="create_staff_location",
 )
-async def create_staff_location(payload: StaffLocationsCreateModel, session: AsyncSession = Depends(get_db)):
-    try:
-        data = _only_model_columns(StaffLocation, clean_create(payload))
-        obj = StaffLocation(**data)
-
-        if hasattr(obj, "created_at") and getattr(obj, "created_at", None) is None:
-            obj.created_at = _utc_now()
-        if hasattr(obj, "updated_at") and getattr(obj, "updated_at", None) is None:
-            obj.updated_at = _utc_now()
-        if hasattr(obj, "is_active") and getattr(obj, "is_active", None) is None:
-            obj.is_active = True
-
-        session.add(obj)
-        await session.commit()
-        await session.refresh(obj)
-
-        return ResponseHandler.success(
-            message=ResponseCode.SUCCESS["REGISTERED"][1],
-            data={"item": StaffLocationResponse.model_validate(obj)},
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+async def create_staff_location(
+    request: Request,
+    payload: StaffLocationsCreateModel,
+    svc: StaffLocationsCrudService = Depends(get_staff_locations_crud_service),
+):
+    obj = await svc.create(payload)
+    return ResponseHandler.success_from_request(
+        request,
+        message=ResponseCode.SUCCESS["CREATED"][1],
+        data={"item": obj},
+        status_code=201,
+    )
 
 
 @router.put(
     "/{staff_location_id:uuid}",
     response_class=UnicodeJSONResponse,
-    response_model=StaffLocationUpdateEnvelope,
+    response_model=StaffLocationsUpdateEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="update_staff_location",
 )
-async def update_staff_location_by_id(
-    staff_location_id: UUID, payload: StaffLocationsUpdateModel, session: AsyncSession = Depends(get_db)
+async def update_staff_location(
+    request: Request,
+    staff_location_id: UUID,
+    payload: StaffLocationsUpdateModel,
+    svc: StaffLocationsCrudService = Depends(get_staff_locations_crud_service),
 ):
     try:
-        updates = payload.model_dump(exclude_unset=True)
-        if not updates:
-            return ResponseHandler.error(
-                *ResponseCode.DATA["INVALID"],
-                details={"staff_location_id": str(staff_location_id), "detail": "No fields to update"},
-                status_code=422,
-            )
-
-        obj = await session.get(StaffLocation, staff_location_id)
-        if not obj:
-            raise HTTPException(status_code=404, detail="staff_location not found")
-
-        data = _only_model_columns(StaffLocation, clean_update(payload))
-        for k, v in data.items():
-            setattr(obj, k, v)
-
-        if hasattr(obj, "updated_at"):
-            obj.updated_at = _utc_now()
-
-        await session.commit()
-        await session.refresh(obj)
-
-        return ResponseHandler.success(
-            message=ResponseCode.SUCCESS["UPDATED"][1],
-            data={"item": StaffLocationResponse.model_validate(obj)},
+        obj = await svc.update(staff_location_id, payload)
+    except ValueError as e:
+        return ResponseHandler.error_from_request(
+            request,
+            *ResponseCode.DATA["VALIDATION_ERROR"],
+            details={"error": str(e)},
+            status_code=422,
         )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+
+    if not obj:
+        return ResponseHandler.error_from_request(
+            request,
+            *ResponseCode.DATA["NOT_FOUND"],
+            details={"staff_location_id": str(staff_location_id)},
+            status_code=404,
+        )
+
+    return ResponseHandler.success_from_request(
+        request,
+        message=ResponseCode.SUCCESS["UPDATED"][1],
+        data={"item": obj},
+    )
 
 
 @router.delete(
     "/{staff_location_id:uuid}",
     response_class=UnicodeJSONResponse,
-    response_model=StaffLocationDeleteEnvelope,
+    response_model=StaffLocationsDeleteEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="delete_staff_location",
 )
-async def delete_staff_location_by_id(staff_location_id: UUID, session: AsyncSession = Depends(get_db)):
-    try:
-        obj = await session.get(StaffLocation, staff_location_id)
-        if not obj:
-            raise HTTPException(status_code=404, detail="staff_location not found")
-
-        await session.delete(obj)
-        await session.commit()
-
-        return ResponseHandler.success(
-            message=ResponseCode.SUCCESS["DELETED"][1],
-            data={"item": str(staff_location_id)},
+async def delete_staff_location(
+    request: Request,
+    staff_location_id: UUID,
+    svc: StaffLocationsCrudService = Depends(get_staff_locations_crud_service),
+):
+    ok = await svc.delete(staff_location_id)
+    if not ok:
+        return ResponseHandler.error_from_request(
+            request,
+            *ResponseCode.DATA["NOT_FOUND"],
+            details={"staff_location_id": str(staff_location_id)},
+            status_code=404,
         )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+
+    return ResponseHandler.success_from_request(
+        request,
+        message=ResponseCode.SUCCESS["DELETED"][1],
+        data={"deleted": True, "id": str(staff_location_id)},
+    )

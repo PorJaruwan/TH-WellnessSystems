@@ -36,8 +36,9 @@ def _parse_sort(sort: str | None, default_by: str, default_order: str) -> tuple[
     response_class=UnicodeJSONResponse,
     response_model=PatientImageListEnvelope,
     response_model_exclude_none=True,
+    operation_id="serch_images",
 )
-async def list_patient_images(
+async def serch_images(
     request: Request,
     patient_id: UUID = Path(..., description="patient id"),
     q: str | None = Query(default=None),
@@ -66,12 +67,13 @@ async def list_patient_images(
 
 
 @router.get(
-    "/{image_id:uuid}",
+    "/images/{image_id:uuid}",
     response_class=UnicodeJSONResponse,
     response_model=PatientImageByIdEnvelope,
     response_model_exclude_none=True,
+    operation_id="read_image",
 )
-async def get_image_by_id(
+async def read_image(
     request: Request,
     image_id: UUID,
     svc: PatientImagesService = Depends(get_patient_images_service),
@@ -97,6 +99,7 @@ async def get_image_by_id(
     response_class=UnicodeJSONResponse,
     response_model=PatientImageCreateEnvelope,
     response_model_exclude_none=True,
+    operation_id="create_image",
 )
 async def create_image(
     request: Request,
@@ -117,10 +120,11 @@ async def create_image(
 
 
 @router.patch(
-    "/{image_id:uuid}",
+    "/images/{image_id:uuid}",
     response_class=UnicodeJSONResponse,
     response_model=PatientImageUpdateEnvelope,
     response_model_exclude_none=True,
+    operation_id="update_image",
 )
 async def update_image(
     request: Request,
@@ -145,10 +149,11 @@ async def update_image(
 
 
 @router.delete(
-    "/{image_id:uuid}",
+    "/images/{image_id:uuid}",
     response_class=UnicodeJSONResponse,
     response_model=PatientImageDeleteEnvelope,
     response_model_exclude_none=True,
+    operation_id="delete_image",
 )
 async def delete_image(
     request: Request,

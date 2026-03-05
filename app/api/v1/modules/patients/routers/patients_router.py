@@ -36,8 +36,9 @@ router = APIRouter()
     response_class=UnicodeJSONResponse,
     response_model=PatientCreateEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="create_patient",
 )
-async def post_patient(
+async def create_patient(
     request: Request,
     payload: PatientCreate,
     svc: PatientsCrudService = Depends(get_patients_crud_service),
@@ -73,8 +74,9 @@ async def post_patient(
     response_class=UnicodeJSONResponse,
     response_model=PatientUpdateEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="patch_patient_",
 )
-async def patch_patient_by_id(
+async def patch_patient_(
     request: Request,
     patient_id: UUID,
     payload: PatientUpdate,
@@ -124,8 +126,9 @@ async def patch_patient_by_id(
     response_class=UnicodeJSONResponse,
     response_model=PatientDeleteEnvelopeV2,
     response_model_exclude_none=True,
+    operation_id="delete_patient",
 )
-async def delete_patient_by_id(
+async def delete_patient(
     request: Request,
     patient_id: UUID,
     svc: PatientsCrudService = Depends(get_patients_crud_service),

@@ -7,3 +7,23 @@ from app.api.v1.modules.masters.repositories.departments_search_repository impor
 class DepartmentSearchService(BaseSettingsSearchService):
     def __init__(self, repo: DepartmentSearchRepository):
         super().__init__(repo=repo)
+
+    async def search(
+        self,
+        q: str = "",
+        company_code: str | None = None,
+        is_active: bool | None = True,
+        limit: int = 50,
+        offset: int = 0,
+        sort_by: str | None = None,
+        sort_dir: str = "asc",
+    ):
+        return await self.repo.search(
+            q=q,
+            company_code=company_code,
+            is_active=is_active,
+            limit=limit,
+            offset=offset,
+            sort_by=sort_by,
+            sort_dir=sort_dir,
+        )

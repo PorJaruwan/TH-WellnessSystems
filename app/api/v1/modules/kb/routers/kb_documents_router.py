@@ -17,7 +17,7 @@ from app.api.v1.modules.kb.models._envelopes.kb_envelopes import KBDocumentsList
 router = APIRouter()
 
 
-@router.get("/search", response_class=UnicodeJSONResponse, response_model=KBDocumentsListEnvelope)
+@router.get("/search", response_class=UnicodeJSONResponse, response_model=KBDocumentsListEnvelope, operation_id="search_kb_documents")
 async def search_kb_documents(
     request: Request,
     doc_type: str | None = Query(default=None),
@@ -53,7 +53,7 @@ async def search_kb_documents(
     )
 
 
-@router.post("/", response_class=UnicodeJSONResponse, response_model=KBDocumentEnvelope)
+@router.post("/", response_class=UnicodeJSONResponse, response_model=KBDocumentEnvelope, operation_id="create_kb_document")
 async def create_kb_document(
     request: Request,
     req: KBDocumentCreateRequest,
@@ -68,8 +68,11 @@ async def create_kb_document(
     )
 
 
-@router.get("/{document_id}", response_class=UnicodeJSONResponse, response_model=KBDocumentEnvelope)
-async def get_kb_document(
+@router.get("/{document_id}", 
+    response_class=UnicodeJSONResponse,
+    response_model=KBDocumentEnvelope, 
+    operation_id="read_kb_document")
+async def read_kb_document(
     request: Request,
     document_id: UUID,
     svc: KBDocumentsService = Depends(get_kb_documents_service),
@@ -89,7 +92,7 @@ async def get_kb_document(
     )
 
 
-@router.patch("/{document_id}", response_class=UnicodeJSONResponse, response_model=KBDocumentEnvelope)
+@router.patch("/{document_id}", response_class=UnicodeJSONResponse, response_model=KBDocumentEnvelope, operation_id="update_kb_document")
 async def update_kb_document(
     request: Request,
     document_id: UUID,
@@ -111,7 +114,7 @@ async def update_kb_document(
     )
 
 
-@router.delete("/{document_id}", response_class=UnicodeJSONResponse, response_model=KBDocumentEnvelope)
+@router.delete("/{document_id}", response_class=UnicodeJSONResponse, response_model=KBDocumentEnvelope, operation_id="delete_kb_document")
 async def delete_kb_document(
     request: Request,
     document_id: UUID,
