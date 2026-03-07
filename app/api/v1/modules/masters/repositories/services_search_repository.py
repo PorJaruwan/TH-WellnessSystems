@@ -59,7 +59,7 @@ class ServiceSearchRepository(BaseSettingsSearchRepository):
             "is_active": Service.is_active,
             "created_at": Service.created_at,
             "updated_at": Service.updated_at,
-            "service_type_name": ServiceType.type_name,
+            "service_type_name": ServiceType.service_type_name,
         }
 
         # default sort

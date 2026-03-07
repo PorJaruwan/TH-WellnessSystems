@@ -24,37 +24,40 @@ ssl_ctx = ssl.create_default_context()
 ssl_ctx.check_hostname = False
 ssl_ctx.verify_mode = ssl.CERT_NONE
 
-# ✅ Direct DB (db.<ref>.supabase.co:5432) -> use pooled connections + recycle
-engine = create_async_engine(
-    DATABASE_URL,
-    pool_size=5,
-    max_overflow=10,
-    pool_timeout=30,     # ✅ กันค้างรอ connection
-    pool_recycle=600,   # 30 นาที
-    pool_pre_ping=True,
-    # pool_use_lifo=True,
-    connect_args={
-        "ssl": ssl_ctx,              # ✅ สำคัญ: ส่ง SSL context เข้าไปจริงๆ
-        "statement_cache_size": 0,   # ✅ ปิด asyncpg statement cache
-        "timeout": 60,               # connect timeout
-        "command_timeout": 90,       # query/command timeout
-    },
-)
+# # ✅ Direct DB (db.<ref>.supabase.co:5432) -> use pooled connections + recycle
+# print("settings.DATABASE_URL =", settings.DATABASE_URL)
+# print("final DATABASE_URL =", DATABASE_URL)
 
-
-
-# ✅ Pooler DB 
-# # engine necnection for: pooler
 # engine = create_async_engine(
 #     DATABASE_URL,
-#     poolclass=NullPool,          # ✅ ใช้ NullPool เมื่อผ่าน PgBouncer/Supabase pooler
+#     pool_size=5,
+#     max_overflow=10,
+#     pool_timeout=30,     # ✅ กันค้างรอ connection
+#     pool_recycle=600,   # 30 นาที
 #     pool_pre_ping=True,
+#     # pool_use_lifo=True,
 #     connect_args={
-#         "ssl": ssl_ctx,
-#         "statement_cache_size": 0,          # ✅ ปิด statement cache ของ asyncpg
-#         "prepared_statement_cache_size": 0, # ✅ (ถ้า dialect รองรับ) ปิดเพิ่มอีกชั้น
+#         "ssl": ssl_ctx,              # ✅ สำคัญ: ส่ง SSL context เข้าไปจริงๆ
+#         "statement_cache_size": 0,   # ✅ ปิด asyncpg statement cache
+#         "timeout": 60,               # connect timeout
+#         "command_timeout": 90,       # query/command timeout
 #     },
 # )
+
+
+
+#✅ Pooler DB 
+# engine necnection for: pooler (เหมาะกับ SQLALChemy + asyncpg มากกว่าในหลาย environment)
+engine = create_async_engine(
+    DATABASE_URL,
+    poolclass=NullPool,          # ✅ ใช้ NullPool เมื่อผ่าน PgBouncer/Supabase pooler
+    pool_pre_ping=True,
+    connect_args={
+        "ssl": ssl_ctx,
+        "statement_cache_size": 0,          # ✅ ปิด statement cache ของ asyncpg
+        "prepared_statement_cache_size": 0, # ✅ (ถ้า dialect รองรับ) ปิดเพิ่มอีกชั้น
+    },
+)
 
 
 # engine = create_async_engine(
