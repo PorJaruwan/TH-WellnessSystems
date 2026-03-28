@@ -47,7 +47,7 @@ async def create_sale_staff(request: Request, payload: SaleStaffCreate, db: Asyn
     obj = await repo.create(SaleStaff, payload.model_dump())
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["REGISTERED"][1],
+        message=ResponseCode.SUCCESS["CREATED"][1],
         data={"item": SaleStaffDTO.model_validate(obj).model_dump(exclude_none=True)},
     )
 
@@ -85,7 +85,7 @@ async def search_sale_staff(
     )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["LISTED"][1],
         data=payload.model_dump(exclude_none=True),
     )
 
@@ -106,7 +106,7 @@ async def read_sale_staff(request: Request, sale_staff_id: UUID, db: AsyncSessio
         )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"item": SaleStaffDTO.model_validate(item).model_dump(exclude_none=True)},
     )
 

@@ -36,7 +36,7 @@ def search_booking_staff():
     if not res.data:
         return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={})
     return ResponseHandler.success(
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["LISTED"][1],
         data={"total": len(res.data), "booking_staff": res.data},
     )
 
@@ -64,7 +64,7 @@ def create_booking_staff_for_booking(booking_id: UUID, booking_staff: BookingSta
             raise HTTPException(status_code=400, detail="Insert failed or no data returned.")
 
         return ResponseHandler.success(
-            message=ResponseCode.SUCCESS["REGISTERED"][1],
+            message=ResponseCode.SUCCESS["CREATED"][1],
             data={"booking_staff": res.data[0]},
         )
     except Exception as e:
@@ -92,7 +92,7 @@ def read_booking_staff_by_booking_id(booking_id: UUID, role: str | None = None):
             )
 
         return ResponseHandler.success(
-            message=ResponseCode.SUCCESS["RETRIEVED"][1],
+            message=ResponseCode.SUCCESS["FOUND"][1],
             data={"booking_staff": res.data},
         )
     except Exception as e:
@@ -119,7 +119,7 @@ def read_booking_staff(booking_staff_id: UUID):
             details={"booking_staff_id": str(booking_staff_id)},
         )
     return ResponseHandler.success(
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"booking_staff": res.data[0]},
     )
 

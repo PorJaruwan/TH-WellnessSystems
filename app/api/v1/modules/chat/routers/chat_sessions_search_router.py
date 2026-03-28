@@ -17,9 +17,7 @@ from app.api.v1.modules.chat.models._envelopes.chat_envelopes import ChatSession
 from app.api.v1.modules.chat.models.dtos import ChatSessionSummaryItem
 from app.api.v1.modules.chat.services.chat_service import ChatService
 
-
 router = APIRouter()
-
 
 
 # GET /api/v1/chat/sessions/my?status=open

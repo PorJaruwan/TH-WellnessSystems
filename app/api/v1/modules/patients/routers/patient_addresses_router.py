@@ -90,7 +90,7 @@ async def search_patient_addresses(
         # payload.items are PatientAddressRead already
         return ResponseHandler.success_from_request(
             request,
-            message=ResponseCode.SUCCESS["RETRIEVED"][1],
+            message=ResponseCode.SUCCESS["LISTED"][1],
             data=payload.model_dump(exclude_none=True),
         )
     except Exception as e:
@@ -120,7 +120,7 @@ async def serch_patient_address_by_type(
             )
         return ResponseHandler.success_from_request(
             request,
-            message=ResponseCode.SUCCESS["RETRIEVED"][1],
+            message=ResponseCode.SUCCESS["LISTED"][1],
             data={"item": item.model_dump(exclude_none=True)},
         )
     except Exception as e:
@@ -146,7 +146,7 @@ async def create_patient_address(
         created = await svc.create(PatientAddressCreate(**data))
         return ResponseHandler.success_from_request(
             request,
-            message=ResponseCode.SUCCESS["REGISTERED"][1],
+            message=ResponseCode.SUCCESS["CREATED"][1],
             data={"item": created.model_dump(exclude_none=True)},
         )
     except Exception as e:

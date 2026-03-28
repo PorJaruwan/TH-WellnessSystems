@@ -54,7 +54,7 @@ async def read_profile(
         )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"item": data.model_dump()},
     )
 
@@ -112,7 +112,7 @@ async def read_contact(
         )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"item": data.model_dump()},
     )
 
@@ -170,7 +170,7 @@ async def read_medical_flags(
         )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"item": data.model_dump()},
     )
 
@@ -228,7 +228,7 @@ async def read_marketing(
         )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"item": data.model_dump()},
     )
 

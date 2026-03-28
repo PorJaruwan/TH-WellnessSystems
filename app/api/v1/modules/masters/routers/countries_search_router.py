@@ -72,6 +72,6 @@ async def search_countries(
 
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["LISTED"][1],
         data=payload.model_dump(exclude_none=True),
     )

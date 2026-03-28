@@ -139,7 +139,10 @@ async def create_booking_service(body: BookingCreate) -> BookingCreateResponse:
     if end_t <= start_t:
         raise HTTPException(status_code=422, detail="INVALID:end_time must be after start_time")
 
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
+    # now = datetime.now(UTC).isoformat()
+    # now = datetime.utcnow().isoformat()
+    
 
     payload = {
         "resource_track_id": (str(body.resource_track_id) if body.resource_track_id else None),
@@ -364,64 +367,6 @@ async def booking_status_action_service(
         "status": updated.get("status") or new_status,
         "updated_at": _to_iso_utc(updated.get("updated_at")),  # ISO 8601 + UTC
     }
-
-
-# async def booking_status_action_service(
-#     *,
-#     booking_id: UUID,
-#     user_id: UUID,
-#     action: str,
-#     note: Optional[str] = None,
-#     cancel_reason: Optional[str] = None,
-#     force: bool = False,
-# ) -> dict:
-#     allowed = {"confirm", "checkin", "start_service", "complete", "cancel", "no_show", "reschedule"}
-#     if action not in allowed:
-#         raise HTTPException(status_code=422, detail="INVALID:action")
-
-#     row = repo_select_booking_row(booking_id, fields="id,status")
-#     if not row:
-#         raise HTTPException(status_code=404, detail="NOT_FOUND")
-
-#     old_status = row.get("status")
-#     new_status_map = {
-#         "confirm": "confirmed",
-#         "checkin": "checked_in",
-#         "start_service": "in_service",
-#         "complete": "completed",
-#         "cancel": "cancelled",
-#         "no_show": "no_show",
-#         "reschedule": "rescheduled",
-#     }
-#     new_status = new_status_map[action]
-
-#     if (not force) and old_status == new_status:
-#         return {"booking_id": str(booking_id), "old_status": old_status, "status": new_status, "updated_at": None}
-
-
-#     updated = repo_update_booking(
-#         booking_id,
-#         {"status": new_status, "updated_at": datetime.utcnow().isoformat()},
-#     )
-#     if not updated:
-#         raise HTTPException(status_code=404, detail="NOT_FOUND")
-
-#     repo_insert_status_history(
-#         {
-#             "booking_id": str(booking_id),
-#             "old_status": old_status,
-#             "new_status": new_status,
-#             "changed_by": str(user_id),
-#             "note": note or (cancel_reason if action == "cancel" else None),
-#         }
-#     )
-
-#     return {
-#         "id": updated["id"],
-#         "old_status": old_status,
-#         "status": updated.get("status"),
-#         "updated_at": str(updated.get("updated_at")) if updated.get("updated_at") is not None else None,
-#     }
 
 
 async def get_booking_history_service(*, booking_id: UUID) -> list[BookingHistoryItem]:

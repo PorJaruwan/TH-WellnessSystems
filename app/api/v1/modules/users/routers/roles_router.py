@@ -14,7 +14,7 @@ from app.api.v1.modules.users.models._envelopes import RolesCreateEnvelope, Role
 
 router = APIRouter()
 
-@router.post("", response_class=UnicodeJSONResponse, response_model=RolesCreateEnvelope, operation_id="create_roles")
+@router.post("/", response_class=UnicodeJSONResponse, response_model=RolesCreateEnvelope, operation_id="create_roles")
 def create_roles(
     request: Request,
     body: RoleCreate,
@@ -28,7 +28,7 @@ def create_roles(
     dto = RoleDTO.model_validate(item, from_attributes=True).model_dump(exclude_none=True)
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["REGISTERED"][1],
+        message=ResponseCode.SUCCESS["CREATED"][1],
         data={"item": dto},
     )
 

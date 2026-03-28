@@ -100,7 +100,7 @@ async def get_booking_grid(
 
         # ✅ 200 shape "คงเดิม" ตามไฟล์เดิม (อย่าเปลี่ยน)
         return ResponseHandler.success(
-            message=ResponseCode.SUCCESS["RETRIEVED"][1],
+            message=ResponseCode.SUCCESS["LISTED"][1],
             data=payload.model_dump(exclude_none=True),
         )
 

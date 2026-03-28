@@ -18,8 +18,11 @@ def get_api_router() -> APIRouter:
     # AI Consult & Chat & KB
     # -------------------------
     ##-- AI Consult
-    from app.api.v1.modules.ai.consult.routers import router as ai_consult_router
-    api_router.include_router(ai_consult_router)
+    from app.api.v1.modules.ai.routers import router as ai_router
+    api_router.include_router(ai_router)
+
+    from app.api.v1.modules.ai.routers import router as ai_router
+    api_router.include_router(ai_router)
     
     ##-- Chat
     from app.api.v1.modules.chat.routers import router as chat_router
@@ -66,7 +69,11 @@ def get_api_router() -> APIRouter:
     from app.api.v1.modules.staff.routers import router as staff_router
     api_router.include_router(staff_router)
 
-
+    # -------------------------
+    # Doctors (Facade Router Only)
+    # -------------------------
+    from app.api.v1.modules.doctors import router as doctors_router
+    api_router.include_router(doctors_router)
 
     # -------------------------
     # Users (Facade)  ✅ FIXED
@@ -90,9 +97,9 @@ def get_api_router() -> APIRouter:
     return api_router
 
 
-
-
-###===Note
+# -------------------------
+# History
+# -------------------------
 
 ##-- logging
 # from app.api.v1.logs import (

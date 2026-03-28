@@ -77,7 +77,7 @@ async def search_patient_photos(
 
         return ResponseHandler.success_from_request(
             request,
-            message=ResponseCode.SUCCESS["RETRIEVED"][1],
+            message=ResponseCode.SUCCESS["LISTED"][1],
             data=result["payload"].model_dump(exclude_none=True),
         )
     except Exception as e:
@@ -106,7 +106,7 @@ async def read_photo(
         )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"item": obj.model_dump(exclude_none=True)},
     )
 
@@ -133,7 +133,7 @@ async def search_photo_by_patient(
         )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["LISTED"][1],
         data={"item": obj.model_dump(exclude_none=True)},
     )
 
@@ -165,7 +165,7 @@ async def upload_photo(
         )
         return ResponseHandler.success_from_request(
             request,
-            message=ResponseCode.SUCCESS["REGISTERED"][1],
+            message=ResponseCode.SUCCESS["CREATED"][1],
             data={"patient_id": patient_id, "file_url": item["file_path"], "photo_id": str(item["id"])},
         )
     except Exception as e:

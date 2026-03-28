@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from uuid import UUID
 
-from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import StaffLocation
+
+
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 class StaffLocationsCrudRepository:
@@ -14,25 +18,41 @@ class StaffLocationsCrudRepository:
 
     async def create(self, payload: dict) -> StaffLocation:
         obj = StaffLocation(**payload)
+
+        if hasattr(obj, "created_at") and getattr(obj, "created_at", None) is None:
+            obj.created_at = _utc_now()
+        if hasattr(obj, "updated_at") and getattr(obj, "updated_at", None) is None:
+            obj.updated_at = _utc_now()
+        if hasattr(obj, "is_active") and getattr(obj, "is_active", None) is None:
+            obj.is_active = True
+
         self.db.add(obj)
-        await self.db.commit()
+        await self.db.flush()
         await self.db.refresh(obj)
         return obj
 
-    async def update(self, staff_location_id: UUID, payload: dict):
-        stmt = (
-            update(StaffLocation)
-            .where(StaffLocation.id == staff_location_id)
-            .values(**payload)
-            .returning(StaffLocation)
-        )
-        res = await self.db.execute(stmt)
-        await self.db.commit()
-        row = res.fetchone()
-        return row[0] if row else None
+    async def update(self, staff_location_id: UUID, payload: dict) -> StaffLocation | None:
+        obj = await self.db.get(StaffLocation, staff_location_id)
+        if not obj:
+            return None
+
+        for k, v in payload.items():
+            if hasattr(obj, k):
+                setattr(obj, k, v)
+
+        if hasattr(obj, "updated_at"):
+            obj.updated_at = _utc_now()
+
+        await self.db.flush()
+        await self.db.refresh(obj)
+        return obj
 
     async def delete(self, staff_location_id: UUID) -> bool:
-        stmt = delete(StaffLocation).where(StaffLocation.id == staff_location_id)
-        res = await self.db.execute(stmt)
-        await self.db.commit()
-        return res.rowcount > 0
+        obj = await self.db.get(StaffLocation, staff_location_id)
+        if not obj:
+            return False
+
+        await self.db.delete(obj)
+        await self.db.flush()
+        return True
+

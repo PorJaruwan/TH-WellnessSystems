@@ -28,21 +28,21 @@ def create_user_groups(payload: UserGroupsCreateModel):
     res = post_user_groups(cleaned)
     if not res.data:
         raise HTTPException(status_code=400, detail="Insert failed or no data returned.")
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["REGISTERED"][1], data={"user_groups": res.data[0]})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["CREATED"][1], data={"user_groups": res.data[0]})
 
 @router.get("/search", response_class=UnicodeJSONResponse)
 def read_all_user_groups():
     res = get_all_user_groups()
     if not res.data:
         return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={})
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["RETRIEVED"][1], data={"total": len(res.data), "user_groups": res.data})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["LISTED"][1], data={"total": len(res.data), "user_groups": res.data})
 
 @router.get("/{user_groups_id:uuid}", response_class=UnicodeJSONResponse)
 def read_user_groups_by_id(user_groups_id: UUID):
     res = get_user_groups_by_id(str(user_groups_id))
     if not res.data:
         return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"user_groups_id": str(user_groups_id)})
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["RETRIEVED"][1], data={"user_groups_id": res.data[0]})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["FOUND"][1], data={"user_groups_id": res.data[0]})
 
 @router.put("/{user_groups_id:uuid}", response_class=UnicodeJSONResponse)
 def update_user_groups_by_id(user_groups_id: UUID, payload: UserGroupsUpdateModel):

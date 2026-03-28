@@ -1,3 +1,4 @@
 
 from .ai_consult_sessions_service import AIConsultSessionsService
 
+from .ai_topic_categories_service import AITopicCategoriesService

@@ -61,7 +61,7 @@ async def serch_images(
 
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["LISTED"][1],
         data=result["payload"].model_dump(),
     )
 
@@ -89,7 +89,7 @@ async def read_image(
 
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"item": obj.model_dump()},
     )
 
@@ -113,7 +113,7 @@ async def create_image(
 
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["REGISTERED"][1],
+        message=ResponseCode.SUCCESS["CREATED"][1],
         data={"item": created.model_dump()},
         status_code=201,
     )

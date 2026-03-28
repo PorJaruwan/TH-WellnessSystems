@@ -33,6 +33,6 @@ async def read_staff_service(
         )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"item": obj},
     )

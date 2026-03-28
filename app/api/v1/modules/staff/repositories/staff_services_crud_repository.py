@@ -27,7 +27,7 @@ class StaffServicesCrudRepository:
             obj.is_active = True
 
         self.db.add(obj)
-        await self.db.commit()
+        await self.db.flush()
         await self.db.refresh(obj)
         return obj
 
@@ -43,8 +43,7 @@ class StaffServicesCrudRepository:
         if hasattr(obj, "updated_at"):
             obj.updated_at = _utc_now()
 
-        self.db.add(obj)
-        await self.db.commit()
+        await self.db.flush()
         await self.db.refresh(obj)
         return obj
 
@@ -52,6 +51,7 @@ class StaffServicesCrudRepository:
         obj = await self.db.get(StaffService, staff_service_id)
         if not obj:
             return False
+
         await self.db.delete(obj)
-        await self.db.commit()
+        await self.db.flush()
         return True

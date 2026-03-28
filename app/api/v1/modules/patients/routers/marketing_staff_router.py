@@ -46,7 +46,7 @@ async def create_marketing_staff(request: Request, payload: MarketingStaffCreate
     obj = await repo.create(MarketingStaff, payload.model_dump())
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["REGISTERED"][1],
+        message=ResponseCode.SUCCESS["CREATED"][1],
         data={"item": MarketingStaffDTO.model_validate(obj).model_dump(exclude_none=True)},
     )
 
@@ -84,7 +84,7 @@ async def search_marketing_staff(
     )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["LISTED"][1],
         data=payload.model_dump(exclude_none=True),
     )
 
@@ -105,7 +105,7 @@ async def read_marketing_staff(request: Request, marketing_staff_id: UUID, db: A
         )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"item": MarketingStaffDTO.model_validate(item).model_dump(exclude_none=True)},
     )
 

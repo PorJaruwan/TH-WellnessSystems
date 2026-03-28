@@ -27,21 +27,21 @@ def create_protected_routes(payload: ProtectedRoutesCreateModel):
     res = post_protected_routes(cleaned)
     if not res.data:
         raise HTTPException(status_code=400, detail="Insert failed or no data returned.")
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["REGISTERED"][1], data={"protected_routes": res.data[0]})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["CREATED"][1], data={"protected_routes": res.data[0]})
 
 @router.get("/search", response_class=UnicodeJSONResponse)
 def read_all_protected_routes():
     res = get_all_protected_routes()
     if not res.data:
         return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={})
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["RETRIEVED"][1], data={"total": len(res.data), "protected_routes": res.data})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["LISTED"][1], data={"total": len(res.data), "protected_routes": res.data})
 
 @router.get("/{protected_routes_id:uuid}", response_class=UnicodeJSONResponse)
 def read_protected_routes_by_id(protected_routes_id: UUID):
     res = get_protected_routes_by_id(str(protected_routes_id))
     if not res.data:
         return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"protected_routes_id": str(protected_routes_id)})
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["RETRIEVED"][1], data={"protected_routes": res.data[0]})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["FOUND"][1], data={"protected_routes": res.data[0]})
 
 @router.put("/{protected_routes_id:uuid}", response_class=UnicodeJSONResponse)
 def update_protected_routes_by_id(protected_routes_id: UUID, payload: ProtectedRoutesUpdateModel):

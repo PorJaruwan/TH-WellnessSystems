@@ -14,7 +14,7 @@ from app.api.v1.modules.users.models._envelopes import UserProfilesCreateEnvelop
 
 router = APIRouter()
 
-@router.post("", response_class=UnicodeJSONResponse, response_model=UserProfilesCreateEnvelope, operation_id="create_user_profiles")
+@router.post("/", response_class=UnicodeJSONResponse, response_model=UserProfilesCreateEnvelope, operation_id="create_user_profiles")
 def create_user_profiles(
     request: Request,
     body: UserProfileCreate,
@@ -28,7 +28,7 @@ def create_user_profiles(
     dto = UserProfileDTO.model_validate(item, from_attributes=True).model_dump(exclude_none=True)
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["REGISTERED"][1],
+        message=ResponseCode.SUCCESS["CREATED"][1],
         data={"item": dto},
     )
 

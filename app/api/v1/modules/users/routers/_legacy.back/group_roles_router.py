@@ -30,21 +30,21 @@ def create_groups(payload: GroupRolesCreateModel):
     res = post_group_roles(cleaned)
     if not res.data:
         raise HTTPException(status_code=400, detail="Insert failed or no data returned.")
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["REGISTERED"][1], data={"group_roles": res.data[0]})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["CREATED"][1], data={"group_roles": res.data[0]})
 
 @router.get("/search", response_class=UnicodeJSONResponse)
 def read_all_groups():
     res = get_all_group_roles()
     if not res.data:
         return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={})
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["RETRIEVED"][1], data={"total": len(res.data), "group_roles": res.data})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["LISTED"][1], data={"total": len(res.data), "group_roles": res.data})
 
 @router.get("/{group_roles_id:uuid}", response_class=UnicodeJSONResponse)
 def read_groups_by_id(group_roles_id: UUID):
     res = get_group_roles_by_id(str(group_roles_id))
     if not res.data:
         return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"group_roles_id": str(group_roles_id)})
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["RETRIEVED"][1], data={"group_roles": res.data[0]})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["FOUND"][1], data={"group_roles": res.data[0]})
 
 @router.put("/{group_roles_id:uuid}", response_class=UnicodeJSONResponse)
 def update_groups_by_id(group_roles_id: UUID, payload: GroupRolesUpdateModel):

@@ -48,7 +48,7 @@ async def create_patient(
         created = await svc.create(payload)
         return ResponseHandler.success_from_request(
             request,
-            message=ResponseCode.SUCCESS["REGISTERED"][1],
+            message=ResponseCode.SUCCESS["CREATED"][1],
             data={"item": created},
             status_code=201,
         )

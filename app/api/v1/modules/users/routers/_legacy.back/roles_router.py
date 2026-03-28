@@ -27,7 +27,7 @@ def create_roles(payload: RolesCreateModel):
     res = post_roles(cleaned)
     if not res.data:
         raise HTTPException(status_code=400, detail="Insert failed or no data returned.")
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["REGISTERED"][1], data={"roles": res.data[0]})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["CREATED"][1], data={"roles": res.data[0]})
 
 # ✅ READ ALL
 @router.get("/search", response_class=UnicodeJSONResponse)
@@ -35,7 +35,7 @@ def read_all_roles():
     res = get_all_roles()
     if not res.data:
         return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={})
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["RETRIEVED"][1], data={"total": len(res.data), "roles": res.data})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["LISTED"][1], data={"total": len(res.data), "roles": res.data})
 
 # ✅ READ BY ID
 @router.get("/{roles_id:uuid}", response_class=UnicodeJSONResponse)
@@ -43,7 +43,7 @@ def read_roles_by_id(roles_id: UUID):
     res = get_roles_by_id(str(roles_id))
     if not res.data:
         return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"roles_id": str(roles_id)})
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["RETRIEVED"][1], data={"roles": res.data[0]})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["FOUND"][1], data={"roles": res.data[0]})
 
 # ✅ UPDATE
 @router.put("/{roles_id:uuid}", response_class=UnicodeJSONResponse)

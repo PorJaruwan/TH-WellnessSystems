@@ -33,7 +33,7 @@ async def create_staff_leave(
         created = await svc.create(payload)
         return ResponseHandler.success_from_request(
             request,
-            message=ResponseCode.SUCCESS["REGISTERED"][1],
+            message=ResponseCode.SUCCESS["CREATED"][1],
             data={"item": created},
             status_code=201,
         )
@@ -70,7 +70,7 @@ async def update_staff_leave(
             )
         return ResponseHandler.success_from_request(
             request,
-            message=ResponseCode.SUCCESS["REGISTERED"][1],
+            message=ResponseCode.SUCCESS["CREATED"][1],
             data={"item": updated},
         )
     except ValueError as e:

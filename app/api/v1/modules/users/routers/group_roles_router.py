@@ -15,7 +15,7 @@ from app.api.v1.modules.users.models._envelopes import GroupRolesCreateEnvelope,
 router = APIRouter()
 # router = APIRouter(prefix="/group_roles", tags=["User_Settings"])
 
-@router.post("", response_class=UnicodeJSONResponse, response_model=GroupRolesCreateEnvelope, operation_id="create_group_roles")
+@router.post("/", response_class=UnicodeJSONResponse, response_model=GroupRolesCreateEnvelope, operation_id="create_group_roles")
 def create_group_roles(
     request: Request,
     body: GroupRoleCreate,
@@ -29,7 +29,7 @@ def create_group_roles(
     dto = GroupRoleDTO.model_validate(item, from_attributes=True).model_dump(exclude_none=True)
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["REGISTERED"][1],
+        message=ResponseCode.SUCCESS["CREATED"][1],
         data={"item": dto},
     )
 

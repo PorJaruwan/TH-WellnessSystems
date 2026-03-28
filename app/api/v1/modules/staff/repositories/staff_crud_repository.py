@@ -6,11 +6,11 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Staff
-from app.utils.payload_cleaner import clean_create
+from app.utils.payload_cleaner import clean_create, clean_update
 
 
 class StaffCrudRepository:
-    """DB layer: create/delete only (no commit/rollback)."""
+    """DB layer: create/update/delete only (no commit/rollback)."""
 
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -39,10 +39,28 @@ class StaffCrudRepository:
         await self.db.refresh(obj)
         return obj
 
+    async def update(self, staff_id: UUID, payload_model) -> Staff | None:
+        obj = await self.db.get(Staff, staff_id)
+        if not obj:
+            return None
+
+        data = self._only_model_columns(Staff, clean_update(payload_model))
+        for k, v in data.items():
+            setattr(obj, k, v)
+
+        if hasattr(obj, "updated_at"):
+            obj.updated_at = self._utc_now()
+
+        await self.db.flush()
+        await self.db.refresh(obj)
+        return obj
+
     async def delete(self, staff_id: UUID) -> UUID:
         obj = await self.db.get(Staff, staff_id)
         if not obj:
             raise ValueError("staff not found")
+
         await self.db.delete(obj)
         await self.db.flush()
         return obj.id
+    

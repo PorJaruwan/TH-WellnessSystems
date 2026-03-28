@@ -26,21 +26,21 @@ def create_role_permissions(payload: RolePermissionsCreateModel):
     res = post_role_permissions(cleaned)
     if not res.data:
         raise HTTPException(status_code=400, detail="Insert failed or no data returned.")
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["REGISTERED"][1], data={"role_permissions": res.data[0]})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["CREATED"][1], data={"role_permissions": res.data[0]})
 
 @router.get("/search", response_class=UnicodeJSONResponse)
 def read_all_role_permissions():
     res = get_all_role_permissions()
     if not res.data:
         return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={})
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["RETRIEVED"][1], data={"total": len(res.data), "role_permissions": res.data})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["LISTED"][1], data={"total": len(res.data), "role_permissions": res.data})
 
 @router.get("/{role_permissions_id:uuid}", response_class=UnicodeJSONResponse)
 def read_role_permissions_by_id(role_permissions_id: UUID):
     res = get_role_permissions_by_id(str(role_permissions_id))
     if not res.data:
         return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"role_permissions_id": str(role_permissions_id)})
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["RETRIEVED"][1], data={"role_permissions": res.data[0]})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["FOUND"][1], data={"role_permissions": res.data[0]})
 
 @router.put("/{role_permissions_id:uuid}", response_class=UnicodeJSONResponse)
 def update_role_permissions_by_id(role_permissions_id: UUID, payload: RolePermissionsUpdateModel):

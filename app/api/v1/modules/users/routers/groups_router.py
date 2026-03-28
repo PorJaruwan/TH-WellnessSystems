@@ -14,7 +14,7 @@ from app.api.v1.modules.users.models._envelopes import GroupsCreateEnvelope, Gro
 
 router = APIRouter()
 
-@router.post("", response_class=UnicodeJSONResponse, response_model=GroupsCreateEnvelope, operation_id="create_groups")
+@router.post("/", response_class=UnicodeJSONResponse, response_model=GroupsCreateEnvelope, operation_id="create_groups")
 def create_groups(
     request: Request,
     body: GroupCreate,
@@ -28,7 +28,7 @@ def create_groups(
     dto = GroupDTO.model_validate(item, from_attributes=True).model_dump(exclude_none=True)
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["REGISTERED"][1],
+        message=ResponseCode.SUCCESS["CREATED"][1],
         data={"item": dto},
     )
 

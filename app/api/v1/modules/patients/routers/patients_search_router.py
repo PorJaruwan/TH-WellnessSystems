@@ -74,7 +74,7 @@ async def search_patients(
         # ✅ IMPORTANT: use success_from_request to auto-fill meta
         return ResponseHandler.success_from_request(
             request,
-            message=ResponseCode.SUCCESS["RETRIEVED"][1],
+            message=ResponseCode.SUCCESS["LISTED"][1],
             data=payload.model_dump(exclude_none=True),
         )
 

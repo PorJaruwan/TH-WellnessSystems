@@ -45,7 +45,7 @@ async def create_source(request: Request, payload: SourceCreate, db: AsyncSessio
     obj = await repo.create(Source, payload.model_dump())
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["REGISTERED"][1],
+        message=ResponseCode.SUCCESS["CREATED"][1],
         data={"item": SourceDTO.model_validate(obj).model_dump(exclude_none=True)},
     )
 
@@ -83,7 +83,7 @@ async def search_sources(
     )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["LISTED"][1],
         data=payload.model_dump(exclude_none=True),
     )
 
@@ -104,7 +104,7 @@ async def read_source(request: Request, source_id: UUID, db: AsyncSession = Depe
         )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"item": SourceDTO.model_validate(item).model_dump(exclude_none=True)},
     )
 

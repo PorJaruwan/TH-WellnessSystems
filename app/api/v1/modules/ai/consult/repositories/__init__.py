@@ -1,1 +1,3 @@
 from .ai_consult_sessions_repository import AIConsultSessionsRepository
+
+from .ai_topic_categories_repository import AITopicCategoriesRepository

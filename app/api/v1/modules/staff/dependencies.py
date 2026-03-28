@@ -59,7 +59,6 @@ from app.api.v1.modules.staff.services.staff_locations_read_service import Staff
 from app.api.v1.modules.staff.services.staff_locations_crud_service import StaffLocationsCrudService
 
 
-
 def get_staff_departments_search_service(db: AsyncSession = Depends(get_db)) -> StaffDepartmentsSearchService:
     return StaffDepartmentsSearchService(StaffDepartmentsSearchRepository(db))
 
@@ -69,7 +68,7 @@ def get_staff_departments_read_service(db: AsyncSession = Depends(get_db)) -> St
 
 
 def get_staff_departments_crud_service(db: AsyncSession = Depends(get_db)) -> StaffDepartmentsCrudService:
-    return StaffDepartmentsCrudService(StaffDepartmentsCrudRepository(db))
+    return StaffDepartmentsCrudService(db=db, repo=StaffDepartmentsCrudRepository(db))
 
 
 def get_staff_services_search_service(db: AsyncSession = Depends(get_db)) -> StaffServicesSearchService:
@@ -81,7 +80,7 @@ def get_staff_services_read_service(db: AsyncSession = Depends(get_db)) -> Staff
 
 
 def get_staff_services_crud_service(db: AsyncSession = Depends(get_db)) -> StaffServicesCrudService:
-    return StaffServicesCrudService(StaffServicesCrudRepository(db))
+    return StaffServicesCrudService(db=db, repo=StaffServicesCrudRepository(db))
 
 
 def get_staff_leave_search_service(db: AsyncSession = Depends(get_db)) -> StaffLeaveSearchService:
@@ -108,5 +107,4 @@ def get_staff_locations_read_service(db: AsyncSession = Depends(get_db)) -> Staf
 
 
 def get_staff_locations_crud_service(db: AsyncSession = Depends(get_db)) -> StaffLocationsCrudService:
-    return StaffLocationsCrudService(StaffLocationsCrudRepository(db))
-
+    return StaffLocationsCrudService(db=db, repo=StaffLocationsCrudRepository(db))

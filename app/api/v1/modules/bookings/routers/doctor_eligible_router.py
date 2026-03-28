@@ -154,8 +154,8 @@ async def check_doctors_eligible(
             )
 
         return ApiResponse.ok(
-            success_key="RETRIEVED",
-            default_message="Retrieved successfully.",
+            success_key="FOUND",
+            default_message="Data loaded successfully.",
             data={
                 "count": len(rows),
                 "filters": filters,

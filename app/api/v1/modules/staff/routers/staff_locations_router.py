@@ -14,7 +14,6 @@ from app.api.v1.modules.staff.models._envelopes.staff_locations_envelopes import
     StaffLocationsDeleteEnvelopeV2,
 )
 
-
 router = APIRouter()
 
 
@@ -30,16 +29,24 @@ async def create_staff_location(
     payload: StaffLocationsCreateModel,
     svc: StaffLocationsCrudService = Depends(get_staff_locations_crud_service),
 ):
-    obj = await svc.create(payload)
-    return ResponseHandler.success_from_request(
-        request,
-        message=ResponseCode.SUCCESS["CREATED"][1],
-        data={"item": obj},
-        status_code=201,
-    )
+    try:
+        obj = await svc.create(payload)
+        return ResponseHandler.success_from_request(
+            request,
+            message=ResponseCode.SUCCESS["CREATED"][1],
+            data={"item": obj},
+            status_code=201,
+        )
+    except Exception as e:
+        return ResponseHandler.error_from_request(
+            request,
+            *ResponseCode.SYSTEM["INTERNAL_ERROR"],
+            details={"error": str(e)},
+            status_code=500,
+        )
 
 
-@router.put(
+@router.patch(
     "/{staff_location_id:uuid}",
     response_class=UnicodeJSONResponse,
     response_model=StaffLocationsUpdateEnvelopeV2,
@@ -57,8 +64,8 @@ async def update_staff_location(
     except ValueError as e:
         return ResponseHandler.error_from_request(
             request,
-            *ResponseCode.DATA["VALIDATION_ERROR"],
-            details={"error": str(e)},
+            *ResponseCode.DATA["INVALID"],
+            details={"staff_location_id": str(staff_location_id), "detail": str(e)},
             status_code=422,
         )
 
@@ -89,17 +96,26 @@ async def delete_staff_location(
     staff_location_id: UUID,
     svc: StaffLocationsCrudService = Depends(get_staff_locations_crud_service),
 ):
-    ok = await svc.delete(staff_location_id)
-    if not ok:
+    try:
+        ok = await svc.delete(staff_location_id)
+        if not ok:
+            return ResponseHandler.error_from_request(
+                request,
+                *ResponseCode.DATA["NOT_FOUND"],
+                details={"staff_location_id": str(staff_location_id)},
+                status_code=404,
+            )
+
+        return ResponseHandler.success_from_request(
+            request,
+            message=ResponseCode.SUCCESS["DELETED"][1],
+            data={"deleted": True, "id": str(staff_location_id)},
+        )
+    except Exception as e:
         return ResponseHandler.error_from_request(
             request,
-            *ResponseCode.DATA["NOT_FOUND"],
-            details={"staff_location_id": str(staff_location_id)},
-            status_code=404,
+            *ResponseCode.SYSTEM["INTERNAL_ERROR"],
+            details={"error": str(e)},
+            status_code=500,
         )
 
-    return ResponseHandler.success_from_request(
-        request,
-        message=ResponseCode.SUCCESS["DELETED"][1],
-        data={"deleted": True, "id": str(staff_location_id)},
-    )

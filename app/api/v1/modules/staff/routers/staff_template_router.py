@@ -95,7 +95,7 @@ async def search_staff_template(
         items_out = [StaffTemplateResponse.model_validate(x, from_attributes=True).model_dump(exclude_none=True) for x in items]
         payload = build_list_payload(items=items_out, total=total, limit=limit, offset=offset, filters=filters)
         return ResponseHandler.success(
-            message=ResponseCode.SUCCESS["RETRIEVED"][1],
+            message=ResponseCode.SUCCESS["LISTED"][1],
             data=payload.model_dump(exclude_none=True),
         )
     except Exception as e:
@@ -120,7 +120,7 @@ async def read_staff_template_by_id(template_id: UUID, session: AsyncSession = D
             )
 
         return ResponseHandler.success(
-            message=ResponseCode.SUCCESS["RETRIEVED"][1],
+            message=ResponseCode.SUCCESS["FOUND"][1],
             data={"item": StaffTemplateResponse.model_validate(obj)},
         )
     except Exception as e:
@@ -151,7 +151,7 @@ async def create_staff_template(payload: StaffTemplateCreateModel, session: Asyn
         await session.refresh(obj)
 
         return ResponseHandler.success(
-            message=ResponseCode.SUCCESS["REGISTERED"][1],
+            message=ResponseCode.SUCCESS["CREATED"][1],
             data={"item": StaffTemplateResponse.model_validate(obj)},
         )
     except Exception as e:

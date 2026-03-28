@@ -43,6 +43,6 @@ async def read_buildings_by_id(
     item = BuildingResponse.model_validate(obj).model_dump()
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"item": item},
     )

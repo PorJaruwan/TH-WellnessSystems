@@ -42,6 +42,6 @@ async def read_districts_by_id(
     item = DistrictResponse.model_validate(obj).model_dump()
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"item": item},
     )

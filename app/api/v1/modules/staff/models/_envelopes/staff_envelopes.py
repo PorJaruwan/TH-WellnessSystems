@@ -12,6 +12,8 @@ from app.api.v1.modules.staff.models.dtos import StaffDetailDTO, StaffSearchItem
 # ---------------------------------------------------------
 
 StaffSearchEnvelopeV2: TypeAlias = SuccessEnvelope[ListPayload[StaffSearchItemDTO]]
-StaffByIdEnvelopeV2: TypeAlias = SuccessEnvelope[dict]   # {"item": StaffDetailDTO}
-StaffCreateEnvelopeV2: TypeAlias = SuccessEnvelope[dict] # {"item": StaffDetailDTO}
-StaffDeleteEnvelopeV2: TypeAlias = SuccessEnvelope[dict] # {"deleted": bool, "id": str}
+StaffByIdEnvelopeV2: TypeAlias = SuccessEnvelope[dict]    # {"item": StaffDetailDTO}
+StaffCreateEnvelopeV2: TypeAlias = SuccessEnvelope[dict]  # {"item": StaffDetailDTO}
+StaffUpdateEnvelopeV2: TypeAlias = SuccessEnvelope[dict]  # {"item": StaffDetailDTO}
+StaffDeleteEnvelopeV2: TypeAlias = SuccessEnvelope[dict]  # {"deleted": bool, "id": str}
+

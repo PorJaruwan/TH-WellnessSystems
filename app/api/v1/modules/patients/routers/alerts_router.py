@@ -46,7 +46,7 @@ async def create_alert(request: Request, payload: AlertCreate, db: AsyncSession 
     obj = await repo.create(Alert, payload.model_dump())
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["REGISTERED"][1],
+        message=ResponseCode.SUCCESS["CREATED"][1],
         data={"item": AlertDTO.model_validate(obj).model_dump(exclude_none=True)},
     )
 
@@ -84,7 +84,7 @@ async def search_alerts(
     )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["LISTED"][1],
         data=payload.model_dump(exclude_none=True),
     )
 
@@ -105,7 +105,7 @@ async def read_alert(request: Request, alert_id: UUID, db: AsyncSession = Depend
         )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"item": AlertDTO.model_validate(item).model_dump(exclude_none=True)},
     )
 

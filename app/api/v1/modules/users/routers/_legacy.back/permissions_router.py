@@ -29,7 +29,7 @@ def create_permissions(payload: PermissionsCreateModel):
     res = post_permissions(cleaned)
     if not res.data:
         raise HTTPException(status_code=400, detail="Insert failed or no data returned.")
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["REGISTERED"][1], data={"permissions": res.data[0]})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["CREATED"][1], data={"permissions": res.data[0]})
 
 # ✅ READ ALL
 @router.get("/search", response_class=UnicodeJSONResponse)
@@ -37,7 +37,7 @@ def read_all_permissions():
     res = get_all_permissions()
     if not res.data:
         return ResponseHandler.error(*ResponseCode.DATA["EMPTY"], details={})
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["RETRIEVED"][1], data={"total": len(res.data), "permissions": res.data})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["LISTED"][1], data={"total": len(res.data), "permissions": res.data})
 
 # ✅ READ BY ID
 @router.get("/{permissions_id:uuid}", response_class=UnicodeJSONResponse)
@@ -45,7 +45,7 @@ def read_permissions_by_id(permissions_id: UUID):
     res = get_permissions_by_id(str(permissions_id))
     if not res.data:
         return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"permissions_id": str(permissions_id)})
-    return ResponseHandler.success(message=ResponseCode.SUCCESS["RETRIEVED"][1], data={"permissions": res.data[0]})
+    return ResponseHandler.success(message=ResponseCode.SUCCESS["FOUND"][1], data={"permissions": res.data[0]})
 
 # ✅ UPDATE
 @router.put("/{permissions_id:uuid}", response_class=UnicodeJSONResponse)

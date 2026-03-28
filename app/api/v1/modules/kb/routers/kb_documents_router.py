@@ -48,7 +48,7 @@ async def search_kb_documents(
     )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["LISTED"][1],
         data=payload.model_dump(exclude_none=True),
     )
 
@@ -68,10 +68,12 @@ async def create_kb_document(
     )
 
 
-@router.get("/{document_id}", 
+@router.get(
+    "/{document_id}",
     response_class=UnicodeJSONResponse,
-    response_model=KBDocumentEnvelope, 
-    operation_id="read_kb_document")
+    response_model=KBDocumentEnvelope,
+    operation_id="read_kb_document",
+)
 async def read_kb_document(
     request: Request,
     document_id: UUID,
@@ -81,15 +83,40 @@ async def read_kb_document(
     if not doc:
         return ResponseHandler.error_from_request(
             request,
+            code="KB_DOCUMENT_NOT_FOUND",
             message="Document not found",
             status_code=404,
         )
-    item = KBDocumentDTO.model_validate(doc).model_dump(exclude_none=True)
+
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
-        data={"item": item},
+        data=doc,
+        message="Document retrieved successfully",
     )
+
+# @router.get("/{document_id}", 
+#     response_class=UnicodeJSONResponse,
+#     response_model=KBDocumentEnvelope, 
+#     operation_id="read_kb_document")
+# async def read_kb_document(
+#     request: Request,
+#     document_id: UUID,
+#     svc: KBDocumentsService = Depends(get_kb_documents_service),
+# ):
+#     doc = await svc.get_document(document_id=document_id)
+#     if not doc:
+#         return ResponseHandler.error_from_request(
+#             request,
+#             code="KB_DOCUMENT_NOT_FOUND",
+#             message="Document not found",
+#             status_code=404,
+#         )
+#     item = KBDocumentDTO.model_validate(doc).model_dump(exclude_none=True)
+#     return ResponseHandler.success_from_request(
+#         request,
+#         message=ResponseCode.SUCCESS["FOUND"][1],
+#         data={"item": item},
+#     )
 
 
 @router.patch("/{document_id}", response_class=UnicodeJSONResponse, response_model=KBDocumentEnvelope, operation_id="update_kb_document")

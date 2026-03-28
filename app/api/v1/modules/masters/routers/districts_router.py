@@ -37,7 +37,7 @@ async def create_districts(
     item = DistrictResponse.model_validate(obj).model_dump()
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["REGISTERED"][1],
+        message=ResponseCode.SUCCESS["CREATED"][1],
         data={"item": item},
         status_code=201,
     )

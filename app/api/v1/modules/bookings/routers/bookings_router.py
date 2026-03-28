@@ -101,7 +101,7 @@ def _normalize_detail(row: dict) -> dict:
     responses={
         **success_200_example(
             example=success_example(
-                message="Registered successfully.",
+                message="Created successfully.",
                 data={"booking": {"id": "uuid"}},
             )
         ),
@@ -124,8 +124,8 @@ async def create_booking(
         ).model_dump(exclude_none=True)
 
         return ApiResponse.ok(
-            success_key="REGISTERED",
-            default_message="Registered successfully.",
+            success_key="CREATED",
+            default_message="Created successfully.",
             data=data,
         )
 
@@ -221,8 +221,8 @@ async def search_bookings(
         normalized = [_normalize_list_item(r) for r in (rows or [])]
 
         return ApiResponse.ok(
-            success_key="RETRIEVED",
-            default_message="Retrieved successfully.",
+            success_key="LISTED",
+            default_message="Data loaded successfully.",
             data={
                 "total": int(total),
                 "count": len(normalized),
@@ -271,8 +271,8 @@ async def read_booking(
         booking_dict = _normalize_detail(booking_dict)
 
         return ApiResponse.ok(
-            success_key="RETRIEVED",
-            default_message="Retrieved successfully.",
+            success_key="FOUND",
+            default_message="Data retrieved successfully.",
             data={"booking": booking_dict},
         )
 
@@ -545,8 +545,8 @@ async def read_booking_history(
         ).model_dump(exclude_none=True)
 
         return ApiResponse.ok(
-            success_key="RETRIEVED",
-            default_message="Retrieved successfully.",
+            success_key="FOUND",
+            default_message="Data retrieved successfully.",
             data=data,
         )
 

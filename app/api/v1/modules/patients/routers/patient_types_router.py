@@ -45,7 +45,7 @@ async def create_patient_type(request: Request, payload: PatientTypeCreate, db: 
     obj = await repo.create(PatientType, payload.model_dump())
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["REGISTERED"][1],
+        message=ResponseCode.SUCCESS["CREATED"][1],
         data={"item": PatientTypeDTO.model_validate(obj).model_dump(exclude_none=True)},
     )
 
@@ -83,7 +83,7 @@ async def search_patient_types(
     )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["LISTED"][1],
         data=payload.model_dump(exclude_none=True),
     )
 
@@ -104,7 +104,7 @@ async def read_patient_type(request: Request, patient_type_id: UUID, db: AsyncSe
         )
     return ResponseHandler.success_from_request(
         request,
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"item": PatientTypeDTO.model_validate(item).model_dump(exclude_none=True)},
     )
 

@@ -47,7 +47,7 @@ EX_SEARCH_200 = success_example(
     },
 )
 EX_ONE_200 = success_example(message="Retrieved successfully.", data={"item": {"id": "uuid"}})
-EX_CREATE_200 = success_example(message="Registered successfully.", data={"item": {"id": "uuid"}})
+EX_CREATE_200 = success_example(message="Created successfully.", data={"item": {"id": "uuid"}})
 EX_UPDATE_200 = success_example(message="Updated successfully.", data={"item": {"id": "uuid"}})
 EX_DELETE_200 = success_example(message="Deleted successfully.", data={"item": "uuid"})
 
@@ -58,7 +58,7 @@ EX_DELETE_200 = success_example(message="Deleted successfully.", data={"item": "
     response_model=dict,
     response_model_exclude_none=True,
     responses={
-        **success_200_example(description="RETRIEVED", example=EX_SEARCH_200),
+        **success_200_example(description="LISTED", example=EX_SEARCH_200),
         **common_errors(
             error_model=dict,
             invalid={
@@ -122,8 +122,8 @@ async def search_staff_availabilities(
         items = (await session.execute(stmt)).scalars().all()
 
         return ApiResponse.ok(
-            success_key="RETRIEVED",
-            default_message="Retrieved successfully.",
+            success_key="LISTED",
+            default_message="Data loaded successfully.",
             data={
                 "filters": filters,
                 "paging": {"total": int(total), "limit": limit, "offset": offset},
@@ -151,7 +151,7 @@ async def search_staff_availabilities(
     response_model=dict,
     response_model_exclude_none=True,
     responses={
-        **success_200_example(description="RETRIEVED", example=EX_ONE_200),
+        **success_200_example(description="FOUND", example=EX_ONE_200),
         **common_errors(error_model=dict, not_found={"staff_availability_id": "uuid"}, include_500=True),
     },
     operation_id="read_staff_availability",
@@ -169,8 +169,8 @@ async def read_staff_availability(staff_availability_id: UUID, session: AsyncSes
             )
 
         return ApiResponse.ok(
-            success_key="RETRIEVED",
-            default_message="Retrieved successfully.",
+            success_key="FOUND",
+            default_message="Data retrieved successfully.",
             data={"item": StaffAvailabilityResponse.model_validate(obj).model_dump(exclude_none=True)},
         )
 
@@ -192,7 +192,7 @@ async def read_staff_availability(staff_availability_id: UUID, session: AsyncSes
     response_model=dict,
     response_model_exclude_none=True,
     responses={
-        **success_200_example(description="REGISTERED", example=EX_CREATE_200),
+        **success_200_example(description="CREATED", example=EX_CREATE_200),
         **common_errors(error_model=dict, invalid={"payload": "invalid"}, include_500=True),
     },
     operation_id="create_staff_availability",
@@ -214,8 +214,8 @@ async def create_staff_availability(payload: StaffAvailabilityCreateModel, sessi
         await session.refresh(obj)
 
         return ApiResponse.ok(
-            success_key="REGISTERED",
-            default_message="Registered successfully.",
+            success_key="CREATED",
+            default_message="Created successfully.",
             data={"item": StaffAvailabilityResponse.model_validate(obj).model_dump(exclude_none=True)},
         )
 

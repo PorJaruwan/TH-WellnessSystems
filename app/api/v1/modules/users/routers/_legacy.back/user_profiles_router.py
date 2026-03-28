@@ -37,7 +37,7 @@ def read_all_user_profiles():
     
     logger.info(f"✅ Retrieved {len(res.data)} user_profiles")
     return ResponseHandler.success(
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["LISTED"][1],
         data={"total": len(res.data), "user_profiles": res.data}
     )
 
@@ -52,7 +52,7 @@ def read_user_profile_by_id(user_profile_id: UUID):
         })
 
     return ResponseHandler.success(
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"user_profiles": res.data[0]}
     )
 
@@ -67,7 +67,7 @@ def read_users_by_name(full_name: str = ""):
     user_with_fullname = transform_user_profiles_with_fullname(res.data)
 
     return ResponseHandler.success(
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["LISTED"][1],
         data={"total": len(user_with_fullname), "user_profiles": user_with_fullname}
     )
 
@@ -84,7 +84,7 @@ def create_user_profile(user_profiles: UserProfilesCreateModel):
             raise HTTPException(status_code=400, detail="Insert failed or no data returned.")
 
         return ResponseHandler.success(
-            message=ResponseCode.SUCCESS["REGISTERED"][1],
+            message=ResponseCode.SUCCESS["CREATED"][1],
             data={"user_profiles": res.data[0]}
         )
     except Exception as e:

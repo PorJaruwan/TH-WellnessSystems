@@ -33,7 +33,7 @@ async def create_staff_department(
         created = await svc.create(payload)
         return ResponseHandler.success_from_request(
             request,
-            message=ResponseCode.SUCCESS["REGISTERED"][1],
+            message=ResponseCode.SUCCESS["CREATED"][1],
             data={"item": created},
             status_code=201,
         )
@@ -46,7 +46,7 @@ async def create_staff_department(
         )
 
 
-@router.put(
+@router.patch(
     "/{staff_department_id:uuid}",
     response_class=UnicodeJSONResponse,
     response_model=StaffDepartmentsUpdateEnvelopeV2,
@@ -70,7 +70,7 @@ async def update_staff_department(
             )
         return ResponseHandler.success_from_request(
             request,
-            message=ResponseCode.SUCCESS["REGISTERED"][1],
+            message=ResponseCode.SUCCESS["UPDATED"][1],
             data={"item": updated},
         )
     except ValueError as e:
@@ -122,3 +122,4 @@ async def delete_staff_department(
             details={"error": str(e)},
             status_code=500,
         )
+
