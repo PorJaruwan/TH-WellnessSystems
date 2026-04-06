@@ -39,7 +39,7 @@ def respond_one(
         )
 
     return ResponseHandler.success(
-        message or ResponseCode.SUCCESS["RETRIEVED"][1],
+        message or ResponseCode.SUCCESS["FOUND"][1],
         data={key: _to_dict(model_cls, obj)},
     )
 
@@ -72,7 +72,7 @@ def respond_list_paged(
     payload = [_to_dict(model_cls, x) for x in items_list]
 
     return ResponseHandler.success(
-        message or ResponseCode.SUCCESS["RETRIEVED"][1],
+        message or ResponseCode.SUCCESS["LISTED"][1],
         data={
             "filters": filters,
             "paging": {

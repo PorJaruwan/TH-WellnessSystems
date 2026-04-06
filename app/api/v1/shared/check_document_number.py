@@ -59,7 +59,7 @@ def read_document_no(document_sequences_id: UUID):
         return ResponseHandler.error(*ResponseCode.DATA["NOT_FOUND"], details={"document_sequences_id": str(document_sequences_id)})
     
     return ResponseHandler.success(
-        message=ResponseCode.SUCCESS["RETRIEVED"][1],
+        message=ResponseCode.SUCCESS["FOUND"][1],
         data={"document_sequences": res.data[0]}
     )
 

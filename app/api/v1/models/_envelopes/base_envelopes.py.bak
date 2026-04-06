@@ -1,0 +1,120 @@
+# ==========================================================
+# Type-safe Envelopes (MATCH ResponseHandler.py)
+# success: {status, message, data}
+# error:   {status, error_code, message, details}
+# ==========================================================
+# app/api/v1/models/_envelopes/base_envelopes.py
+
+from __future__ import annotations
+
+from datetime import datetime
+from typing import Any, Dict, Generic, Literal, Optional, TypeVar
+
+from pydantic import BaseModel, ConfigDict, Field
+
+
+T = TypeVar("T")
+
+
+
+class ORMBaseModel(BaseModel):
+    """
+    Base Pydantic model that supports SQLAlchemy ORM objects (Pydantic v2).
+    """
+    model_config = ConfigDict(from_attributes=True)
+
+class EnvelopeBase(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+class EnvelopeMeta(ORMBaseModel):
+    """
+    Optional metadata for observability & debugging (safe defaults).
+    """
+    request_id: Optional[str] = None
+    path: Optional[str] = None
+    trace_id: Optional[str] = None
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+
+class SuccessEnvelope(ORMBaseModel, Generic[T]):
+    """
+    Standard success envelope used by all endpoints.
+    """
+    status: Literal["success"] = "success"
+    status_code: int = Field(default=200, description="Mirror HTTP status code.")
+    #status_code: int = 200
+    message: str = "OK"
+    data: T
+    meta: Optional[EnvelopeMeta] = None
+
+
+
+class ErrorDetail(ORMBaseModel):
+    """
+    Optional structured detail for errors (field-level, validation, etc.)
+    Keep it flexible and small.
+    """
+    field: Optional[str] = None
+    issue: Optional[str] = None
+    hint: Optional[str] = None
+    extra: Optional[Dict[str, Any]] = None
+
+
+class ErrorEnvelope(ORMBaseModel):
+    """
+    Standard error envelope used by all endpoints.
+
+    Notes:
+    - `error_code` is your internal stable code (e.g. SYS_001, AUTH_001, BOOK_404).
+    - `details` is intentionally flexible to support many error shapes.
+    """
+    status: Literal["error"] = "error"
+    status_code: int = Field(..., ge=400, le=599)
+    error_code: str = Field(..., min_length=1, max_length=50)
+    message: str = Field(..., min_length=1, max_length=500)
+
+    # Flexible details (ex: {"error": "...", "path": "..."} or {"errors":[...]} )
+    details: Dict[str, Any] = Field(default_factory=dict)
+
+    # Optional typed details (nice for validation / field errors)
+    errors: Optional[list[ErrorDetail]] = None
+
+    meta: Optional[EnvelopeMeta] = None
+
+
+# class ErrorEnvelope(ORMBaseModel):
+#     status: Literal["error"]
+#     status_code: int = Field(..., description="Mirror HTTP status code.")
+#     error_code: str
+#     message: str
+#     details: Optional[Dict[str, Any]] = Field(
+#         default_factory=dict,
+#         description="Optional error details (defaults to {})."
+#     )
+
+
+# Optional: a reusable paginated payload structure (if you want one standard)
+class PageInfo(ORMBaseModel):
+    page: int = Field(1, ge=1)
+    page_size: int = Field(20, ge=1, le=200)
+    total: int = Field(0, ge=0)
+
+
+class PaginatedPayload(ORMBaseModel, Generic[T]):
+    items: list[T]
+    page_info: PageInfo
+
+
+class Paging(BaseModel):
+    total: int
+    limit: int
+    offset: int
+
+
+class Sort(BaseModel):
+    by: str
+    order: Literal["asc", "desc"]
+
+
+# Backward-compat alias (legacy imports)
+EnvelopeBase = ORMBaseModel

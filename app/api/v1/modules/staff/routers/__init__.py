@@ -43,9 +43,9 @@ router.include_router(staff_departments_read_router, prefix="/departments")
 router.include_router(staff_departments_router, prefix="/departments")
 
 # Services: /staff/services/...
-router.include_router(staff_services_search_router, prefix="/services")
-router.include_router(staff_services_read_router, prefix="/services")
-router.include_router(staff_services_router, prefix="/services")
+# router.include_router(staff_services_search_router, prefix="/services")
+# router.include_router(staff_services_read_router, prefix="/services")
+# router.include_router(staff_services_router, prefix="/services")
 
 # Leave: /staff/leave/...
 router.include_router(staff_leave_search_router, prefix="/leave")

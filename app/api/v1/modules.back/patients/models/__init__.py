@@ -1,9 +1,0 @@
-"""patients.models package
-
-WellPlus Standard entrypoints:
-- Request schemas: from .schemas import ...
-- Response DTOs:   from .dtos import ...
-- Envelopes:       from ._envelopes import ...
-"""
-from .schemas import *  # noqa
-from .dtos import *  # noqa

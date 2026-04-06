@@ -52,16 +52,38 @@ class ResponseCode:
     }
 
     SUCCESS = {
-        "REGISTERED": ("SUCCESS_001", "Registered successfully."),
-        "UPDATED": ("SUCCESS_002", "Updated successfully."),
-        "RETRIEVED": ("SUCCESS_003", "Retrieved successfully."),
-        "DELETED": ("SUCCESS_004", "Deleted successfully."),
+        "OK": ("SUCCESS_200", "Success."),
+        "CREATED": ("SUCCESS_201", "Created successfully."),
+        "UPDATED": ("SUCCESS_200", "Updated successfully."),
+        "DELETED": ("SUCCESS_200", "Deleted successfully."),
+        "FOUND": ("SUCCESS_200", "Data retrieved successfully."),
+        "LISTED": ("SUCCESS_200", "Data loaded successfully."),
+
+        # backward compatibility
+        "REGISTERED": ("SUCCESS_201", "Created successfully."),
+        "RETRIEVED": ("SUCCESS_200", "Data retrieved successfully."),
     }
+
+    # SUCCESS = {
+    #     "REGISTERED": ("SUCCESS_001", "Registered successfully."),
+    #     "UPDATED": ("SUCCESS_002", "Updated successfully."),
+    #     "RETRIEVED": ("SUCCESS_003", "Retrieved successfully."),
+    #     "DELETED": ("SUCCESS_004", "Deleted successfully."),
+    # }
 
     DATA = {
         "NOT_FOUND": ("DATA_001", "Data not found."),
         "EMPTY": ("DATA_002", "Data empty."),
         "INVALID": ("DATA_003", "Invalid data."),
+    }
+
+    ERROR = {
+        "VALIDATION": ("VALID_001", "Validation error."),
+        "BAD_REQUEST": ("REQ_400", "Bad request."),
+        "NOT_FOUND": ("DATA_001", "Data not found."),
+        "CONFLICT": ("DB_002", "Duplicate entry found."),
+        "UNAUTHORIZED": ("AUTH_002", "Unauthorized access."),
+        "INTERNAL": ("SYS_001", "Internal server error."),
     }
 
 

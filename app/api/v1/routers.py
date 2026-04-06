@@ -21,8 +21,6 @@ def get_api_router() -> APIRouter:
     from app.api.v1.modules.ai.routers import router as ai_router
     api_router.include_router(ai_router)
 
-    from app.api.v1.modules.ai.routers import router as ai_router
-    api_router.include_router(ai_router)
     
     ##-- Chat
     from app.api.v1.modules.chat.routers import router as chat_router

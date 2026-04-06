@@ -1,3 +1,0 @@
-from .kb_documents_repository import KBDocumentsRepository
-from .kb_chunks_repository import KBChunksRepository
-from .kb_search_repository import KBSearchRepository
