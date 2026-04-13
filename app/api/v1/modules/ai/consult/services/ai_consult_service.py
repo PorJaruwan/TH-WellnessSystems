@@ -1,28 +1,25 @@
-# app/api/v1/modules/ai/consult/services/ai_consult_service.py
-
+# # app/api/v1/modules/ai/consult/services/ai_consult_service.py
 from __future__ import annotations
 
 import uuid
-from typing import Any, Tuple
+from typing import Any, Optional, Tuple
+from uuid import UUID
 
-from sqlalchemy import select, func, text, bindparam
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import func, select, text, bindparam
 from sqlalchemy.dialects.postgresql import JSONB
 
-import logging
-
-logger = logging.getLogger(__name__)
-
-
 from app.db.models.ai_topics import AITopic
-from app.api.v1.modules.chat.models.chat_models import ChatSession  # ✅ ใช้ตัวนี้ (ตรงกับไฟล์ chat_models.py)
-
+from app.api.v1.modules.chat.models.chat_models import ChatSession, ChatMessage
 from app.api.v1.modules.ai.consult.models.dtos import (
     AITopicItem,
+    AITopicsList,
     AITopicCards,
+    AITopicCardsPayload,
 )
-
-from app.api.v1.modules.chat.models.chat_models import ChatMessage
+from app.api.v1.modules.ai.consult.repositories.ai_topics_repository import (
+    AITopicsRepository,
+)
 
 DEFAULT_DISCLAIMER_TH = (
     "ข้อมูลทั่วไปเพื่อการให้ความรู้ ไม่ใช่คำแนะนำทางการแพทย์ "
@@ -34,123 +31,176 @@ DEFAULT_DISCLAIMER_EN = (
 )
 
 
+class AITopicsService:
+    def __init__(self, repo: AITopicsRepository):
+        self.repo = repo
+
+    @staticmethod
+    def _to_iso(v):
+        return v.isoformat() if v else None
+
+    @staticmethod
+    def _norm_lang(lang: str | None) -> str:
+        if not lang:
+            return "TH"
+        value = lang.strip().upper()
+        if value.startswith("EN") or "EN" in value:
+            return "EN"
+        return "TH"
+
+    def _pick_label_from_row(self, row: dict[str, Any], lang: str) -> str:
+        if lang == "EN":
+            return (
+                row.get("topic_name_en")
+                or row.get("label_en")
+                or row.get("topic_name_th")
+                or row.get("label_th")
+                or row.get("topic_code")
+            )
+        return (
+            row.get("topic_name_th")
+            or row.get("label_th")
+            or row.get("topic_name_en")
+            or row.get("label_en")
+            or row.get("topic_code")
+        )
+
+    def _pick_desc_from_row(self, row: dict[str, Any], lang: str) -> str | None:
+        if lang == "EN":
+            return row.get("description_en") or row.get("description_th")
+        return row.get("description_th") or row.get("description_en")
+
+    def _pick_category_name_from_row(self, row: dict[str, Any], lang: str) -> str | None:
+        if lang == "EN":
+            return row.get("category_name_en") or row.get("category_name_th")
+        return row.get("category_name_th") or row.get("category_name_en")
+
+    def _map_item(self, row: dict[str, Any], lang: str) -> AITopicItem:
+        return AITopicItem(
+            id=str(row["id"]) if row.get("id") else None,
+            company_code=row.get("company_code"),
+            topic_code=row["topic_code"],
+            label=self._pick_label_from_row(row, lang),
+            description=self._pick_desc_from_row(row, lang),
+            sort_order=row.get("sort_order", 0),
+            category_id=str(row["ai_topic_category_id"]) if row.get("ai_topic_category_id") else None,
+            category_code=row.get("category_code"),
+            category_name=self._pick_category_name_from_row(row, lang),
+            parent_category_id=str(row["parent_category_id"]) if row.get("parent_category_id") else None,
+            topic_type=row.get("topic_type"),
+            topic_level=row.get("topic_level"),
+            intent_code=row.get("intent_code"),
+            output_format=row.get("output_format"),
+            action_type=row.get("action_type"),
+            requires_auth=bool(row.get("requires_auth", False)),
+            requires_patient_context=bool(row.get("requires_patient_context", False)),
+            requires_booking_context=bool(row.get("requires_booking_context", False)),
+            requires_payment_context=bool(row.get("requires_payment_context", False)),
+            requires_service_context=bool(row.get("requires_service_context", False)),
+            is_active=bool(row.get("is_active", True)),
+            is_system=bool(row.get("is_system", True)),
+            is_default=bool(row.get("is_default", False)),
+            version_no=int(row.get("version_no", 1) or 1),
+            created_at=self._to_iso(row.get("created_at")),
+            updated_at=self._to_iso(row.get("updated_at")),
+        )
+
+    @staticmethod
+    def _parse_default_cards(default_cards: object) -> AITopicCards:
+        cards = AITopicCards()
+
+        if isinstance(default_cards, dict):
+            cards.check = [str(x) for x in (default_cards.get("check") or [])]
+            cards.self_care = [str(x) for x in (default_cards.get("self_care") or [])]
+            cards.red_flag = [
+                str(x)
+                for x in (default_cards.get("red_flag") or default_cards.get("red_flags") or [])
+            ]
+            cards.cause = [str(x) for x in (default_cards.get("cause") or [])]
+            return cards
+
+        if isinstance(default_cards, list):
+            for block in default_cards:
+                if not isinstance(block, dict):
+                    continue
+                block_type = (block.get("type") or "").lower()
+                items = block.get("items") or []
+                if not isinstance(items, list):
+                    continue
+
+                if block_type in ("check", "assessment", "questions"):
+                    cards.check = [str(x) for x in items]
+                elif block_type in ("self_care", "selfcare", "care"):
+                    cards.self_care = [str(x) for x in items]
+                elif block_type in ("red_flag", "red_flags", "redflag", "redflags", "when_to_see_doctor"):
+                    cards.red_flag = [str(x) for x in items]
+                elif block_type in ("cause", "causes"):
+                    cards.cause = [str(x) for x in items]
+        return cards
+
+    async def list_topics(
+        self,
+        *,
+        company_code: Optional[str],
+        lang: str | None,
+        category_id: Optional[UUID],
+        q: Optional[str],
+        is_active: Optional[bool],
+        include_uncategorized: bool,
+        limit: int,
+        offset: int,
+        sort_by: str,
+        sort_dir: str,
+    ) -> tuple[AITopicsList, int]:
+        lang_norm = self._norm_lang(lang)
+        rows, total = await self.repo.list_topics(
+            company_code=company_code,
+            category_id=category_id,
+            q=q,
+            is_active=is_active,
+            include_uncategorized=include_uncategorized,
+            limit=limit,
+            offset=offset,
+            sort_by=sort_by,
+            sort_dir=sort_dir,
+        )
+        items = [self._map_item(row, lang_norm) for row in rows]
+        return AITopicsList(items=items), total
+
+    async def get_topic_cards(
+        self,
+        *,
+        company_code: Optional[str],
+        topic_code: str,
+        lang: str | None,
+    ) -> Optional[AITopicCardsPayload]:
+        lang_norm = self._norm_lang(lang)
+        row = await self.repo.get_topic_cards(
+            company_code=company_code,
+            topic_code=topic_code,
+        )
+        if not row:
+            return None
+
+        cards = self._parse_default_cards(row.get("default_cards"))
+        disclaimer = DEFAULT_DISCLAIMER_EN if lang_norm == "EN" else DEFAULT_DISCLAIMER_TH
+
+        return AITopicCardsPayload(
+            topic_code=row["topic_code"],
+            cards=cards,
+            disclaimer=disclaimer,
+        )
+
+
+# =========================
+# legacy helpers kept below
+# =========================
+
 def _to_uuid(v: str | uuid.UUID) -> uuid.UUID:
     if isinstance(v, uuid.UUID):
         return v
     return uuid.UUID(str(v))
 
-
-def _norm_lang(lang: str | None) -> str:
-    if not lang:
-        return "TH"
-    u = lang.upper()
-    if u.startswith("EN") or "EN" in u:
-        return "EN"
-    return "TH"
-
-
-def _pick_label(t: AITopic, lang: str) -> str:
-    return t.label_en if (lang == "EN" and t.label_en) else t.label_th
-
-
-def _pick_desc(t: AITopic, lang: str) -> str | None:
-    if lang == "EN":
-        return t.description_en or t.description_th
-    return t.description_th or t.description_en
-
-
-
-def _parse_default_cards(default_cards: object) -> AITopicCards:
-    """
-    รองรับ 2 format:
-      A) {check:[...], cause:[...], self_care:[...], red_flag:[...]}
-      B) [{type:"check", items:[...]}, ...]
-    """    
-    cards = AITopicCards()
-
-    if isinstance(default_cards, dict):
-        # ✅ accept both new key red_flag and legacy red_flag
-        cards.check = [str(x) for x in (default_cards.get("check") or [])]
-        cards.self_care = [str(x) for x in (default_cards.get("self_care") or [])]
-        cards.red_flag = [str(x) for x in (default_cards.get("red_flag") or default_cards.get("red_flags") or [])]
-        cards.cause = [str(x) for x in (default_cards.get("cause") or [])]
-        return cards
-
-    if isinstance(default_cards, list):
-        for block in default_cards:
-            if not isinstance(block, dict):
-                continue
-            t = (block.get("type") or "").lower()
-            items = block.get("items") or []
-            if not isinstance(items, list):
-                continue
-            if t in ("check", "assessment", "questions"):
-                cards.check = [str(x) for x in items]
-            elif t in ("self_care", "selfcare", "care"):
-                cards.self_care = [str(x) for x in items]
-            elif t in ("red_flag", "red_flags", "redflag", "redflags", "when_to_see_doctor"):
-                cards.red_flag = [str(x) for x in items]
-            elif t in ("cause", "causes"):
-                cards.cause = [str(x) for x in items]
-    return cards
-
-
-
-async def list_ai_topics(
-    db: AsyncSession,
-    *,
-    company_code: str,
-    lang: str | None = None,
-) -> list[AITopicItem]:
-    lang2 = _norm_lang(lang)
-
-    q = (
-        select(AITopic)
-        .where(AITopic.company_code == company_code, AITopic.is_active.is_(True))
-        .order_by(AITopic.sort_order.asc(), AITopic.topic_code.asc())
-    )
-    res = await db.execute(q)
-    rows = res.scalars().all()
-
-    return [
-        AITopicItem(
-            topic_code=r.topic_code,
-            label=_pick_label(r, lang2),
-            description=_pick_desc(r, lang2),
-            sort_order=r.sort_order,
-        )
-        for r in rows
-    ]
-
-
-async def get_ai_topic_cards(
-    db: AsyncSession,
-    *,
-    company_code: str,
-    topic_code: str,
-    lang: str | None = None,
-):
-    lang2 = _norm_lang(lang)
-
-    q = select(AITopic).where(
-        AITopic.company_code == company_code,
-        AITopic.topic_code == topic_code,
-        AITopic.is_active.is_(True),
-    )
-    res = await db.execute(q)
-    topic = res.scalar_one_or_none()
-    if not topic:
-        return None
-
-    cards = _parse_default_cards(topic.default_cards)
-    disclaimer = DEFAULT_DISCLAIMER_EN if lang2 == "EN" else DEFAULT_DISCLAIMER_TH
-
-    return topic, cards, disclaimer
-
-
-# ============================================================
-# AI Consult Sessions (Create or Re-use active session) - ORM
-# ============================================================
 
 async def create_or_get_ai_consult_session(
     db: AsyncSession,
@@ -161,14 +211,6 @@ async def create_or_get_ai_consult_session(
     language: str,
     entry_point: str,
 ) -> Tuple[dict[str, Any] | None, str]:
-    """
-    กันสร้าง session ซ้ำ:
-      - ถ้ามี ACTIVE session เดิมของ patient+topic เดียวกัน (ai_consult/patient)
-        -> return session เดิม (flag="REUSED")
-      - ไม่งั้นสร้างใหม่ (flag="CREATED")
-    """
-
-    # 1) Validate topic exists & active
     chk = await db.execute(
         select(AITopic.id).where(
             AITopic.company_code == company_code,
@@ -181,7 +223,6 @@ async def create_or_get_ai_consult_session(
 
     pid = _to_uuid(patient_id)
 
-    # 2) Find active session (ORM)
     q_find = (
         select(ChatSession)
         .where(
@@ -206,24 +247,23 @@ async def create_or_get_ai_consult_session(
             "patient_id": str(sess.patient_id),
             "topic_code": sess.topic_code,
             "language": sess.language or "th-TH",
-            "entry_point": (sess.meta or {}).get("entry_point", "pre_consult"),  # ✅ meta ไม่ใช่ metadata
+            "entry_point": (sess.meta or {}).get("entry_point", "pre_consult"),
             "app_context": sess.app_context or "ai_consult",
             "channel": sess.channel or "patient",
             "status": sess.status or "active",
         }
         return out, "REUSED"
 
-    # 3) Create new session (ORM object)
     new_session = ChatSession(
         company_code=company_code,
         patient_id=pid,
         app_context="ai_consult",
         channel="patient",
-        status="active",  # override default "open"
+        status="active",
         topic_code=topic_code,
         language=language or "th-TH",
         last_activity_at=func.now(),
-        meta={"entry_point": entry_point or "pre_consult"},  # ✅ meta ไม่ใช่ metadata
+        meta={"entry_point": entry_point or "pre_consult"},
     )
 
     db.add(new_session)
@@ -244,10 +284,6 @@ async def create_or_get_ai_consult_session(
     return out, "CREATED"
 
 
-# ============================================================
-# Quick Actions (Chips): Causes / Self-care / When to see doctor
-# ============================================================
-
 def _action_title(action: str, lang: str) -> str:
     if lang == "EN":
         return {
@@ -259,7 +295,8 @@ def _action_title(action: str, lang: str) -> str:
         "cause": "อาจเกิดจาก",
         "self_care": "ดูแลเบื้องต้น",
         "red_flag": "ควรพบแพทย์เมื่อ",
-    }.get(action, "ข้อมูลเพิ่มเติม")
+    }.get(action, "ข้อมูลด่วน")
+
 
 
 def _bullets(items: list[str]) -> str:
@@ -282,6 +319,73 @@ def _default_chips(lang: str) -> list[dict[str, Any]]:
     ]
 
 
+# ============================================================
+# backward-compatible wrappers for old routers
+# ============================================================
+
+async def list_ai_topics(
+    db: AsyncSession,
+    *,
+    company_code: str,
+    lang: str | None = None,
+    category_id: UUID | None = None,
+    q: str | None = None,
+) -> list[AITopicItem]:
+    """
+    Legacy function kept for old routers.
+    Returns only items list, matching old behavior.
+    """
+    repo = AITopicsRepository(db)
+    service = AITopicsService(repo)
+
+    payload, _total = await service.list_topics(
+        company_code=company_code,
+        lang=lang,
+        category_id=category_id,
+        q=q,
+        is_active=True,
+        include_uncategorized=True,
+        limit=100,
+        offset=0,
+        sort_by="sort_order",
+        sort_dir="asc",
+    )
+    return payload.items
+
+
+async def get_ai_topic_cards(
+    db: AsyncSession,
+    *,
+    company_code: str,
+    topic_code: str,
+    lang: str | None = None,
+):
+    """
+    Legacy function kept for old routers/actions.
+    Returns tuple(topic_like, cards, disclaimer) to preserve old contract.
+    """
+    repo = AITopicsRepository(db)
+    service = AITopicsService(repo)
+
+    row = await repo.get_topic_cards(
+        company_code=company_code,
+        topic_code=topic_code,
+    )
+    if not row:
+        return None
+
+    lang_norm = service._norm_lang(lang)
+    cards = service._parse_default_cards(row.get("default_cards"))
+    disclaimer = DEFAULT_DISCLAIMER_EN if lang_norm == "EN" else DEFAULT_DISCLAIMER_TH
+
+    class _TopicLite:
+        def __init__(self, topic_code: str):
+            self.topic_code = topic_code
+
+    topic = _TopicLite(topic_code=row["topic_code"])
+    return topic, cards, disclaimer
+
+
 async def run_quick_action(
     db: AsyncSession,
     *,
@@ -291,41 +395,38 @@ async def run_quick_action(
     action: str,
     lang: str | None = None,
 ) -> dict[str, Any] | str:
-    """Execute a quick action and append an assistant message into chat_messages.
-
-    Returns:
-      - "SESSION_NOT_FOUND" | "TOPIC_NOT_SET" | "TOPIC_NOT_FOUND"
-      - dict payload (assistant_text, triage, ui_cards, retrieval)
     """
-
+    Legacy quick action executor for old action router.
+    """
     sid = _to_uuid(session_id)
     pid = _to_uuid(patient_id)
 
-    # 1) owned session
     q_sess = select(ChatSession).where(
         ChatSession.id == sid,
         ChatSession.company_code == company_code,
         ChatSession.patient_id == pid,
-    )    
+    )
     sess = (await db.execute(q_sess)).scalar_one_or_none()
     if not sess:
         return "SESSION_NOT_FOUND"
 
-    # ✅ cache primitives (กัน greenlet_spawn)
     topic_code = sess.topic_code
     if not topic_code:
         return "TOPIC_NOT_SET"
 
-    lang2 = _norm_lang(lang or sess.language)
+    lang2 = AITopicsService._norm_lang(lang or sess.language)
 
-
-    # 2) topic cards
-    res = await get_ai_topic_cards(db, company_code=company_code, topic_code=topic_code, lang=lang2)
+    res = await get_ai_topic_cards(
+        db,
+        company_code=company_code,
+        topic_code=topic_code,
+        lang=lang2,
+    )
     if not res:
         return "TOPIC_NOT_FOUND"
+
     _topic, cards, disclaimer = res
 
-    items: list[str]
     if action == "cause":
         items = cards.cause
     elif action == "self_care":
@@ -339,9 +440,9 @@ async def run_quick_action(
     body = _bullets(items)
 
     if lang2 == "EN":
-        empty_msg = "No predefined items for this topic yet. Please describe your symptoms and I’ll help assess." 
+        empty_msg = "No predefined items for this topic yet. Please describe your symptoms and I’ll help assess."
     else:
-        empty_msg = "ยังไม่มีรายการสำเร็จรูปสำหรับหัวข้อนี้ กรุณาเล่าอาการเพิ่มเติม แล้วฉันจะช่วยประเมินเบื้องต้น" 
+        empty_msg = "ยังไม่มีรายการสำเร็จรูปสำหรับหัวข้อนี้ กรุณาเล่าอาการเพิ่มเติม แล้วฉันจะช่วยประเมินเบื้องต้น"
 
     assistant_text = f"{title}\n{body}".strip() if body else f"{title}\n{empty_msg}"
     assistant_text = f"{assistant_text}\n\n{disclaimer}".strip()
@@ -349,7 +450,6 @@ async def run_quick_action(
     triage: dict[str, Any] = {}
     ui_cards: list[dict[str, Any]] = _default_chips(lang2)
 
-    # If user asks "When to see a doctor", surface escalation CTA.
     if action == "red_flag" and items:
         if lang2 == "EN":
             triage = {"level": "recommended", "reason": "Some symptoms may require medical evaluation."}
@@ -360,11 +460,9 @@ async def run_quick_action(
             {"type": "cta", "label": "Doctor Consultation Recommended", "action": {"type": "open_escalation"}}
         )
 
-        # Stamp triage into session header for UI
         sess.triage_level = triage.get("level")
         sess.triage_reason = triage.get("reason")
 
-    # 3) append assistant message
     asst_msg = ChatMessage(
         company_code=company_code,
         session_id=sid,
@@ -392,12 +490,6 @@ async def run_quick_action(
     }
 
 
-
-# ============================================================
-# Escalation (Handoff to Booking)
-# ============================================================
-
-
 def _safe_str(v) -> str | None:
     if v is None:
         return None
@@ -417,20 +509,12 @@ async def create_escalation_handoff(
     lang: str | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any] | str:
-    """Create chat_escalations row and return a booking handoff payload.
-
-    Preferred implementation: call DB RPC `public.rpc_request_escalation(...)` (from V5_full).
-    Fallback: insert into chat_escalations directly and stamp chat_sessions metadata.
-
-    Returns:
-      - "SESSION_NOT_FOUND"
-      - dict payload (escalation_id, deeplink, handoff)
     """
-
+    Legacy escalation helper kept for routers that still import it.
+    """
     sid = _to_uuid(session_id)
     pid = _to_uuid(patient_id)
 
-    # 1) owned session
     q_sess = select(ChatSession).where(
         ChatSession.id == sid,
         ChatSession.company_code == company_code,
@@ -440,28 +524,18 @@ async def create_escalation_handoff(
     if not sess:
         return "SESSION_NOT_FOUND"
 
-    # ------------------------------------------------------------
-    # IMPORTANT (Async SQLAlchemy):
-    # Do NOT access ORM attributes after commit/rollback.
-    # Rollback can expire ORM objects and trigger lazy IO which
-    # causes: greenlet_spawn has not been called (await_only()).
-    # Cache everything we need NOW (primitives only).
-    # ------------------------------------------------------------
     sess_patient_id = _safe_str(sess.patient_id)
     sess_language = sess.language
-    sess_topic_code = sess.topic_code  # ✅ correct
-    sess_triage_reason = sess.triage_reason
-    sess_triage_level = sess.triage_level
+    sess_topic_code = sess.topic_code
+    sess_triage_reason = getattr(sess, "triage_reason", None)
+    sess_triage_level = getattr(sess, "triage_level", None)
 
-    # 2) derive defaults
-    lang2 = _norm_lang(lang or sess_language)  # cached
-    topic_code = sess_topic_code  # cached
+    lang2 = AITopicsService._norm_lang(lang or sess_language)
+    topic_code = sess_topic_code
 
-    # Normalize reason: prefer request reason, then session triage_reason
     final_reason = (reason or sess_triage_reason or "").strip() or None
     final_triage = (triage_level or sess_triage_level or "").strip() or None
 
-    # Escalation metadata (keep small + UI friendly)
     meta: dict[str, Any] = {}
     if isinstance(metadata, dict):
         meta.update(metadata)
@@ -475,13 +549,10 @@ async def create_escalation_handoff(
 
     escalation_id: str | None = None
 
-    # 3) Try RPC first (recommended; matches DB design you provided)
     try:
         rpc_sql = text(
             "select public.rpc_request_escalation(:sid, :triage_level, :reason, :metadata) as escalation_id"
-        ).bindparams(
-            bindparam("metadata", type_=JSONB)
-        )
+        ).bindparams(bindparam("metadata", type_=JSONB))
 
         res = await db.execute(
             rpc_sql,
@@ -492,7 +563,6 @@ async def create_escalation_handoff(
                 "metadata": meta,
             },
         )
-
         escalation_id = _safe_str(res.scalar_one_or_none())
 
         if not escalation_id:
@@ -500,20 +570,17 @@ async def create_escalation_handoff(
 
         await db.commit()
 
-    except Exception as e:
-        # 🔴 สำคัญมาก: ต้อง rollback ก่อน
+    except Exception:
         await db.rollback()
 
-        logger.exception("rpc_request_escalation failed, fallback to direct insert")
-
-        insert_sql = text("""
+        insert_sql = text(
+            """
             insert into public.chat_escalations
             (session_id, company_code, triage_level, reason, metadata)
             values (:sid, :company_code, :triage_level, :reason, :metadata)
             returning id
-        """).bindparams(
-            bindparam("metadata", type_=JSONB)
-        )
+            """
+        ).bindparams(bindparam("metadata", type_=JSONB))
 
         res2 = await db.execute(
             insert_sql,
@@ -525,24 +592,18 @@ async def create_escalation_handoff(
                 "metadata": meta,
             },
         )
-
         escalation_id = _safe_str(res2.scalar_one_or_none())
-
         await db.commit()
 
-
     if not escalation_id:
-        # rare, but keep safe
         raise RuntimeError("failed to create escalation")
 
-    # 5) Build handoff payload for booking page prefill
-    # Note: keep it consistent with your DB/RPC design.
     handoff = {
         "handoff_type": "booking_prefill",
         "escalation_id": escalation_id,
         "session_id": str(sid),
         "company_code": company_code,
-        "patient_id": sess_patient_id,  # cached (avoid ORM IO after commit/rollback)
+        "patient_id": sess_patient_id,
         "topic_code": topic_code,
         "triage": {"level": final_triage, "reason": final_reason},
         "prefill": {
@@ -555,14 +616,13 @@ async def create_escalation_handoff(
         },
     }
 
-    # Optional deeplink convention (your FlutterFlow can map this)
     deeplink = f"wellplus://booking?handoff_id={escalation_id}&session_id={sid}"
 
     return {
         "escalation_id": escalation_id,
         "session_id": str(sid),
         "company_code": company_code,
-        "patient_id": sess_patient_id,  # cached (avoid ORM IO after commit/rollback)
+        "patient_id": sess_patient_id,
         "topic_code": topic_code,
         "triage_level": final_triage,
         "reason": final_reason,
@@ -570,6 +630,7 @@ async def create_escalation_handoff(
         "deeplink": deeplink,
         "handoff": handoff,
     }
+
 
 async def list_my_ai_sessions(
     db: AsyncSession,
@@ -579,15 +640,9 @@ async def list_my_ai_sessions(
     status: str = "active",
     limit: int = 20,
 ) -> list[dict[str, Any]]:
-    """List AI consult sessions for resume.
-
-    Filter:
-      - app_context='ai_consult'
-      - channel='patient'
-      - patient_id ของคนปัจจุบัน
-      - status: active|closed|all (อื่น ๆ -> active)
     """
-
+    Legacy helper kept for routers that still import it.
+    """
     pid = _to_uuid(patient_id)
     st = (status or "active").strip().lower()
 

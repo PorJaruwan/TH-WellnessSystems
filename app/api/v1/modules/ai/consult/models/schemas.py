@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Literal, Optional
+from uuid import UUID
 
 from pydantic import Field
 
@@ -13,8 +14,19 @@ class CreateAIConsultSessionRequest(ORMBaseModel):
     entry_point: Optional[str] = Field(default="pre_consult", description="e.g. pre_consult, homepage_free_ai")
 
 
+class SearchAITopicsRequest(ORMBaseModel):
+    lang: Optional[str] = Field(default=None, description="TH|EN or th-TH/en-US")
+    category_id: Optional[UUID] = Field(default=None)
+    q: Optional[str] = Field(default=None)
+    is_active: Optional[bool] = Field(default=True)
+    include_uncategorized: bool = Field(default=True)
+    limit: int = Field(default=20, ge=1, le=100)
+    offset: int = Field(default=0, ge=0)
+    sort_by: str = Field(default="sort_order")
+    sort_dir: Literal["asc", "desc"] = Field(default="asc")
+
+
 class AIQuickActionRequest(ORMBaseModel):
-    """Request payload for chip actions: Causes / Self-care / When to see a doctor."""
     action: Literal["cause", "self_care", "red_flag"] = Field(
         ..., description="cause | self_care | red_flag"
     )

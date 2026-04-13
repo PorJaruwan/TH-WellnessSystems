@@ -209,3 +209,7 @@
 {"asctime": "2026-04-13 13:30:19,334", "levelname": "INFO", "name": "main", "message": "ENV=dev"}
 {"asctime": "2026-04-13 13:30:19,334", "levelname": "INFO", "name": "main", "message": "API_PREFIX=/api/v1"}
 {"asctime": "2026-04-13 13:38:38,804", "levelname": "INFO", "name": "main", "message": "\ud83e\uddf9 SQLAlchemy engine disposed"}
+{"asctime": "2026-04-13 14:51:53,786", "levelname": "INFO", "name": "main", "message": "\u2705 API startup"}
+{"asctime": "2026-04-13 14:51:53,788", "levelname": "INFO", "name": "main", "message": "ENV=dev"}
+{"asctime": "2026-04-13 14:51:53,788", "levelname": "INFO", "name": "main", "message": "API_PREFIX=/api/v1"}
+{"asctime": "2026-04-13 14:59:13,349", "levelname": "INFO", "name": "main", "message": "\ud83e\uddf9 SQLAlchemy engine disposed"}

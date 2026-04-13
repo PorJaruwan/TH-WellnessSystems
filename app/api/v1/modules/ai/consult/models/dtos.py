@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List, Optional, Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -10,10 +10,37 @@ class ORMBaseModel(BaseModel):
 
 
 class AITopicItem(ORMBaseModel):
+    id: Optional[str] = None
+    company_code: Optional[str] = None
     topic_code: str
     label: str
     description: Optional[str] = None
     sort_order: int = 0
+
+    category_id: Optional[str] = None
+    category_code: Optional[str] = None
+    category_name: Optional[str] = None
+    parent_category_id: Optional[str] = None
+
+    topic_type: Optional[str] = None
+    topic_level: Optional[str] = None
+    intent_code: Optional[str] = None
+    output_format: Optional[str] = None
+    action_type: Optional[str] = None
+
+    requires_auth: bool = False
+    requires_patient_context: bool = False
+    requires_booking_context: bool = False
+    requires_payment_context: bool = False
+    requires_service_context: bool = False
+
+    is_active: bool = True
+    is_system: bool = True
+    is_default: bool = False
+    version_no: int = 1
+
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
 
 
 class AITopicsList(ORMBaseModel):
@@ -21,7 +48,6 @@ class AITopicsList(ORMBaseModel):
 
 
 class AITopicCards(ORMBaseModel):
-    # ✅ order for UI: 1) check 2) self_care 3) red_flag 4) cause
     check: List[str] = Field(default_factory=list)
     self_care: List[str] = Field(default_factory=list)
     red_flag: List[str] = Field(default_factory=list)
@@ -56,6 +82,7 @@ class AIConsultSessionDetailPayload(AIConsultSessionItem):
     triage_reason: Optional[str] = None
     app_context: Optional[str] = None
     channel: Optional[str] = None
+
 
 class CreateAIConsultSessionPayload(ORMBaseModel):
     session_id: str
