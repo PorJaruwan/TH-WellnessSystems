@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from typing import Any
+from uuid import UUID
 
 from app.api.v1.modules.doctors.repositories.doctors_query_repository import (
     DoctorsQueryRepository,
@@ -37,6 +38,17 @@ class DoctorsQueryService:
 
         return []
 
+    @staticmethod
+    def _normalize_uuid(value: Any) -> UUID | None:
+        if value is None:
+            return None
+        if isinstance(value, UUID):
+            return value
+        try:
+            return UUID(str(value))
+        except (ValueError, TypeError):
+            return None
+
     async def get_doctors_by_service(
         self,
         params: DoctorByServiceQueryParams,
@@ -44,19 +56,39 @@ class DoctorsQueryService:
         rows = await self.repository.get_doctors_by_service(params=params)
 
         items: list[DoctorByServiceItemResponse] = []
+
         for row in rows:
             raw_locations = self._normalize_locations(row.get("locations"))
 
-            locations = [
-                DoctorLocationResponse(
-                    location_id=loc["location_id"],
-                    location_name=loc["location_name"],
+            locations: list[DoctorLocationResponse] = []
+            seen_location_ids: set[str] = set()
+
+            for loc in raw_locations:
+                if not isinstance(loc, dict):
+                    continue
+
+                normalized_location_id = self._normalize_uuid(loc.get("location_id"))
+                location_name = loc.get("location_name")
+
+                if normalized_location_id is None or not location_name:
+                    continue
+
+                location_key = str(normalized_location_id)
+                if location_key in seen_location_ids:
+                    continue
+
+                seen_location_ids.add(location_key)
+
+                locations.append(
+                    DoctorLocationResponse(
+                        location_id=normalized_location_id,
+                        location_name=location_name,
+                    )
                 )
-                for loc in raw_locations
-                if isinstance(loc, dict)
-                and loc.get("location_id") is not None
-                and loc.get("location_name") is not None
-            ]
+
+            duration_minutes = row.get("duration_minutes")
+            if duration_minutes is None:
+                duration_minutes = 0
 
             items.append(
                 DoctorByServiceItemResponse(
@@ -75,7 +107,7 @@ class DoctorsQueryService:
                     service_name=row["service_name"],
                     service_name_th=row.get("service_name_th"),
                     service_name_en=row.get("service_name_en"),
-                    duration_minutes=row["duration_minutes"],
+                    duration_minutes=int(duration_minutes),
                     locations=locations,
                 )
             )

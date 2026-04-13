@@ -20,8 +20,9 @@ class DoctorsQueryRepository:
     ) -> List[Dict[str, Any]]:
         filters = [
             "st.is_active = true",
-            "st.role = 'doctor'",
-            "ss.is_active = true",
+            "LOWER(st.role) = 'doctor'",
+            "sd.is_active = true",
+            "svd.is_active = true",
             "s.is_active = true",
         ]
 
@@ -39,7 +40,7 @@ class DoctorsQueryRepository:
             filters.append("s.company_code = :company_code")
 
         if params.company_code:
-            filters.append("st.company_code = :company_code")
+            filters.append("s.company_code = :company_code")
 
         if params.location_id:
             filters.append("l.id = CAST(:location_id AS uuid)")
@@ -75,15 +76,13 @@ class DoctorsQueryRepository:
                 st.email,
                 st.avatar_url,
                 st.main_location_id,
-                st.company_code AS staff_company_code,
 
                 s.id AS service_id,
                 s.service_code,
                 s.service_name,
                 s.service_name_th,
                 s.service_name_en,
-
-                ss.duration_minutes,
+                s.duration AS duration_minutes,
 
                 COALESCE(
                     json_agg(
@@ -96,11 +95,14 @@ class DoctorsQueryRepository:
                 ) AS locations
 
             FROM staff st
-            JOIN staff_services ss
-                ON ss.staff_id = st.id
-               AND ss.is_active = true
+            JOIN staff_departments sd
+                ON sd.staff_id = st.id
+               AND sd.is_active = true
+            JOIN services_departments svd
+                ON svd.department_id = sd.department_id
+               AND svd.is_active = true
             JOIN services s
-                ON s.id = ss.service_id
+                ON s.id = svd.service_id
                AND s.is_active = true
             LEFT JOIN staff_locations sl
                 ON sl.staff_id = st.id
@@ -120,13 +122,12 @@ class DoctorsQueryRepository:
                 st.email,
                 st.avatar_url,
                 st.main_location_id,
-                st.company_code,
                 s.id,
                 s.service_code,
                 s.service_name,
                 s.service_name_th,
                 s.service_name_en,
-                ss.duration_minutes
+                s.duration
 
             ORDER BY
                 st.staff_name ASC,

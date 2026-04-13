@@ -43,6 +43,8 @@ def _parse_cors_origins() -> List[str]:
         "https://we-l-l-plus-admin-35c1o0.flutterflow.app",
         "http://localhost:3000",
         "http://localhost:8080",
+        "https://app.wellplusplatform.com",
+
     ]
 
 

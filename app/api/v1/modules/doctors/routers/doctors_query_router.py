@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import Optional
 from uuid import UUID
 
@@ -22,6 +23,8 @@ from app.api.v1.modules.doctors.schemas.doctors_query_response import (
 from app.api.v1.modules.doctors.services.doctors_query_service import (
     DoctorsQueryService,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/doctors",
@@ -79,7 +82,16 @@ async def get_doctors_by_service(
         raise
 
     except Exception as exc:
+        logger.exception(
+            "Failed to fetch doctors by service. "
+            "service_id=%s service_code=%s location_id=%s primary_only=%s company_code=%s",
+            service_id,
+            service_code,
+            location_id,
+            primary_only,
+            company_code,
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch doctors by service: {str(exc)}",
+            detail="Failed to fetch doctors by service",
         ) from exc
