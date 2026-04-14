@@ -40,6 +40,7 @@ async def search_topics(
     company_code: str | None = Depends(current_company_code),
     lang: str | None = Query(default=None, description="TH|EN or th-TH/en-US"),
     category_id: UUID | None = Query(default=None),
+    category_code: str | None = Query(default=None),
     q: str | None = Query(default=None),
     is_active: bool | None = Query(default=True),
     include_uncategorized: bool = Query(default=True),
@@ -55,6 +56,7 @@ async def search_topics(
         company_code=company_code,
         lang=lang,
         category_id=category_id,
+        category_code=category_code,
         q=q,
         is_active=is_active,
         include_uncategorized=include_uncategorized,
@@ -72,6 +74,7 @@ async def search_topics(
         filters={
             "lang": lang,
             "category_id": str(category_id) if category_id else None,
+            "category_code": category_code,
             "q": q,
             "is_active": is_active,
             "include_uncategorized": include_uncategorized,

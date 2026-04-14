@@ -144,6 +144,7 @@ class AITopicsService:
         company_code: Optional[str],
         lang: str | None,
         category_id: Optional[UUID],
+        category_code: Optional[str],
         q: Optional[str],
         is_active: Optional[bool],
         include_uncategorized: bool,
@@ -156,6 +157,7 @@ class AITopicsService:
         rows, total = await self.repo.list_topics(
             company_code=company_code,
             category_id=category_id,
+            category_code=category_code,
             q=q,
             is_active=is_active,
             include_uncategorized=include_uncategorized,
@@ -166,6 +168,7 @@ class AITopicsService:
         )
         items = [self._map_item(row, lang_norm) for row in rows]
         return AITopicsList(items=items), total
+
 
     async def get_topic_cards(
         self,

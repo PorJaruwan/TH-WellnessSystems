@@ -16,6 +16,7 @@ class AITopicsRepository:
         *,
         company_code: Optional[str],
         category_id: Optional[UUID],
+        category_code: Optional[str],
         q: Optional[str],
         is_active: Optional[bool],
         include_uncategorized: bool,
@@ -44,7 +45,12 @@ class AITopicsRepository:
         if category_id:
             where.append("t.ai_topic_category_id = :category_id")
             params["category_id"] = str(category_id)
-        elif not include_uncategorized:
+
+        if category_code:
+            where.append("c.category_code = :category_code")
+            params["category_code"] = category_code
+
+        if not include_uncategorized and not category_id and not category_code:
             where.append("t.ai_topic_category_id IS NOT NULL")
 
         if q:
@@ -142,56 +148,101 @@ class AITopicsRepository:
         rows = [dict(row._mapping) for row in result.fetchall()]
         return rows, total
 
+
     async def get_topic_cards(
         self,
         *,
         company_code: Optional[str],
         topic_code: str,
     ) -> Optional[dict[str, Any]]:
-        sql = text(
-            """
-            SELECT
-                t.id,
-                t.company_code,
-                t.topic_code,
-                t.label_th,
-                t.label_en,
-                t.topic_name_th,
-                t.topic_name_en,
-                t.description_th,
-                t.description_en,
-                t.default_cards,
-                t.is_active,
-                t.sort_order,
-                t.created_at,
-                t.updated_at,
-                t.ai_topic_category_id,
-                c.category_code,
-                c.category_name_th,
-                c.category_name_en
-            FROM public.ai_topics t
-            LEFT JOIN public.ai_topic_categories c
-                ON c.id = t.ai_topic_category_id
-            WHERE t.topic_code = :topic_code
-              AND t.is_deleted = false
-              AND t.is_active = true
-              AND (
-                    (:company_code IS NULL AND t.company_code IS NULL)
-                    OR t.company_code = :company_code
-                    OR t.company_code IS NULL
-                  )
-            ORDER BY
-                CASE WHEN t.company_code = :company_code THEN 0 ELSE 1 END,
-                t.sort_order ASC
-            LIMIT 1
-            """
-        )
-        result = await self.db.execute(
-            sql,
-            {
-                "topic_code": topic_code,
-                "company_code": company_code,
-            },
-        )
+        if company_code:
+            sql = text(
+                """
+                SELECT
+                    t.id,
+                    t.company_code,
+                    t.topic_code,
+                    t.label_th,
+                    t.label_en,
+                    t.topic_name_th,
+                    t.topic_name_en,
+                    t.description_th,
+                    t.description_en,
+                    t.default_cards,
+                    t.is_active,
+                    t.sort_order,
+                    t.created_at,
+                    t.updated_at,
+                    t.ai_topic_category_id,
+                    c.category_code,
+                    c.category_name_th,
+                    c.category_name_en
+                FROM public.ai_topics t
+                LEFT JOIN public.ai_topic_categories c
+                    ON c.id = t.ai_topic_category_id
+                WHERE t.topic_code = :topic_code
+                AND t.is_deleted = false
+                AND t.is_active = true
+                AND (
+                        t.company_code = :company_code
+                        OR t.company_code IS NULL
+                    )
+                ORDER BY
+                    CASE WHEN t.company_code = :company_code THEN 0 ELSE 1 END,
+                    t.sort_order ASC
+                LIMIT 1
+                """
+            )
+
+            result = await self.db.execute(
+                sql,
+                {
+                    "topic_code": topic_code,
+                    "company_code": company_code,
+                },
+            )
+        else:
+            sql = text(
+                """
+                SELECT
+                    t.id,
+                    t.company_code,
+                    t.topic_code,
+                    t.label_th,
+                    t.label_en,
+                    t.topic_name_th,
+                    t.topic_name_en,
+                    t.description_th,
+                    t.description_en,
+                    t.default_cards,
+                    t.is_active,
+                    t.sort_order,
+                    t.created_at,
+                    t.updated_at,
+                    t.ai_topic_category_id,
+                    c.category_code,
+                    c.category_name_th,
+                    c.category_name_en
+                FROM public.ai_topics t
+                LEFT JOIN public.ai_topic_categories c
+                    ON c.id = t.ai_topic_category_id
+                WHERE t.topic_code = :topic_code
+                AND t.is_deleted = false
+                AND t.is_active = true
+                AND t.company_code IS NULL
+                ORDER BY
+                    t.sort_order ASC
+                LIMIT 1
+                """
+            )
+
+            result = await self.db.execute(
+                sql,
+                {
+                    "topic_code": topic_code,
+                },
+            )
+
         row = result.mappings().first()
         return dict(row) if row else None
+

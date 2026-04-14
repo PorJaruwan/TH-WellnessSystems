@@ -73,6 +73,22 @@ def get_api_router() -> APIRouter:
     from app.api.v1.modules.doctors import router as doctors_router
     api_router.include_router(doctors_router)
 
+    
+    # -------------------------
+    # Doctor Dashboard (Facade Router Only)
+    # -------------------------
+    from app.api.v1.modules.doctor_dashboard.routers.doctor_dashboard_query_router import (
+        router as doctor_dashboard_query_router,
+    )
+    api_router.include_router(doctor_dashboard_query_router)
+
+    # from app.api.v1.modules.doctor_dashboard.routers.doctor_dashboard_action_router import (
+    #     router as doctor_dashboard_action_router,
+    # )
+    # api_router.include_router(doctor_dashboard_action_router)
+
+
+
     # -------------------------
     # Users (Facade)  ✅ FIXED
     # -------------------------
